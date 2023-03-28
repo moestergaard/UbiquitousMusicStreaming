@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">UbiquitousMusicStreaming</string>
+    <string name="title_music">Musik</string>
+    <string name="title_system">Lokation</string>
+    <string name="title_configuring">Konfigurering</string>
+</resources>
