@@ -1,6 +1,7 @@
 package com.example.ubiquitousmusicstreaming;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.wifi.ScanResult;
@@ -32,6 +33,12 @@ import com.spotify.android.appremote.api.SpotifyAppRemote;
 import com.spotify.protocol.client.Subscription;
 import com.spotify.protocol.types.PlayerState;
 import com.spotify.protocol.types.Track;
+import com.spotify.sdk.android.auth.AuthorizationClient;
+import com.spotify.sdk.android.auth.AuthorizationRequest;
+import com.spotify.sdk.android.auth.AuthorizationResponse;
+//import com.spotify.sdk.android.auth.AuthorizationClient;
+//import com.spotify.sdk.android.auth.AuthorizationRequest;
+//import com.spotify.sdk.android.auth.AuthorizationResponse;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -50,7 +57,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String CLIENT_ID = "6e101d8a913048819b5af5e6ee372b59";
     private static final String REDIRECT_URI = "ubiquitousmusicstreaming-login://callback";
     //private static final String REDIRECT_URI = "http://com.yourdomain.yourapp/callback";
-    private SpotifyAppRemote mSpotifyAppRemote;
+    private static SpotifyAppRemote mSpotifyAppRemote;
+    private static String ACCESS_TOKEN;
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -96,7 +104,46 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         wifiReceiver.attach(this); // Adding this mainActivity as an observer.
         dm = new DataManagement();
+
+        // Authorize spotify
+        AuthorizationRequest.Builder builder =
+                new AuthorizationRequest.Builder(CLIENT_ID, AuthorizationResponse.Type.TOKEN, REDIRECT_URI);
+
+        builder.setScopes(new String[]{"streaming"});
+        AuthorizationRequest request = builder.build();
+
+        AuthorizationClient.openLoginActivity(this, REQUEST_CODE, request);
+
+
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+
+        // Check if result comes from the correct activity
+        if (requestCode == REQUEST_CODE) {
+            AuthorizationResponse response = AuthorizationClient.getResponse(resultCode, intent);
+
+            switch (response.getType()) {
+                // Response was successful and contains auth token
+                case TOKEN:
+                    ACCESS_TOKEN = response.getAccessToken();
+                    // Handle successful response
+                    break;
+
+                // Auth flow returned an error
+                case ERROR:
+                    // Handle error response
+                    break;
+
+                // Most likely auth flow was cancelled
+                default:
+                    // Handle other cases
+            }
+        }
+    }
+
 
     @Override
     protected void onStart() {
@@ -134,8 +181,16 @@ public class MainActivity extends AppCompatActivity {
     private void connected() {
         // Then we will write some more code here.
         // Play a playlist
-        mSpotifyAppRemote.getPlayerApi().play("spotify:playlist:37i9dQZF1DX7K31D69s4M1");
+
+        //mSpotifyAppRemote.getPlayerApi().play("spotify:playlist:37i9dQZF1DX7K31D69s4M1");
+
+
+        System.out.println(mSpotifyAppRemote.getConnectApi());
+
+
+
         // Subscribe to PlayerState
+        /*
         mSpotifyAppRemote.getPlayerApi()
                 .subscribeToPlayerState()
                 .setEventCallback(playerState -> {
@@ -144,6 +199,8 @@ public class MainActivity extends AppCompatActivity {
                         Log.d("MainActivity", track.name + " by " + track.artist.name);
                     }
                 });
+
+         */
     }
 
     @Override
@@ -151,6 +208,9 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
         SpotifyAppRemote.disconnect(mSpotifyAppRemote);
         // Aaand we will finish off here.
+
+        //mSpotifyAppRemote.getConnectApi().
+
     }
 
     public static WifiReceiver getWifiReceiver() {
@@ -160,6 +220,12 @@ public class MainActivity extends AppCompatActivity {
     public static WifiManager getWifiManager() {
         return wifiManager;
     }
+
+    public static String getAccessToken() {
+        return ACCESS_TOKEN;
+    }
+
+    public static SpotifyAppRemote getmSpotifyAppRemote() { return mSpotifyAppRemote; }
 
     public void setInUse(Boolean bool) {
         if (bool) {

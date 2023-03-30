@@ -1,10 +1,13 @@
 package com.example.ubiquitousmusicstreaming.ui.music;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.telecom.Call;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,14 +24,26 @@ import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.appcompat.widget.AppCompatSeekBar;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.ubiquitousmusicstreaming.MainActivity;
+import com.example.ubiquitousmusicstreaming.R;
 import com.example.ubiquitousmusicstreaming.databinding.FragmentMusicBinding;
+import com.google.android.material.snackbar.Snackbar;
+import com.spotify.android.appremote.api.SpotifyAppRemote;
+import com.spotify.sdk.android.auth.AuthorizationClient;
+import com.spotify.sdk.android.auth.AuthorizationRequest;
+import com.spotify.sdk.android.auth.AuthorizationResponse;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -55,6 +70,17 @@ import com.spotify.protocol.types.Repeat;
 
 
  */
+/*
+import com.spotify.sdk.android.auth.AuthorizationClient;
+import com.spotify.sdk.android.auth.AuthorizationRequest;
+import com.spotify.sdk.android.auth.AuthorizationResponse;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+*/
+
 
 
 public class MusicFragment extends Fragment {
@@ -63,14 +89,31 @@ public class MusicFragment extends Fragment {
 
     private static final String TAG = MusicFragment.class.getSimpleName();
 
-    private static final String CLIENT_ID = "089d841ccc194c10a77afad9e1c11d54";
-    private static final String REDIRECT_URI = "comspotifytestsdk://callback";
+    private static final int REQUEST_CODE = 1337;
+    private static final String CLIENT_ID = "6e101d8a913048819b5af5e6ee372b59";
+    private static final String REDIRECT_URI = "ubiquitousmusicstreaming-login://callback";
 
     private static final String TRACK_URI = "spotify:track:4IWZsfEkaK49itBwCTFDXQ";
     private static final String ALBUM_URI = "spotify:album:4nZ5wPL5XxSY2OuDgbnYdc";
     private static final String ARTIST_URI = "spotify:artist:3WrFJ7ztbogyGnTHbHJFl2";
     private static final String PLAYLIST_URI = "spotify:playlist:37i9dQZEVXbMDoHDwVN2tF";
     private static final String PODCAST_URI = "spotify:show:2tgPYIeGErjk6irHRhk9kj";
+
+    //public static final String CLIENT_ID = "0bda033615af412eb05a8ce97d44fec2";
+    public static final int AUTH_TOKEN_REQUEST_CODE = 0x10;
+    public static final int AUTH_CODE_REQUEST_CODE = 0x11;
+
+    //private final OkHttpClient mOkHttpClient = new OkHttpClient();
+    private String mAccessToken;
+    private String mAccessCode;
+    private Call mCall;
+
+    private MainActivity mainActivity;
+    private SpotifyAppRemote mSpotifyAppRemote;
+    private static String ACCESS_TOKEN;
+    private Button btnToken, btnProfile, btnSpeakers;
+
+
 
     /*
     private static SpotifyAppRemote mSpotifyAppRemote;
@@ -222,12 +265,39 @@ public class MusicFragment extends Fragment {
                 new ViewModelProvider(this).get(MusicViewModel.class);
 
         binding = FragmentMusicBinding.inflate(inflater, container, false);
+        mainActivity = (MainActivity) getParentFragment().getActivity();
+        ACCESS_TOKEN = mainActivity.getAccessToken();
+        mSpotifyAppRemote = mainActivity.getmSpotifyAppRemote();
         View root = binding.getRoot();
 
-        final TextView textView = binding.textHome;
-        musicViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+        btnToken = binding.tokenButton;
+        btnProfile = binding.buttonGetProfile;
+        btnSpeakers = binding.buttonGetSpeakers;
+
+        btnToken.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final TextView textView = binding.tokenTextView;
+                ACCESS_TOKEN = mainActivity.getAccessToken();
+                textView.setText(ACCESS_TOKEN);
+                System.out.println(ACCESS_TOKEN);
+            }
+        });
+
+        btnProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final TextView textViewProfile = binding.responseTextView;
+                textViewProfile.setText(mSpotifyAppRemote.getUserApi().getCapabilities().toString());
+            }
+        });
+
+
+        //final TextView textView = binding.textHome;
+        //musicViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
+
 
     @Override
     public void onDestroyView() {
@@ -236,6 +306,145 @@ public class MusicFragment extends Fragment {
     }
 
 
+
+
+    /*
+    public void onGetSpeakersClicked(View view) {
+        if (mAccessToken == null) {
+            final Snackbar snackbar = Snackbar.make(getView(R.id.activity_main), R.string.warning_need_token, Snackbar.LENGTH_SHORT);
+            snackbar.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.colorAccent));
+            snackbar.show();
+            return;
+        }
+
+        final Request request = new Request.Builder()
+                .url("https://api.spotify.com/v1/me/player/devices")
+                .addHeader("Authorization","Bearer " + mAccessToken)
+                .build();
+
+        cancelCall();
+        mCall = mOkHttpClient.newCall(request);
+
+        mCall.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                setResponse("Failed to fetch data: " + e);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try {
+                    final JSONObject jsonObject = new JSONObject(response.body().string());
+                    setResponse(jsonObject.toString(3));
+                } catch (JSONException e) {
+                    setResponse("Failed to parse data: " + e);
+                }
+            }
+        });
+    }
+
+    public void onGetUserProfileClicked(View view) {
+        if (mAccessToken == null) {
+            final Snackbar snackbar = Snackbar.make(findViewById(R.id.activity_main), R.string.warning_need_token, Snackbar.LENGTH_SHORT);
+            snackbar.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.colorAccent));
+            snackbar.show();
+            return;
+        }
+
+        final Request request = new Request.Builder()
+                .url("https://api.spotify.com/v1/me")
+                .addHeader("Authorization","Bearer " + mAccessToken)
+                .build();
+
+        cancelCall();
+        mCall = mOkHttpClient.newCall(request);
+
+        mCall.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                setResponse("Failed to fetch data: " + e);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try {
+                    final JSONObject jsonObject = new JSONObject(response.body().string());
+                    setResponse(jsonObject.toString(3));
+                } catch (JSONException e) {
+                    setResponse("Failed to parse data: " + e);
+                }
+            }
+        });
+    }
+
+    public void onRequestCodeClicked(View view) {
+        final AuthorizationRequest request = getAuthenticationRequest(AuthorizationResponse.Type.CODE);
+        AuthorizationClient.openLoginActivity(this, AUTH_CODE_REQUEST_CODE, request);
+    }
+
+    public void onRequestTokenClicked(View view) {
+        final AuthorizationRequest request = getAuthenticationRequest(AuthorizationResponse.Type.TOKEN);
+        AuthorizationClient.openLoginActivity(this, AUTH_TOKEN_REQUEST_CODE, request);
+    }
+
+    private AuthorizationRequest getAuthenticationRequest(AuthorizationResponse.Type type) {
+        return new AuthorizationRequest.Builder(CLIENT_ID, type, getRedirectUri().toString())
+                .setShowDialog(false)
+                //.setScopes(new String[]{"user-read-email"})
+                .setScopes(new String[]{"australiadk17@gmail.com"})
+                //.setCampaign("your-campaign-token")
+                .setCampaign("e8123d225a2341c1a4780d37a70c89d6")
+                .build();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        final AuthorizationResponse response = AuthorizationClient.getResponse(resultCode, data);
+        if (response.getError() != null && !response.getError().isEmpty()) {
+            setResponse(response.getError());
+        }
+        if (requestCode == AUTH_TOKEN_REQUEST_CODE) {
+            mAccessToken = response.getAccessToken();
+            updateTokenView();
+        } else if (requestCode == AUTH_CODE_REQUEST_CODE) {
+            mAccessCode = response.getCode();
+            updateCodeView();
+        }
+    }
+
+    private void setResponse(final String text) {
+        runOnUiThread(() -> {
+            final TextView responseView = findViewById(R.id.response_text_view);
+            responseView.setText(text);
+        });
+    }
+
+    private void updateTokenView() {
+        final TextView tokenView = findViewById(R.id.token_text_view);
+        tokenView.setText(getString(R.string.token, mAccessToken));
+    }
+
+    private void updateCodeView() {
+        final TextView codeView = findViewById(R.id.code_text_view);
+        codeView.setText(getString(R.string.code, mAccessCode));
+    }
+
+    private void cancelCall() {
+        if (mCall != null) {
+            mCall.cancel();
+        }
+    }
+
+    private Uri getRedirectUri() {
+        return new Uri.Builder()
+                .scheme(getString(R.string.com_spotify_sdk_redirect_scheme))
+                .authority(getString(R.string.com_spotify_sdk_redirect_host))
+                .build();
+    }
+
+
+     */
 
 
 

@@ -49,4 +49,6 @@ dependencies {
     //implementation files('../libs/spotify-app-remote-release-0.7.2.aar')
     //implementation project(':spotify-app-remote')
     implementation "com.google.code.gson:gson:2.6.1"
+    implementation 'com.spotify.android:auth:1.2.5' // Maven dependency
+    implementation 'androidx.browser:browser:1.0.0'
 }

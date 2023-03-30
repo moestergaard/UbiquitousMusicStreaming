@@ -6,17 +6,60 @@
     android:layout_height="match_parent"
     tools:context=".ui.music.MusicFragment">
 
-    <TextView
-        android:id="@+id/text_home"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/token_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            tools:text="Token: 089d841ccc194c10a77afad9e1c11d54" />
+
+        <Button
+            android:id="@+id/token_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="Request Token" />
+
+        <TextView
+            android:id="@+id/code_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            tools:text="Code: 089d841ccc194c10a77afad9e1c11d54" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="8dp"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/response_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                tools:text="Line 1\nLine 2\nLine 3" />
+
+        </ScrollView>
+
+        <Button
+            android:id="@+id/buttonGetSpeakers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="Get Speakers" />
+
+        <Button
+            android:id="@+id/buttonGetProfile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="Get User Profile" />
+
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
