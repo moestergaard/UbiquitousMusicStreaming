@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -36,6 +37,8 @@ import com.spotify.protocol.types.Track;
 import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
+
+import okhttp3.OkHttpClient;
 //import com.spotify.sdk.android.auth.AuthorizationClient;
 //import com.spotify.sdk.android.auth.AuthorizationRequest;
 //import com.spotify.sdk.android.auth.AuthorizationResponse;
@@ -43,6 +46,7 @@ import com.spotify.sdk.android.auth.AuthorizationResponse;
 
 public class MainActivity extends AppCompatActivity {
 
+    //static OkHttpClient mOkHttpClient;
     private ActivityMainBinding binding;
     private Integer REQUEST_CODE = 42;
     private static WifiReceiver wifiReceiver;
@@ -55,10 +59,12 @@ public class MainActivity extends AppCompatActivity {
     private static String[] locations = new String[]{"Kontor", "Stue", "Køkken"};
 
     private static final String CLIENT_ID = "6e101d8a913048819b5af5e6ee372b59";
+    //public static final String CLIENT_ID = "0bda033615af412eb05a8ce97d44fec2";
     private static final String REDIRECT_URI = "ubiquitousmusicstreaming-login://callback";
     //private static final String REDIRECT_URI = "http://com.yourdomain.yourapp/callback";
     private static SpotifyAppRemote mSpotifyAppRemote;
     private static String ACCESS_TOKEN;
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -105,11 +111,13 @@ public class MainActivity extends AppCompatActivity {
         wifiReceiver.attach(this); // Adding this mainActivity as an observer.
         dm = new DataManagement();
 
+        //mOkHttpClient = new OkHttpClient();
+
         // Authorize spotify
         AuthorizationRequest.Builder builder =
                 new AuthorizationRequest.Builder(CLIENT_ID, AuthorizationResponse.Type.TOKEN, REDIRECT_URI);
 
-        builder.setScopes(new String[]{"streaming"});
+        builder.setScopes(new String[]{"streaming", "user-read-email", "user-read-currently-playing", "user-read-playback-state"});
         AuthorizationRequest request = builder.build();
 
         AuthorizationClient.openLoginActivity(this, REQUEST_CODE, request);
@@ -177,6 +185,13 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
+    private Uri getRedirectUri() {
+        return new Uri.Builder()
+                .scheme(getString(R.string.com_spotify_sdk_redirect_scheme))
+                .authority(getString(R.string.com_spotify_sdk_redirect_host))
+                .build();
+    }
+
 
     private void connected() {
         // Then we will write some more code here.
@@ -226,6 +241,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static SpotifyAppRemote getmSpotifyAppRemote() { return mSpotifyAppRemote; }
+
+    //public static OkHttpClient getOkHttpClient() { return mOkHttpClient; }
 
     public void setInUse(Boolean bool) {
         if (bool) {

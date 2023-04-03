@@ -7,7 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.telecom.Call;
+//import android.telecom.Call;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,12 +43,26 @@ import com.spotify.sdk.android.auth.AuthorizationResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
+
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.Call;
 
 /*
 import com.google.gson.Gson;
@@ -74,6 +88,8 @@ import com.spotify.protocol.types.Repeat;
 import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
+*/
+/*
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -99,11 +115,11 @@ public class MusicFragment extends Fragment {
     private static final String PLAYLIST_URI = "spotify:playlist:37i9dQZEVXbMDoHDwVN2tF";
     private static final String PODCAST_URI = "spotify:show:2tgPYIeGErjk6irHRhk9kj";
 
-    //public static final String CLIENT_ID = "0bda033615af412eb05a8ce97d44fec2";
+    // public static final String CLIENT_ID = "0bda033615af412eb05a8ce97d44fec2";
     public static final int AUTH_TOKEN_REQUEST_CODE = 0x10;
     public static final int AUTH_CODE_REQUEST_CODE = 0x11;
 
-    //private final OkHttpClient mOkHttpClient = new OkHttpClient();
+    private OkHttpClient mOkHttpClient = new OkHttpClient();
     private String mAccessToken;
     private String mAccessCode;
     private Call mCall;
@@ -112,6 +128,8 @@ public class MusicFragment extends Fragment {
     private SpotifyAppRemote mSpotifyAppRemote;
     private static String ACCESS_TOKEN;
     private Button btnToken, btnProfile, btnSpeakers;
+    private static TextView txtViewUserProfile;
+
 
 
 
@@ -273,6 +291,8 @@ public class MusicFragment extends Fragment {
         btnToken = binding.tokenButton;
         btnProfile = binding.buttonGetProfile;
         btnSpeakers = binding.buttonGetSpeakers;
+        txtViewUserProfile = binding.responseTextView;
+
 
         btnToken.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -287,15 +307,122 @@ public class MusicFragment extends Fragment {
         btnProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                /*
                 final TextView textViewProfile = binding.responseTextView;
-                textViewProfile.setText(mSpotifyAppRemote.getUserApi().getCapabilities().toString());
+                URL url = null;
+                HttpURLConnection urlConnection = null;
+                String server_response;
+                try {
+                    url = new URL("https://api.spotify.com/v1/me");
+                    urlConnection = (HttpURLConnection) url.openConnection();
+
+                    int responseCode = urlConnection.getResponseCode();
+                    System.out.println(responseCode);
+
+                    if(responseCode == HttpURLConnection.HTTP_OK){
+                        server_response = readStream(urlConnection.getInputStream());
+                        final JSONObject jsonObject;
+                        try {
+                            jsonObject = new JSONObject(server_response);
+                            textViewProfile.setText(jsonObject.toString(3));
+                        } catch (JSONException e) {
+                            System.out.println(e.toString());
+                            //throw new RuntimeException(e);
+                        }
+                    }
+                    InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+                    readStream(in);
+                } catch (MalformedURLException e) {
+                    System.out.println(e.toString());
+                    //throw new RuntimeException(e);
+                } catch (IOException e) {
+                    System.out.println(e.toString());
+                    //throw new RuntimeException(e);
+                }
+
+                finally {
+                    urlConnection.disconnect();
+                }
+                */
+                //OkHttpClient mOkHttpClient = mainActivity.getOkHttpClient();
+                //TextView textViewProfile = binding.responseTextView;
+
+                final Request request = new Request.Builder()
+                        .url("https://api.spotify.com/v1/me")
+                        .addHeader("Authorization","Bearer " + mainActivity.getAccessToken())
+                        .build();
+
+                System.out.println("Access token: " + mainActivity.getAccessToken());
+
+                cancelCall();
+                mCall = mOkHttpClient.newCall(request);
+
+                mCall.enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        //txtViewUserProfile.setText("Failed to fetch data: " + e);
+                        setResponse("Failed to fetch data: " + e);
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        try {
+                            final JSONObject jsonObject = new JSONObject(response.body().string());
+                            System.out.println("jsonObject: " + jsonObject);
+                            System.out.println("jsonObject to string: " + jsonObject.toString());
+                            //txtViewUserProfile.setText(jsonObject.toString());
+                            //setResponse("hello world!");
+                            setResponse(jsonObject.toString(3));
+                        } catch (JSONException e) {
+                            //txtViewUserProfile.setText("Failed to parse data: " + e);
+                            setResponse("Failed to parse data: " + e);
+                        }
+                    }
+                });
+
+
+                //textViewProfile.setText(mSpotifyAppRemote.getUserApi().getCapabilities().toString());
             }
         });
+
+        /*
+        btnSpeakers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final TextView
+            }
+        });
+         */
 
 
         //final TextView textView = binding.textHome;
         //musicViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
+    }
+
+    // Converting InputStream to String
+
+    private String readStream(InputStream in) {
+        BufferedReader reader = null;
+        StringBuffer response = new StringBuffer();
+        try {
+            reader = new BufferedReader(new InputStreamReader(in));
+            String line = "";
+            while ((line = reader.readLine()) != null) {
+                response.append(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return response.toString();
     }
 
 
@@ -304,6 +431,24 @@ public class MusicFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+
+    private void cancelCall() {
+        if (mCall != null) {
+            mCall.cancel();
+        }
+    }
+
+    private void setResponse(String response) {
+        System.out.println("Reponse to put in txt view: " + response);
+        mainActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                txtViewUserProfile.setText(response);
+            }
+        });
+    }
+
+
 
 
 
