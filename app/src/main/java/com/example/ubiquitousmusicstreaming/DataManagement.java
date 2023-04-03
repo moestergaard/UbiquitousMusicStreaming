@@ -200,7 +200,7 @@ public class DataManagement {
     private static double[] softmax(double[] matrice) {
         for (int i = 0; i < matrice.length; i++) {
             matrice[i] = Math.exp(matrice[i]);
-            System.out.println("matrice i" + matrice[i]);
+            //System.out.println("matrice i" + matrice[i]);
         }
         double sum = Arrays.stream(matrice).sum();
 

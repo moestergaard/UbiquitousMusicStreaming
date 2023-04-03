@@ -34,12 +34,14 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.ubiquitousmusicstreaming.MainActivity;
 import com.example.ubiquitousmusicstreaming.R;
 import com.example.ubiquitousmusicstreaming.databinding.FragmentMusicBinding;
+import com.example.ubiquitousmusicstreaming.ui.location.LocationFragment;
 import com.google.android.material.snackbar.Snackbar;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
 import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -54,13 +56,16 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 
 import okhttp3.Callback;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.Call;
 
@@ -126,9 +131,10 @@ public class MusicFragment extends Fragment {
 
     private MainActivity mainActivity;
     private SpotifyAppRemote mSpotifyAppRemote;
-    private static String ACCESS_TOKEN;
+    private static String ACCESS_TOKEN, playingLocation = "";
     private Button btnToken, btnProfile, btnSpeakers;
     private static TextView txtViewUserProfile;
+    private static Hashtable<String, String> locationSpeakerID = new Hashtable<>();
 
 
 
@@ -284,6 +290,8 @@ public class MusicFragment extends Fragment {
 
         binding = FragmentMusicBinding.inflate(inflater, container, false);
         mainActivity = (MainActivity) getParentFragment().getActivity();
+        mainActivity.attachMusicFragment(MusicFragment.this);
+
         ACCESS_TOKEN = mainActivity.getAccessToken();
         mSpotifyAppRemote = mainActivity.getmSpotifyAppRemote();
         View root = binding.getRoot();
@@ -292,6 +300,8 @@ public class MusicFragment extends Fragment {
         btnProfile = binding.buttonGetProfile;
         btnSpeakers = binding.buttonGetSpeakers;
         txtViewUserProfile = binding.responseTextView;
+
+        initializeLocationSpeakerID();
 
 
         btnToken.setOnClickListener(new View.OnClickListener() {
@@ -307,52 +317,10 @@ public class MusicFragment extends Fragment {
         btnProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*
-                final TextView textViewProfile = binding.responseTextView;
-                URL url = null;
-                HttpURLConnection urlConnection = null;
-                String server_response;
-                try {
-                    url = new URL("https://api.spotify.com/v1/me");
-                    urlConnection = (HttpURLConnection) url.openConnection();
-
-                    int responseCode = urlConnection.getResponseCode();
-                    System.out.println(responseCode);
-
-                    if(responseCode == HttpURLConnection.HTTP_OK){
-                        server_response = readStream(urlConnection.getInputStream());
-                        final JSONObject jsonObject;
-                        try {
-                            jsonObject = new JSONObject(server_response);
-                            textViewProfile.setText(jsonObject.toString(3));
-                        } catch (JSONException e) {
-                            System.out.println(e.toString());
-                            //throw new RuntimeException(e);
-                        }
-                    }
-                    InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-                    readStream(in);
-                } catch (MalformedURLException e) {
-                    System.out.println(e.toString());
-                    //throw new RuntimeException(e);
-                } catch (IOException e) {
-                    System.out.println(e.toString());
-                    //throw new RuntimeException(e);
-                }
-
-                finally {
-                    urlConnection.disconnect();
-                }
-                */
-                //OkHttpClient mOkHttpClient = mainActivity.getOkHttpClient();
-                //TextView textViewProfile = binding.responseTextView;
-
                 final Request request = new Request.Builder()
                         .url("https://api.spotify.com/v1/me")
                         .addHeader("Authorization","Bearer " + mainActivity.getAccessToken())
                         .build();
-
-                System.out.println("Access token: " + mainActivity.getAccessToken());
 
                 cancelCall();
                 mCall = mOkHttpClient.newCall(request);
@@ -360,7 +328,6 @@ public class MusicFragment extends Fragment {
                 mCall.enqueue(new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
-                        //txtViewUserProfile.setText("Failed to fetch data: " + e);
                         setResponse("Failed to fetch data: " + e);
                     }
 
@@ -368,31 +335,46 @@ public class MusicFragment extends Fragment {
                     public void onResponse(Call call, Response response) throws IOException {
                         try {
                             final JSONObject jsonObject = new JSONObject(response.body().string());
-                            System.out.println("jsonObject: " + jsonObject);
-                            System.out.println("jsonObject to string: " + jsonObject.toString());
-                            //txtViewUserProfile.setText(jsonObject.toString());
-                            //setResponse("hello world!");
                             setResponse(jsonObject.toString(3));
                         } catch (JSONException e) {
-                            //txtViewUserProfile.setText("Failed to parse data: " + e);
                             setResponse("Failed to parse data: " + e);
                         }
                     }
                 });
-
-
-                //textViewProfile.setText(mSpotifyAppRemote.getUserApi().getCapabilities().toString());
             }
         });
 
-        /*
+
         btnSpeakers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final TextView
+                final Request request = new Request.Builder()
+                        .url("https://api.spotify.com/v1/me/player/devices")
+                        .addHeader("Authorization","Bearer " + mainActivity.getAccessToken())
+                        .build();
+
+                cancelCall();
+                mCall = mOkHttpClient.newCall(request);
+
+                mCall.enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        setResponse("Failed to fetch data: " + e);
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        try {
+                            final JSONObject jsonObject = new JSONObject(response.body().string());
+                            setResponse(jsonObject.toString(3));
+                        } catch (JSONException e) {
+                            setResponse("Failed to parse data: " + e);
+                        }
+                    }
+                });
             }
         });
-         */
+
 
 
         //final TextView textView = binding.textHome;
@@ -432,6 +414,47 @@ public class MusicFragment extends Fragment {
         binding = null;
     }
 
+    public void updateSpeaker(String location) {
+        if(playingLocation != location) {
+            playingLocation = location;
+
+            String speakerID = locationSpeakerID.get(location);
+
+            JSONArray device = new JSONArray();
+            device.put(speakerID);
+
+            JSONObject body = new JSONObject();
+            try {
+                body.put("device_ids", device);
+                body.put("play", true);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+
+            MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+            RequestBody requestBody = RequestBody.create(JSON, String.valueOf(body));
+
+            final Request request = new Request.Builder()
+                    .url("https://api.spotify.com/v1/me/player")
+                    .put(requestBody)
+                    .addHeader("Authorization","Bearer " + mainActivity.getAccessToken())
+                    .build();
+
+            cancelCall();
+            mCall = mOkHttpClient.newCall(request);
+
+            mCall.enqueue(new Callback() {
+
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    setResponse("Noget gik galt.");
+                }
+                @Override
+                public void onResponse(Call call, Response response) { }
+            });
+        }
+    }
+
     private void cancelCall() {
         if (mCall != null) {
             mCall.cancel();
@@ -446,6 +469,12 @@ public class MusicFragment extends Fragment {
                 txtViewUserProfile.setText(response);
             }
         });
+    }
+
+    private void initializeLocationSpeakerID() {
+        locationSpeakerID.put("Køkken", "9421d826c2f75f49a95085a1063b9f74c8581cbb");
+        locationSpeakerID.put("Kontor", "55ee551079c70a6e720fb7af7ed1455b050f0c37");
+        locationSpeakerID.put("Stue", "1af54257b625e17733f383612d7e027ad658bee2");
     }
 
 

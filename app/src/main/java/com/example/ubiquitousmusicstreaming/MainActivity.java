@@ -13,6 +13,7 @@ import android.util.Log;
 
 import com.example.ubiquitousmusicstreaming.ui.configuration.ConfigurationFragment;
 import com.example.ubiquitousmusicstreaming.ui.location.LocationFragment;
+import com.example.ubiquitousmusicstreaming.ui.music.MusicFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,6 +39,10 @@ import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import okhttp3.OkHttpClient;
 //import com.spotify.sdk.android.auth.AuthorizationClient;
 //import com.spotify.sdk.android.auth.AuthorizationRequest;
@@ -53,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     private static WifiManager wifiManager;
     private static ConfigurationFragment configurationFragment;
     private static LocationFragment locationFragment;
+    private static MusicFragment musicFragment;
     private static Boolean inUse = false, inUseTemp;
     private static DataManagement dm;
     private static String predictedRoom, previousLocation;
@@ -121,7 +127,6 @@ public class MainActivity extends AppCompatActivity {
         AuthorizationRequest request = builder.build();
 
         AuthorizationClient.openLoginActivity(this, REQUEST_CODE, request);
-
 
     }
 
@@ -252,6 +257,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void attachMusicFragment(MusicFragment musicFragment) { this.musicFragment = musicFragment; }
     public void attachConfigurationFragment(ConfigurationFragment configurationFragment) { this.configurationFragment = configurationFragment; }
 
     public void attachLocationFragment(LocationFragment locationFragment) { this.locationFragment = locationFragment; }
@@ -260,7 +266,9 @@ public class MainActivity extends AppCompatActivity {
 
     public static void update() {
         if(!inUse) {
-            configurationFragment.update();
+            if(configurationFragment != null) {
+                configurationFragment.update();
+            }
         }
         else {
             List<ScanResult> scanResults = wifiReceiver.getScanResult();
@@ -309,6 +317,7 @@ public class MainActivity extends AppCompatActivity {
         }
         if(inUseTemp) {
             if (quessedRoom.equals("")) {
+                musicFragment.updateSpeaker(predictedRoom);
                 locationFragment.SetTextView("Lokation: " + predictedRoom);
             }
 
@@ -316,9 +325,9 @@ public class MainActivity extends AppCompatActivity {
             //System.out.println("Lokation string: " + location.toString());
             //System.out.println("Lokation length: " + location.length);
             wifiManager.startScan();
-            for (double d : location) {
-                System.out.println("Value: " + d);
-            }
+            //for (double d : location) {
+            //    System.out.println("Value: " + d);
+            //}
         }
         else { inUse = false; }
     }
