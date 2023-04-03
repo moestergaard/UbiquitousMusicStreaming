@@ -50,7 +50,7 @@ public class ConfigurationFragment extends Fragment {
     Button buttonStartScanning, buttonGetResultScanning;
     TextView textViewStartScanning, textViewStopScanning;
     String room, displayGetScanResult, lastScanResults = "";
-    String FILE_NAME = "WifiData230324.txt";
+    String FILE_NAME = "WifiData230403.txt";
     String[] locations = new String[]{"Kontor", "Stue", "Køkken"};
     List<ScanResult> scanResults;
     Boolean scan = false;
@@ -74,7 +74,7 @@ public class ConfigurationFragment extends Fragment {
         textViewStartScanning = binding.textRoom;
         textViewStopScanning = binding.textStopScanning;
 
-        // makeFile(new View(this));
+        // makeFile(new View(mainActivity));
 
         buttonStartScanning.setOnClickListener(new View.OnClickListener() {
             @Override
