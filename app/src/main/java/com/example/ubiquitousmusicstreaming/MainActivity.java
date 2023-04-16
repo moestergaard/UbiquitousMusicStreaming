@@ -241,6 +241,10 @@ public class MainActivity extends AppCompatActivity {
         return wifiManager;
     }
 
+    public static void startScan() {
+        wifiManager.startScan();
+    }
+
     public static String getAccessToken() {
         return ACCESS_TOKEN;
     }
@@ -271,7 +275,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         else {
-            List<ScanResult> scanResults = wifiReceiver.getScanResult();
+            List<ScanResult> scanResults = wifiManager.getScanResults();
             printLocation(scanResults);
         }
     }
