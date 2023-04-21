@@ -51,7 +51,7 @@ public class WifiReceiver extends BroadcastReceiver {
 
 
     private void notifyMainActivity() {
-        mainActivity.update()
+        mainActivity.update();
     }
 
     public List<ScanResult> getScanResult() {

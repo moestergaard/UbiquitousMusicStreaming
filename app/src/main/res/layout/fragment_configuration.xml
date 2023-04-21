@@ -2,103 +2,65 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/ConfigurationFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_centerInParent="true"
-    android:layout_gravity="center"
-    android:gravity="center"
-    android:padding="20dp"
     tools:context=".ui.configuration.ConfigurationFragment">
 
-    <Button
-        android:id="@+id/btnStartScanning"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/editTextRoom"
-        android:layout_centerInParent="true"
-        android:gravity="center"
-        android:paddingStart="20dp"
-        android:paddingTop="20dp"
-        android:paddingEnd="20dp"
-        android:paddingBottom="20dp"
-        android:text="Start Wifi Scanning"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/editTextRoom" />
-
-    <Button
-        android:id="@+id/btnStopScanning"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/btnStartScanning"
-        android:layout_centerInParent="true"
-        android:gravity="center"
-        android:paddingStart="20dp"
-        android:paddingTop="20dp"
-        android:paddingEnd="20dp"
-        android:paddingBottom="20dp"
-        android:text="Stop Wifi Scanning"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/btnStartScanning" />
-
-    <TextView
-        android:id="@+id/textRoom"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/btnStopScanning"
-        android:layout_centerInParent="true"
-        android:gravity="center"
-        android:paddingStart="20dp"
-        android:paddingTop="20dp"
-        android:paddingEnd="20dp"
-        android:paddingBottom="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/btnStopScanning" />
-
-    <TextView
-        android:id="@+id/textStopScanning"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/btnStopScanning"
-        android:layout_centerInParent="true"
-        android:gravity="center"
-        android:paddingStart="20dp"
-        android:paddingTop="20dp"
-        android:paddingEnd="20dp"
-        android:paddingBottom="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/btnStopScanning" />
-
-    <EditText
-        android:id="@+id/editTextRoom"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:autofillHints="Skriv rummets navn"
-        android:ems="10"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="60dp"
+        android:orientation="vertical"
         android:gravity="center"
-        android:hint="Skriv rummets navn"
-        android:inputType="textPersonName"
-        android:paddingStart="20dp"
-        android:paddingTop="20dp"
-        android:paddingEnd="20dp"
-        android:paddingBottom="20dp"
-        android:textColorHint="@android:color/darker_gray"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.023" />
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <Switch
+            android:id="@+id/switch1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Switch" />
+
+        <EditText
+            android:id="@+id/editTextRoom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints="Skriv rummets navn"
+            android:ems="10"
+            android:gravity="center"
+            android:hint="Skriv rummets navn"
+            android:inputType="textPersonName"
+            android:layout_margin="8dp"
+            android:textColorHint="@android:color/darker_gray"/>
+
+        <TextView
+            android:id="@+id/textRoom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_margin="8dp"/>
+
+        <TextView
+            android:id="@+id/textStopScanning"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_margin="8dp"/>
+
+        <Button
+            android:id="@+id/btnStartScanning"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="Start Wifi Scanning"/>
+        <Button
+            android:id="@+id/btnStopScanning"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="Stop Wifi Scanning"/>
 
 
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

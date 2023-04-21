@@ -39,6 +39,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.lang.Math;
 
 public class ConfigurationFragment extends Fragment {
 
@@ -50,7 +51,7 @@ public class ConfigurationFragment extends Fragment {
     Button buttonStartScanning, buttonGetResultScanning;
     TextView textViewStartScanning, textViewStopScanning;
     String room, displayGetScanResult, lastScanResults = "";
-    String FILE_NAME = "WifiData230413.txt";
+    String FILE_NAME = "WifiData230421_9-12-" + Math.random() + ".txt";
     String[] locations = new String[]{"Kontor", "Stue", "Køkken"};
     List<ScanResult> scanResults;
     Boolean scan = false;
