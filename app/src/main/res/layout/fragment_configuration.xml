@@ -40,7 +40,15 @@
                 android:textSize="16sp"
                 android:layout_margin="8dp"
                 android:layout_marginBottom="16dp"
-                android:text="Tilføj datapunkter til datafillen ved at indtaste rummets navn og trykke start scanning. Gå derefter rundt i rummet uden at forlade denne side." />
+                android:text="Lav en model til sporing ved at indsamle datapunkter. Dette gøres ved at indsamle i de ønskede rum et efter et. Indsaml i et rum ved at indtaste rummets navn og trykke start scanning. Gå derefter rundt i rummet uden at forlade denne side. Hvis der ønskes en ny model lav da en ny datafil og indsaml data på ny." />
+
+            <TextView
+                android:id="@+id/textRoom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="16sp"
+                android:layout_margin="8dp"/>
 
             <EditText
                 android:id="@+id/editTextRoom"
@@ -51,16 +59,12 @@
                 android:gravity="center"
                 android:inputType="textPersonName"
                 android:hint="Skriv rummets navn"
-                android:layout_margin="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="8dp"
                 android:textColorHint="@android:color/darker_gray"/>
 
-            <TextView
-                android:id="@+id/textRoom"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textSize="16sp"
-                android:layout_margin="8dp"/>
 
             <TextView
                 android:id="@+id/textStopScanning"
@@ -103,7 +107,6 @@
                 android:layout_marginRight="8dp"
                 android:layout_marginBottom="60dp"
                 android:text="Lav ny datafil"/>
-
 
             <TextView
                 android:id="@+id/speakerHeader"

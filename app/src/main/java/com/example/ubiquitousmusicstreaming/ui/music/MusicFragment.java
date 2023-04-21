@@ -301,7 +301,8 @@ public class MusicFragment extends Fragment {
         btnSpeakers = binding.buttonGetSpeakers;
         txtViewUserProfile = binding.responseTextView;
 
-        initializeLocationSpeakerID();
+        locationSpeakerID = mainActivity.getLocationSpeakerID();
+        //initializeLocationSpeakerID();
 
 
         btnToken.setOnClickListener(new View.OnClickListener() {
@@ -471,11 +472,14 @@ public class MusicFragment extends Fragment {
         });
     }
 
+    /*
     private void initializeLocationSpeakerID() {
         locationSpeakerID.put("Køkken", "9421d826c2f75f49a95085a1063b9f74c8581cbb");
         locationSpeakerID.put("Kontor", "55ee551079c70a6e720fb7af7ed1455b050f0c37");
         locationSpeakerID.put("Stue", "1af54257b625e17733f383612d7e027ad658bee2");
     }
+
+     */
 
 
 

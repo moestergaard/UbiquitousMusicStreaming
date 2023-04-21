@@ -10,6 +10,7 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.Manifest;
 import android.util.Log;
+import android.view.View;
 
 import com.example.ubiquitousmusicstreaming.ui.configuration.ConfigurationFragment;
 import com.example.ubiquitousmusicstreaming.ui.location.LocationFragment;
@@ -26,6 +27,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.example.ubiquitousmusicstreaming.databinding.ActivityMainBinding;
 
+import java.util.Hashtable;
 import java.util.List;
 
 import com.spotify.android.appremote.api.ConnectionParams;
@@ -70,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
     //private static final String REDIRECT_URI = "http://com.yourdomain.yourapp/callback";
     private static SpotifyAppRemote mSpotifyAppRemote;
     private static String ACCESS_TOKEN;
+    private Hashtable<String, String> locationSpeakerID;
 
 
     @Override
@@ -128,6 +131,7 @@ public class MainActivity extends AppCompatActivity {
 
         AuthorizationClient.openLoginActivity(this, REQUEST_CODE, request);
 
+        loadSettings();
     }
 
     @Override
@@ -334,5 +338,28 @@ public class MainActivity extends AppCompatActivity {
             //}
         }
         else { inUse = false; }
+    }
+
+    public void updateLocationSpeakerID(Hashtable<String, String> _locationSpeakerID) {
+        locationSpeakerID = _locationSpeakerID;
+    }
+
+    public Hashtable<String, String> getLocationSpeakerID() {
+        return locationSpeakerID;
+    }
+
+    public void loadSettings(){
+        Settings settings = FileSystem.loadSettings(new View(this));
+
+        if (settings != null) {
+            String fileName = settings.getFileName();
+            configurationFragment.setFileName(fileName);
+
+            locationSpeakerID = settings.getLocationSpeakerID();
+
+            String[] settingLocations = settings.getLocations();
+            locations = settingLocations;
+            configurationFragment.setLocations(settingLocations);
+        }
     }
 }

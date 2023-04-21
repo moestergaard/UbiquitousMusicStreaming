@@ -3,7 +3,9 @@ package com.example.ubiquitousmusicstreaming.ui.configuration;
 import static android.content.Context.MODE_APPEND;
 import static android.content.Context.MODE_PRIVATE;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.net.wifi.ScanResult;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -26,12 +28,13 @@ import com.example.ubiquitousmusicstreaming.R;
 import com.example.ubiquitousmusicstreaming.WifiReceiver;
 import com.example.ubiquitousmusicstreaming.databinding.FragmentConfigurationBinding;
 
-import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -44,6 +47,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import com.example.ubiquitousmusicstreaming.Settings;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -63,7 +67,7 @@ public class ConfigurationFragment extends Fragment {
     ArrayAdapter<String> adapterSpeakers, adapterRoom;
     String room, displayGetScanResult, lastScanResults = "";
     String FILE_NAME = "";
-    String[] locations = new String[]{"","Kontor", "Stue", "Køkken"};
+    String[] locations = new String[]{};//{"","Kontor", "Stue", "Køkken"};
     String choosenSpeaker = "", choosenRoom = "";
     Hashtable<String, String> locationSpeakerID = new Hashtable<>();
     List<ScanResult> scanResults;
@@ -104,15 +108,16 @@ public class ConfigurationFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 room = editTextRoom.getText().toString();
-                System.out.println(Arrays.asList(locations));
+                // System.out.println(Arrays.asList(locations));
                 List<String> l = new ArrayList<String>(Arrays.asList(locations));
                 l.add(room);
                 locations = l.toArray(locations);
-                System.out.println(Arrays.asList(locations));
+                //System.out.println(Arrays.asList(locations));
                 editTextRoom.getText().clear();
                 String displayStartScanning = "Scanning startet af: ";
                 textViewStopScanning.setText("");
                 textViewStartScanning.setText(displayStartScanning + room);
+                addLocationToSettings(room);
 
                 scan = true;
                 startScanning();
@@ -132,9 +137,33 @@ public class ConfigurationFragment extends Fragment {
         buttonNewDataFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FILE_NAME = LocalDateTime.now().toString() + ".txt";
-                updateTextViewDataFile();
-                makeFile(new View(mainActivity));
+                AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);
+                builder.setTitle("Lav ny datafil");
+                builder.setMessage("Ønsker du at lave en ny datafil til en ny model?");
+
+                builder.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        FILE_NAME = LocalDateTime.now().toString() + ".txt";
+                        updateTextViewDataFile();
+                        makeFileSettings(new View(mainActivity), "Settings.txt");
+                        //Settings settings = new Settings();
+                        saveSettings(new Settings());
+                        mainActivity.loadSettings();
+                        //save(new View(mainActivity), Settings.convertToString(), FILE_NAME);
+                        makeFile(new View(mainActivity), FILE_NAME);
+                    }
+                });
+
+                builder.setNegativeButton("Nej", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
             }
         });
 
@@ -143,10 +172,61 @@ public class ConfigurationFragment extends Fragment {
             public void onClick(View view) {
                 if(!choosenSpeaker.equals("") && !choosenRoom.equals("")) {
                     locationSpeakerID.put(choosenRoom, choosenSpeaker);
+                    addLocationSpeakerID(choosenRoom, choosenSpeaker);
+                    mainActivity.updateLocationSpeakerID(locationSpeakerID);
+                }
+                else {
+                    Toast.makeText(mainActivity, "Vælg både en højtaler og et rum.", Toast.LENGTH_LONG).show();
                 }
             }
         });
         return root;
+    }
+
+    private void addLocationToSettings(String room) {
+        Settings settings = loadSettings(new View(mainActivity));
+
+        /*
+        String newLocation = "New Location";
+        String newSpeakerID = "New Speaker ID";
+        settings.getLocationSpeakerID().put(newLocation, newSpeakerID);
+         */
+        if (settings == null) {
+            String[] locations = new String[]{};
+        } else { String[] locations = settings.getLocations(); }
+
+        String[] newLocations = Arrays.copyOf(locations, locations.length + 1);
+        newLocations[newLocations.length - 1] = room;
+        //locations = newLocations;
+        settings.setLocations(newLocations);
+        //List<String> locationList
+        //settings.setLocations(Arrays.copyOf(settings.getLocations(), settings.getLocations().length + 1));
+        //settings.getLocations()[settings.getLocations().length - 1] = room;
+
+        saveSettings(settings);
+
+    }
+
+    private void addLocationSpeakerID(String room, String speakerID) {
+        Settings settings = loadSettings(new View(mainActivity));
+        if (settings == null) {
+            Hashtable<String, String> locationsSpeakerID = new Hashtable<String, String>();
+        } else { Hashtable<String, String> locationSpeakerID = settings.getLocationSpeakerID(); }
+        locationSpeakerID.put(room, speakerID);
+        settings.setLocationSpeakerID(locationSpeakerID);
+        saveSettings(settings);
+    }
+
+    private void saveSettings(Settings settings) {
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream(new File("Settings.txt"));
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+            objectOutputStream.writeObject(settings);
+            objectOutputStream.close();
+            fileOutputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -210,7 +290,7 @@ public class ConfigurationFragment extends Fragment {
         if(lastScanResults.equals("")) {
             String result = makeScanResultString(scanResults);
             lastScanResults = result;
-            save(new View(mainActivity), result);
+            save(new View(mainActivity), result, FILE_NAME);
         }
         else {
             String resultElse = makeScanResultString(scanResults);
@@ -223,7 +303,7 @@ public class ConfigurationFragment extends Fragment {
                 System.out.println(lastScanResults.equals(resultElse));
                 System.out.println("--------------");
                 System.out.println("***************");
-                save(new View(mainActivity), resultElse);
+                save(new View(mainActivity), resultElse, FILE_NAME);
             }
             lastScanResults = resultElse;
         }
@@ -287,47 +367,20 @@ public class ConfigurationFragment extends Fragment {
             }
             @Override
             public void onResponse(Call call, Response response) {
-                Gson gson = new Gson();
-                try {
-                    JsonObject json = gson.fromJson(response.body().string(), JsonObject.class);
-                    JsonArray devicesJson = json.getAsJsonArray("devices");
+                if (response.code() == 200) {
+                    Gson gson = new Gson();
+                    try {
+                        JsonObject json = gson.fromJson(response.body().string(), JsonObject.class);
+                        JsonArray devicesJson = json.getAsJsonArray("devices");
 
-                    for (JsonElement deviceJson : devicesJson) {
-                        Device device = gson.fromJson(deviceJson, Device.class);
-                        devices.add(device);
+                        for (JsonElement deviceJson : devicesJson) {
+                            Device device = gson.fromJson(deviceJson, Device.class);
+                            devices.add(device);
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
                     }
-
-                    /*
-                    for (Device device : devices) {
-                        System.out.println(device.getName());
-                    }
-
-                     */
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
                 }
-                //JsonEquals.jsonEquals(response.body().toString());
-
-                /*
-                response.body();
-                System.out.println(response.toString());
-                System.out.println("****");
-                System.out.println(response.body());
-                System.out.println("****");
-                ObjectMapper om = new ObjectMapper();
-                */
-
-                /*
-                try {
-                    Speakers speakers = om.readValue((DataInput) response.body(), Speakers.class);
-                } catch (IOException e) {
-                    System.out.println("*** FEJL!! ***");
-                    System.out.println(e);
-                    throw new RuntimeException(e);
-                }
-                */
-                //JSONObject speakers = new JSONObject(response.body());
-
             }
         });
 
@@ -340,14 +393,14 @@ public class ConfigurationFragment extends Fragment {
         }
     }
 
-    public void makeFile(View v) {
+    public void makeFile(View v, String fileName) {
         FileOutputStream fos = null;
 
         try {
-            fos = mainActivity.openFileOutput(FILE_NAME, MODE_PRIVATE);
+            fos = mainActivity.openFileOutput(fileName, MODE_PRIVATE);
             fos.write("WIFI DATA \n\n\n".getBytes());
 
-            Toast.makeText(mainActivity, "Fil oprettet med navn: " + FILE_NAME, Toast.LENGTH_LONG).show();
+            Toast.makeText(mainActivity, "Fil oprettet med navn: " + fileName, Toast.LENGTH_LONG).show();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -363,15 +416,13 @@ public class ConfigurationFragment extends Fragment {
         }
     }
 
-    public void save(View v, String data) {
+    public void makeFileSettings(View v, String fileName) {
         FileOutputStream fos = null;
 
         try {
-            fos = mainActivity.openFileOutput(FILE_NAME, MODE_APPEND);
-            fos.write(data.getBytes());
-            System.out.println(data);
+            fos = mainActivity.openFileOutput(fileName, MODE_PRIVATE);
 
-            Toast.makeText(mainActivity, "Data tilføjet til: " + FILE_NAME, Toast.LENGTH_LONG).show();
+            Toast.makeText(mainActivity, "Fil oprettet med navn: " + fileName, Toast.LENGTH_LONG).show();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -387,32 +438,50 @@ public class ConfigurationFragment extends Fragment {
         }
     }
 
-    public void load(View v) {
-        FileInputStream fis = null;
+    public void save(View v, String data, String fileName) {
+        FileOutputStream fos = null;
 
         try {
-            fis = mainActivity.openFileInput(FILE_NAME);
-            InputStreamReader isr = new InputStreamReader(fis);
-            BufferedReader br = new BufferedReader(isr);
-            StringBuilder sb = new StringBuilder();
-            String text;
+            fos = mainActivity.openFileOutput(fileName, MODE_APPEND);
+            fos.write(data.getBytes());
+            //System.out.println(data);
 
-            while((text = br.readLine()) != null) {
-                sb.append(text).append("\n");
-            }
-            textViewStopScanning.setText(sb.toString());
+            Toast.makeText(mainActivity, "Data tilføjet til: " + fileName, Toast.LENGTH_LONG).show();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            if (fis != null) {
+            if(fos != null) {
                 try {
-                    fis.close();
+                    fos.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }
+    }
+
+    public Settings loadSettings(View v) {
+        Settings settings = null;
+        try {
+            FileInputStream fileInputStream = new FileInputStream(new File("Settings.txt"));
+            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+            settings = (Settings) objectInputStream.readObject();
+            objectInputStream.close();
+            fileInputStream.close();
+            // Do something with the loaded settings object
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return settings;
+    }
+
+    public void setFileName(String fileName) {
+        FILE_NAME = fileName;
+    }
+
+    public void setLocations(String[] settingLocations) {
+        locations = settingLocations;
     }
 }

@@ -36,6 +36,8 @@ public class LocationFragment extends Fragment {
         buttonInUse = binding.btnUseSystem;
         buttonStop = binding.btnStopSystem;
 
+        updateTextView();
+
         buttonInUse.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -62,6 +64,15 @@ public class LocationFragment extends Fragment {
             }
         });
         return root;
+    }
+
+    private void updateTextView() {
+        if(inUse) {
+            txtViewInUse.setText("Sporing er aktiveret");
+        }
+        else {
+            txtViewInUse.setText("Sporing er deaktiveret");
+        }
     }
 
     @Override
