@@ -6,61 +6,152 @@
     android:layout_height="match_parent"
     tools:context=".ui.configuration.ConfigurationFragment">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="60dp"
-        android:orientation="vertical"
-        android:gravity="center"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:layout_height="wrap_content"
+        android:verticalScrollbarPosition="defaultPosition"
+        tools:ignore="MissingConstraints">
 
-        <Switch
-            android:id="@+id/switch1"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Switch" />
-
-        <EditText
-            android:id="@+id/editTextRoom"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:autofillHints="Skriv rummets navn"
-            android:ems="10"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="60dp"
+            android:orientation="vertical"
             android:gravity="center"
-            android:hint="Skriv rummets navn"
-            android:inputType="textPersonName"
-            android:layout_margin="8dp"
-            android:textColorHint="@android:color/darker_gray"/>
-
-        <TextView
-            android:id="@+id/textRoom"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_margin="8dp"/>
-
-        <TextView
-            android:id="@+id/textStopScanning"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_margin="8dp"/>
-
-        <Button
-            android:id="@+id/btnStartScanning"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:text="Start Wifi Scanning"/>
-        <Button
-            android:id="@+id/btnStopScanning"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:text="Stop Wifi Scanning"/>
+            app:layout_constraintBottom_toBottomOf="parent">
 
 
 
-    </LinearLayout>
+
+
+            <TextView
+                android:id="@+id/dataHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_margin="8dp"
+                android:text="FØRSTE STEP: Indsaml data" />
+
+            <TextView
+                android:id="@+id/dataSubHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:layout_margin="8dp"
+                android:layout_marginBottom="16dp"
+                android:text="Tilføj datapunkter til datafillen ved at indtaste rummets navn og trykke start scanning. Gå derefter rundt i rummet uden at forlade denne side." />
+
+            <EditText
+                android:id="@+id/editTextRoom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints="Skriv rummets navn"
+                android:ems="10"
+                android:gravity="center"
+                android:inputType="textPersonName"
+                android:hint="Skriv rummets navn"
+                android:layout_margin="8dp"
+                android:textColorHint="@android:color/darker_gray"/>
+
+            <TextView
+                android:id="@+id/textRoom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="16sp"
+                android:layout_margin="8dp"/>
+
+            <TextView
+                android:id="@+id/textStopScanning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="16sp"
+                android:layout_margin="8dp"/>
+
+            <Button
+                android:id="@+id/btnStartScanning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:text="Start Wifi Scanning"/>
+            <Button
+                android:id="@+id/btnStopScanning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:text="Stop Wifi Scanning"/>
+
+            <TextView
+                android:id="@+id/textFileName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="16sp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="24dp"/>
+
+            <Button
+                android:id="@+id/btnNewFile"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="60dp"
+                android:text="Lav ny datafil"/>
+
+
+            <TextView
+                android:id="@+id/speakerHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_margin="8dp"
+                android:text="ANDET STEP: Vælg højtalere" />
+
+            <TextView
+                android:id="@+id/speakerSubHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:layout_margin="8dp"
+                android:text="Vælg den ønskede højtaler, og hvilket rum den hører til. Tryk derefter gem. Gør dette for alle højtalere." />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:layout_margin="8dp"
+                android:text="Vælg højtaler" />
+            <Spinner
+                android:id="@+id/spinnerSpeaker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:layout_margin="8dp"
+                android:text="Vælg lokale" />
+            <Spinner
+                android:id="@+id/spinnerRoom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"/>
+            <Button
+                android:id="@+id/btnStoreSpeakerRoom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:text="Gem"/>
+
+        </LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

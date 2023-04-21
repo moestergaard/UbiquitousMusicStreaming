@@ -2,31 +2,27 @@ package com.example.ubiquitousmusicstreaming.ui.configuration;
 
 import static android.content.Context.MODE_APPEND;
 import static android.content.Context.MODE_PRIVATE;
-import static androidx.core.content.ContextCompat.getSystemService;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.net.wifi.ScanResult;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.ubiquitousmusicstreaming.MainActivity;
+import com.example.ubiquitousmusicstreaming.R;
 import com.example.ubiquitousmusicstreaming.WifiReceiver;
 import com.example.ubiquitousmusicstreaming.databinding.FragmentConfigurationBinding;
 
@@ -38,8 +34,21 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.List;
-import java.lang.Math;
+import java.time.LocalDateTime;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 
 public class ConfigurationFragment extends Fragment {
 
@@ -48,13 +57,19 @@ public class ConfigurationFragment extends Fragment {
     MainActivity mainActivity;
     WifiReceiver wifiReceiver;
     EditText editTextRoom;
-    Button buttonStartScanning, buttonGetResultScanning;
-    TextView textViewStartScanning, textViewStopScanning;
+    Button buttonStartScanning, buttonGetResultScanning, buttonNewDataFile, buttonStoreSpeakerRoom;
+    TextView textViewStartScanning, textViewStopScanning, textViewDataFile;
+    Spinner spinSpeaker, spinRoom;
+    ArrayAdapter<String> adapterSpeakers, adapterRoom;
     String room, displayGetScanResult, lastScanResults = "";
-    String FILE_NAME = "WifiData230421_9-12-" + Math.random() + ".txt";
-    String[] locations = new String[]{"Kontor", "Stue", "Køkken"};
+    String FILE_NAME = "";
+    String[] locations = new String[]{"","Kontor", "Stue", "Køkken"};
+    String choosenSpeaker = "", choosenRoom = "";
+    Hashtable<String, String> locationSpeakerID = new Hashtable<>();
     List<ScanResult> scanResults;
     Boolean scan = false;
+    private Call mCall;
+    private OkHttpClient mOkHttpClient = new OkHttpClient();
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -72,10 +87,18 @@ public class ConfigurationFragment extends Fragment {
         editTextRoom = binding.editTextRoom;
         buttonStartScanning = binding.btnStartScanning;
         buttonGetResultScanning = binding.btnStopScanning;
+        buttonNewDataFile = binding.btnNewFile;
+        buttonStoreSpeakerRoom = binding.btnStoreSpeakerRoom;
         textViewStartScanning = binding.textRoom;
         textViewStopScanning = binding.textStopScanning;
+        textViewDataFile = binding.textFileName;
+        spinSpeaker = binding.spinnerSpeaker;
+        spinRoom = binding.spinnerRoom;
 
-        makeFile(new View(mainActivity));
+
+        setupSpeakerRoomSelection(spinSpeaker, spinRoom);
+
+        updateTextViewDataFile();
 
         buttonStartScanning.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,13 +119,33 @@ public class ConfigurationFragment extends Fragment {
             }
         });
 
-        buttonGetResultScanning.setOnClickListener(arg0 -> {
-            scan = false;
-            String message = "Scanning stoppet for: ";
-            textViewStartScanning.setText("");
-            textViewStopScanning.setText(message + room);
+        buttonGetResultScanning.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                scan = false;
+                String message = "Scanning stoppet for: ";
+                textViewStartScanning.setText("");
+                textViewStopScanning.setText(message + room);
+            }
         });
 
+        buttonNewDataFile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FILE_NAME = LocalDateTime.now().toString() + ".txt";
+                updateTextViewDataFile();
+                makeFile(new View(mainActivity));
+            }
+        });
+
+        buttonStoreSpeakerRoom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!choosenSpeaker.equals("") && !choosenRoom.equals("")) {
+                    locationSpeakerID.put(choosenRoom, choosenSpeaker);
+                }
+            }
+        });
         return root;
     }
 
@@ -111,6 +154,55 @@ public class ConfigurationFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    private void updateTextViewDataFile() {
+        textViewDataFile.setText("Nuværende datafil er: " + FILE_NAME);
+    }
+
+    private void setupSpeakerRoomSelection(Spinner spinSpeaker, Spinner spinRoom) {
+        List<Device> devices = getAvailableSpeakers();
+        List<String> rooms = new ArrayList<>();
+
+        for (Device d : devices) {
+            rooms.add(d.getName());
+        }
+
+        String[] roomsArray = new String[rooms.size()];
+        rooms.toArray(roomsArray);
+
+
+        adapterSpeakers = new ArrayAdapter<String>(mainActivity, R.layout.list_item, locations);
+        adapterSpeakers.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinSpeaker.setAdapter(adapterSpeakers);
+
+        adapterRoom = new ArrayAdapter<String>(mainActivity, R.layout.list_item, roomsArray);
+        adapterRoom.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinSpeaker.setAdapter(adapterRoom);
+
+        spinSpeaker.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                choosenSpeaker = adapterView.getItemAtPosition(i).toString();
+                //Toast.makeText(mainActivity, "Højtaler: " + item, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {}
+        });
+
+        spinRoom.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                int indexRoom = rooms.indexOf(adapterView.getItemAtPosition(i).toString());
+                choosenRoom = devices.get(indexRoom).getId();
+                //adapterView.getItemAtPosition(i).toString();
+                //Toast.makeText(mainActivity, "Højtaler: " + item, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {}
+        });
     }
 
     public void update() {
@@ -176,6 +268,78 @@ public class ConfigurationFragment extends Fragment {
         }
     }
 
+    private List<Device> getAvailableSpeakers() {
+        final Request request = new Request.Builder()
+                .url("https://api.spotify.com/v1/me/player/devices")
+                .addHeader("Authorization","Bearer " + mainActivity.getAccessToken())
+                .build();
+
+        List<Device> devices = new ArrayList<>();
+
+        cancelCall();
+        mCall = mOkHttpClient.newCall(request);
+
+        mCall.enqueue(new Callback() {
+
+            @Override
+            public void onFailure(Call call, IOException e) {
+                System.out.println("Noget gik galt.");
+            }
+            @Override
+            public void onResponse(Call call, Response response) {
+                Gson gson = new Gson();
+                try {
+                    JsonObject json = gson.fromJson(response.body().string(), JsonObject.class);
+                    JsonArray devicesJson = json.getAsJsonArray("devices");
+
+                    for (JsonElement deviceJson : devicesJson) {
+                        Device device = gson.fromJson(deviceJson, Device.class);
+                        devices.add(device);
+                    }
+
+                    /*
+                    for (Device device : devices) {
+                        System.out.println(device.getName());
+                    }
+
+                     */
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                //JsonEquals.jsonEquals(response.body().toString());
+
+                /*
+                response.body();
+                System.out.println(response.toString());
+                System.out.println("****");
+                System.out.println(response.body());
+                System.out.println("****");
+                ObjectMapper om = new ObjectMapper();
+                */
+
+                /*
+                try {
+                    Speakers speakers = om.readValue((DataInput) response.body(), Speakers.class);
+                } catch (IOException e) {
+                    System.out.println("*** FEJL!! ***");
+                    System.out.println(e);
+                    throw new RuntimeException(e);
+                }
+                */
+                //JSONObject speakers = new JSONObject(response.body());
+
+            }
+        });
+
+        return devices;
+    }
+
+    private void cancelCall() {
+        if (mCall != null) {
+            mCall.cancel();
+        }
+    }
+
     public void makeFile(View v) {
         FileOutputStream fos = null;
 
@@ -183,7 +347,7 @@ public class ConfigurationFragment extends Fragment {
             fos = mainActivity.openFileOutput(FILE_NAME, MODE_PRIVATE);
             fos.write("WIFI DATA \n\n\n".getBytes());
 
-            Toast.makeText(mainActivity, "Fil oprettet i " + mainActivity.getFilesDir() + "/" + FILE_NAME, Toast.LENGTH_LONG).show();
+            Toast.makeText(mainActivity, "Fil oprettet med navn: " + FILE_NAME, Toast.LENGTH_LONG).show();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -207,7 +371,7 @@ public class ConfigurationFragment extends Fragment {
             fos.write(data.getBytes());
             System.out.println(data);
 
-            Toast.makeText(mainActivity, "Tilføjet til " + mainActivity.getFilesDir() + "/" + FILE_NAME, Toast.LENGTH_LONG).show();
+            Toast.makeText(mainActivity, "Data tilføjet til: " + FILE_NAME, Toast.LENGTH_LONG).show();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
