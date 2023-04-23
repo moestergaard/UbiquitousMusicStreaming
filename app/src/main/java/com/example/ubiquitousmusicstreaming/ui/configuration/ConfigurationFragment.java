@@ -154,14 +154,20 @@ public class ConfigurationFragment extends Fragment {
                         //makeSettings();
                         //saveSettings(new Settings());
                         FileSystem.createSettingFile(mainActivity);
-                        FileSystem.writeObjectToFile(mainActivity, new Settings());
+                        Settings settings = new Settings();
+                        settings.setFileName(FILE_NAME);
+                        FileSystem.writeObjectToFile(mainActivity, settings);
 
+                        /*
                         File result = new File("Settings").getAbsoluteFile();
                         System.out.println("Path name: " + result);
                         boolean canRead = new File("Settings").canRead();
                         System.out.println("File can read: " + canRead);
+                         */
 
-                        //mainActivity.loadSettings();
+                        mainActivity.loadSettings();
+                        locations = new String[]{};
+                        locationSpeakerID = new Hashtable<>();
 
                         //save(new View(mainActivity), Settings.convertToString(), FILE_NAME);
                         makeFile(new View(mainActivity), FILE_NAME);
@@ -306,18 +312,20 @@ public class ConfigurationFragment extends Fragment {
         rooms.toArray(roomsArray);
 
 
-        adapterSpeakers = new ArrayAdapter<String>(mainActivity, R.layout.list_item, locations);
+        adapterSpeakers = new ArrayAdapter<String>(mainActivity, R.layout.list_item, roomsArray);
         adapterSpeakers.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinSpeaker.setAdapter(adapterSpeakers);
 
-        adapterRoom = new ArrayAdapter<String>(mainActivity, R.layout.list_item, roomsArray);
+        adapterRoom = new ArrayAdapter<String>(mainActivity, R.layout.list_item, locations);
         adapterRoom.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinSpeaker.setAdapter(adapterRoom);
+        spinRoom.setAdapter(adapterRoom);
 
         spinSpeaker.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                choosenSpeaker = adapterView.getItemAtPosition(i).toString();
+                String room = adapterView.getItemAtPosition(i).toString();
+                int indexRoom = rooms.indexOf(room);
+                choosenSpeaker = devices.get(indexRoom).getId();
                 //Toast.makeText(mainActivity, "Højtaler: " + item, Toast.LENGTH_SHORT).show();
             }
 
@@ -328,8 +336,13 @@ public class ConfigurationFragment extends Fragment {
         spinRoom.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                int indexRoom = rooms.indexOf(adapterView.getItemAtPosition(i).toString());
+                choosenRoom = adapterView.getItemAtPosition(i).toString();
+                /*
+                String room = adapterView.getItemAtPosition(i).toString();
+                int indexRoom = rooms.indexOf(room);
                 choosenRoom = devices.get(indexRoom).getId();
+
+                 */
                 //adapterView.getItemAtPosition(i).toString();
                 //Toast.makeText(mainActivity, "Højtaler: " + item, Toast.LENGTH_SHORT).show();
             }
