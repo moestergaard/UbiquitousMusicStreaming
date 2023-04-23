@@ -86,6 +86,8 @@ public class ConfigurationFragment extends Fragment {
 
         mainActivity = (MainActivity) getParentFragment().getActivity();
         mainActivity.attachConfigurationFragment(this);
+        FILE_NAME = mainActivity.getFileName();
+        locations = mainActivity.getLocation();
 
         wifiReceiver = mainActivity.getWifiReceiver();
 
@@ -159,7 +161,8 @@ public class ConfigurationFragment extends Fragment {
                         boolean canRead = new File("Settings").canRead();
                         System.out.println("File can read: " + canRead);
 
-                        // mainActivity.loadSettings();
+                        //mainActivity.loadSettings();
+
                         //save(new View(mainActivity), Settings.convertToString(), FILE_NAME);
                         makeFile(new View(mainActivity), FILE_NAME);
                     }

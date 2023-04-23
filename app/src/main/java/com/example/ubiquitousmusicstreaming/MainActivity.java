@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
     private static SpotifyAppRemote mSpotifyAppRemote;
     private static String ACCESS_TOKEN;
     private Hashtable<String, String> locationSpeakerID;
+    private String fileName;
 
 
     @Override
@@ -95,6 +96,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        // ONLY FOR TESTING OF FILE SYSTEM
+        FileSystemTest fileSystemTest = new FileSystemTest(this);
+        fileSystemTest.overAllTestMethod();
+
         super.onCreate(savedInstanceState);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -355,7 +361,12 @@ public class MainActivity extends AppCompatActivity {
         if (settings != null) {
             String fileName = settings.getFileName();
             if (fileName != null) {
-                configurationFragment.setFileName(fileName);
+                this.fileName = fileName;
+                /*
+                if (configurationFragment != null) {
+                    configurationFragment.setFileName(fileName);
+                }
+                */
             }
 
             locationSpeakerID = settings.getLocationSpeakerID();
@@ -364,8 +375,15 @@ public class MainActivity extends AppCompatActivity {
 
             if (settingLocations != null) {
                 locations = settingLocations;
-                configurationFragment.setLocations(settingLocations);
             }
         }
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public String[] getLocation() {
+        return locations;
     }
 }
