@@ -1,5 +1,6 @@
 package com.example.ubiquitousmusicstreaming.ui.music;
 
+//package com.spotify.sdk.demo;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -33,10 +34,20 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.ubiquitousmusicstreaming.MainActivity;
 import com.example.ubiquitousmusicstreaming.R;
+import com.example.ubiquitousmusicstreaming.TrackProgressBar;
 import com.example.ubiquitousmusicstreaming.databinding.FragmentMusicBinding;
 import com.example.ubiquitousmusicstreaming.ui.location.LocationFragment;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
+import com.spotify.protocol.client.ErrorCallback;
+import com.spotify.protocol.client.Subscription;
+import com.spotify.protocol.types.Capabilities;
+import com.spotify.protocol.types.Image;
+import com.spotify.protocol.types.PlayerContext;
+import com.spotify.protocol.types.PlayerState;
+import com.spotify.protocol.types.Repeat;
 import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
@@ -69,14 +80,13 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.Call;
 
-/*
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.spotify.android.appremote.api.ConnectionParams;
 import com.spotify.android.appremote.api.Connector;
 import com.spotify.android.appremote.api.ContentApi;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
-import com.spotify.android.appremote.demo.R;
 import com.spotify.protocol.client.ErrorCallback;
 import com.spotify.protocol.client.Subscription;
 import com.spotify.protocol.types.Capabilities;
@@ -88,37 +98,171 @@ import com.spotify.protocol.types.PlayerState;
 import com.spotify.protocol.types.Repeat;
 
 
- */
-/*
 import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
-*/
-/*
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-*/
 
 
 
 public class MusicFragment extends Fragment {
 
     private FragmentMusicBinding binding;
-
     private static final String TAG = MusicFragment.class.getSimpleName();
-
-    private static final int REQUEST_CODE = 1337;
-    private static final String CLIENT_ID = "6e101d8a913048819b5af5e6ee372b59";
-    private static final String REDIRECT_URI = "ubiquitousmusicstreaming-login://callback";
 
     private static final String TRACK_URI = "spotify:track:4IWZsfEkaK49itBwCTFDXQ";
     private static final String ALBUM_URI = "spotify:album:4nZ5wPL5XxSY2OuDgbnYdc";
     private static final String ARTIST_URI = "spotify:artist:3WrFJ7ztbogyGnTHbHJFl2";
     private static final String PLAYLIST_URI = "spotify:playlist:37i9dQZEVXbMDoHDwVN2tF";
     private static final String PODCAST_URI = "spotify:show:2tgPYIeGErjk6irHRhk9kj";
+
+    private static final int REQUEST_CODE = 1337;
+    private static final String CLIENT_ID = "6e101d8a913048819b5af5e6ee372b59";
+    private static final String REDIRECT_URI = "ubiquitousmusicstreaming-login://callback";
+
+    private static SpotifyAppRemote mSpotifyAppRemote;
+
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+    Button mConnectButton, mConnectAuthorizeButton;
+    Button mSubscribeToPlayerContextButton;
+    Button mPlayerContextButton;
+    Button mSubscribeToPlayerStateButton;
+    Button mPlayerStateButton;
+    ImageView mCoverArtImageView;
+    AppCompatTextView mImageLabel;
+    AppCompatTextView mImageScaleTypeLabel;
+    AppCompatImageButton mToggleShuffleButton;
+    AppCompatImageButton mPlayPauseButton;
+    AppCompatImageButton mToggleRepeatButton;
+    AppCompatSeekBar mSeekBar;
+    AppCompatImageButton mPlaybackSpeedButton;
+
+    List<View> mViews;
+    TrackProgressBar mTrackProgressBar;
+
+    Subscription<PlayerState> mPlayerStateSubscription;
+    Subscription<PlayerContext> mPlayerContextSubscription;
+    Subscription<Capabilities> mCapabilitiesSubscription;
+
+    // private final ErrorCallback mErrorCallback = this::logError;
+
+    private final Subscription.EventCallback<PlayerContext> mPlayerContextEventCallback =
+            new Subscription.EventCallback<PlayerContext>() {
+                @Override
+                public void onEvent(PlayerContext playerContext) {
+                    mPlayerContextButton.setText(
+                            String.format(Locale.US, "%s\n%s", playerContext.title, playerContext.subtitle));
+                    mPlayerContextButton.setTag(playerContext);
+                }
+            };
+
+    private final Subscription.EventCallback<PlayerState> mPlayerStateEventCallback =
+            new Subscription.EventCallback<PlayerState>() {
+                @Override
+                public void onEvent(PlayerState playerState) {
+
+                    Drawable drawable =
+                            ResourcesCompat.getDrawable(
+                                    getResources(), R.drawable.mediaservice_shuffle, getTheme());
+                    if (!playerState.playbackOptions.isShuffling) {
+                        mToggleShuffleButton.setImageDrawable(drawable);
+                        DrawableCompat.setTint(mToggleShuffleButton.getDrawable(), Color.WHITE);
+                    } else {
+                        mToggleShuffleButton.setImageDrawable(drawable);
+                        DrawableCompat.setTint(
+                                mToggleShuffleButton.getDrawable(),
+                                getResources().getColor(R.color.cat_medium_green));
+                    }
+
+                    if (playerState.playbackOptions.repeatMode == Repeat.ALL) {
+                        mToggleRepeatButton.setImageResource(R.drawable.mediaservice_repeat_all);
+                        DrawableCompat.setTint(
+                                mToggleRepeatButton.getDrawable(),
+                                getResources().getColor(R.color.cat_medium_green));
+                    } else if (playerState.playbackOptions.repeatMode == Repeat.ONE) {
+                        mToggleRepeatButton.setImageResource(R.drawable.mediaservice_repeat_one);
+                        DrawableCompat.setTint(
+                                mToggleRepeatButton.getDrawable(),
+                                getResources().getColor(R.color.cat_medium_green));
+                    } else {
+                        mToggleRepeatButton.setImageResource(R.drawable.mediaservice_repeat_off);
+                        DrawableCompat.setTint(mToggleRepeatButton.getDrawable(), Color.WHITE);
+                    }
+
+                    if (playerState.track != null) {
+                        mPlayerStateButton.setText(
+                                String.format(
+                                        Locale.US, "%s\n%s", playerState.track.name, playerState.track.artist.name));
+                        mPlayerStateButton.setTag(playerState);
+                    }
+                    // Update progressbar
+                    if (playerState.playbackSpeed > 0) {
+                        mTrackProgressBar.unpause();
+                    } else {
+                        mTrackProgressBar.pause();
+                    }
+
+                    // Invalidate play / pause
+                    if (playerState.isPaused) {
+                        mPlayPauseButton.setImageResource(R.drawable.btn_play);
+                    } else {
+                        mPlayPauseButton.setImageResource(R.drawable.btn_pause);
+                    }
+
+                    // Invalidate playback speed
+                    mPlaybackSpeedButton.setVisibility(View.VISIBLE);
+                    if (playerState.playbackSpeed == 0.5f) {
+                        mPlaybackSpeedButton.setImageResource(R.drawable.ic_playback_speed_50);
+                    } else if (playerState.playbackSpeed == 0.8f) {
+                        mPlaybackSpeedButton.setImageResource(R.drawable.ic_playback_speed_80);
+                    } else if (playerState.playbackSpeed == 1f) {
+                        mPlaybackSpeedButton.setImageResource(R.drawable.ic_playback_speed_100);
+                    } else if (playerState.playbackSpeed == 1.2f) {
+                        mPlaybackSpeedButton.setImageResource(R.drawable.ic_playback_speed_120);
+                    } else if (playerState.playbackSpeed == 1.5f) {
+                        mPlaybackSpeedButton.setImageResource(R.drawable.ic_playback_speed_150);
+                    } else if (playerState.playbackSpeed == 2f) {
+                        mPlaybackSpeedButton.setImageResource(R.drawable.ic_playback_speed_200);
+                    } else if (playerState.playbackSpeed == 3f) {
+                        mPlaybackSpeedButton.setImageResource(R.drawable.ic_playback_speed_300);
+                    }
+                    if (playerState.track != null && playerState.track.isPodcast && playerState.track.isEpisode) {
+                        mPlaybackSpeedButton.setEnabled(true);
+                        mPlaybackSpeedButton.clearColorFilter();
+                    } else {
+                        mPlaybackSpeedButton.setEnabled(false);
+                        mPlaybackSpeedButton.setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_ATOP);
+                    }
+
+                    if (playerState.track != null) {
+                        // Get image from track
+                        mSpotifyAppRemote
+                                .getImagesApi()
+                                .getImage(playerState.track.imageUri, Image.Dimension.LARGE)
+                                .setResultCallback(
+                                        bitmap -> {
+                                            mCoverArtImageView.setImageBitmap(bitmap);
+                                            mImageLabel.setText(
+                                                    String.format(
+                                                            Locale.ENGLISH, "%d x %d", bitmap.getWidth(), bitmap.getHeight()));
+                                        });
+                        // Invalidate seekbar length and position
+                        mSeekBar.setMax((int) playerState.track.duration);
+                        mTrackProgressBar.setDuration(playerState.track.duration);
+                        mTrackProgressBar.update(playerState.playbackPosition);
+                    }
+
+                    mSeekBar.setEnabled(true);
+                }
+            };
+
+
+
 
     // public static final String CLIENT_ID = "0bda033615af412eb05a8ce97d44fec2";
     public static final int AUTH_TOKEN_REQUEST_CODE = 0x10;
@@ -296,15 +440,17 @@ public class MusicFragment extends Fragment {
         mSpotifyAppRemote = mainActivity.getmSpotifyAppRemote();
         View root = binding.getRoot();
 
+        /*
         btnToken = binding.tokenButton;
         btnProfile = binding.buttonGetProfile;
         btnSpeakers = binding.buttonGetSpeakers;
         txtViewUserProfile = binding.responseTextView;
+         */
 
         //locationSpeakerID = mainActivity.getLocationSpeakerID();
         initializeLocationSpeakerID();
 
-
+        /*
         btnToken.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -314,7 +460,9 @@ public class MusicFragment extends Fragment {
                 System.out.println(ACCESS_TOKEN);
             }
         });
+         */
 
+        /*
         btnProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -345,7 +493,9 @@ public class MusicFragment extends Fragment {
             }
         });
 
+         */
 
+        /*
         btnSpeakers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -375,6 +525,8 @@ public class MusicFragment extends Fragment {
                 });
             }
         });
+
+         */
 
 
 
