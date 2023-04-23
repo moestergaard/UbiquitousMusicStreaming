@@ -1,9 +1,10 @@
 package com.example.ubiquitousmusicstreaming;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Hashtable;
 
-public class Settings {
+public class Settings implements Serializable {
     private static Hashtable<String, String> locationSpeakerID;
     private static String[] locations;
     private static String fileName;

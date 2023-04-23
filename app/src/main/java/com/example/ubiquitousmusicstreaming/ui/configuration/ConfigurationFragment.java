@@ -23,6 +23,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.ubiquitousmusicstreaming.FileSystem;
 import com.example.ubiquitousmusicstreaming.MainActivity;
 import com.example.ubiquitousmusicstreaming.R;
 import com.example.ubiquitousmusicstreaming.WifiReceiver;
@@ -146,10 +147,19 @@ public class ConfigurationFragment extends Fragment {
                     public void onClick(DialogInterface dialog, int which) {
                         FILE_NAME = LocalDateTime.now().toString() + ".txt";
                         updateTextViewDataFile();
-                        makeFileSettings(new View(mainActivity), "Settings.txt");
+                        //makeFileSettings(new View(mainActivity), "Settings");
                         //Settings settings = new Settings();
-                        saveSettings(new Settings());
-                        mainActivity.loadSettings();
+                        //makeSettings();
+                        //saveSettings(new Settings());
+                        FileSystem.createSettingFile(mainActivity);
+                        FileSystem.writeObjectToFile(mainActivity, new Settings());
+
+                        File result = new File("Settings").getAbsoluteFile();
+                        System.out.println("Path name: " + result);
+                        boolean canRead = new File("Settings").canRead();
+                        System.out.println("File can read: " + canRead);
+
+                        // mainActivity.loadSettings();
                         //save(new View(mainActivity), Settings.convertToString(), FILE_NAME);
                         makeFile(new View(mainActivity), FILE_NAME);
                     }
@@ -184,42 +194,83 @@ public class ConfigurationFragment extends Fragment {
     }
 
     private void addLocationToSettings(String room) {
-        Settings settings = loadSettings(new View(mainActivity));
+        //Settings settings = loadSettings(new View(mainActivity));
+        Settings settings = FileSystem.readObjectFromFile(mainActivity);
 
         /*
         String newLocation = "New Location";
         String newSpeakerID = "New Speaker ID";
         settings.getLocationSpeakerID().put(newLocation, newSpeakerID);
          */
+        /*
         if (settings == null) {
             String[] locations = new String[]{};
         } else { String[] locations = settings.getLocations(); }
 
-        String[] newLocations = Arrays.copyOf(locations, locations.length + 1);
-        newLocations[newLocations.length - 1] = room;
+         */
+
+        if (settings != null) {
+            String[] locations = settings.getLocations();
+            String[] newLocations;
+            if (locations != null) {
+                newLocations = Arrays.copyOf(locations, locations.length + 1);
+            } else {
+                newLocations = new String[1];
+            }
+
+            newLocations[newLocations.length - 1] = room;
+            settings.setLocations(newLocations);
+        }
+
+
         //locations = newLocations;
-        settings.setLocations(newLocations);
+
+
         //List<String> locationList
         //settings.setLocations(Arrays.copyOf(settings.getLocations(), settings.getLocations().length + 1));
         //settings.getLocations()[settings.getLocations().length - 1] = room;
 
-        saveSettings(settings);
+        FileSystem.writeObjectToFile(mainActivity, settings);
+        //saveSettings(settings);
 
     }
 
     private void addLocationSpeakerID(String room, String speakerID) {
-        Settings settings = loadSettings(new View(mainActivity));
+        //Settings settings = loadSettings(new View(mainActivity));
+        Settings settings = FileSystem.readObjectFromFile(mainActivity);
+
+        /*
         if (settings == null) {
             Hashtable<String, String> locationsSpeakerID = new Hashtable<String, String>();
         } else { Hashtable<String, String> locationSpeakerID = settings.getLocationSpeakerID(); }
-        locationSpeakerID.put(room, speakerID);
-        settings.setLocationSpeakerID(locationSpeakerID);
-        saveSettings(settings);
+
+         */
+
+        if (settings != null) {
+            Hashtable<String, String> locationSpeakerID = settings.getLocationSpeakerID();
+            locationSpeakerID.put(room, speakerID);
+            settings.setLocationSpeakerID(locationSpeakerID);
+        }
+
+        FileSystem.writeObjectToFile(mainActivity, settings);
+        //saveSettings(settings);
+    }
+
+    private void makeSettings() {
+        File settingsFile = new File("Settings");
+        settingsFile.setReadable(true);
+        settingsFile.setWritable(true);
+        try {
+            settingsFile.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void saveSettings(Settings settings) {
         try {
-            FileOutputStream fileOutputStream = new FileOutputStream(new File("Settings.txt"));
+            FileOutputStream fileOutputStream = new FileOutputStream(new File("Settings"));
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
             objectOutputStream.writeObject(settings);
             objectOutputStream.close();
@@ -465,7 +516,7 @@ public class ConfigurationFragment extends Fragment {
     public Settings loadSettings(View v) {
         Settings settings = null;
         try {
-            FileInputStream fileInputStream = new FileInputStream(new File("Settings.txt"));
+            FileInputStream fileInputStream = new FileInputStream(new File("Settings"));
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
             settings = (Settings) objectInputStream.readObject();
             objectInputStream.close();

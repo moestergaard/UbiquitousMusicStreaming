@@ -349,17 +349,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void loadSettings(){
-        Settings settings = FileSystem.loadSettings(new View(this));
+        Settings settings = FileSystem.readObjectFromFile(this);
+        //Settings settings = FileSystem.loadSettings(new View(this));
 
         if (settings != null) {
             String fileName = settings.getFileName();
-            configurationFragment.setFileName(fileName);
+            if (fileName != null) {
+                configurationFragment.setFileName(fileName);
+            }
 
             locationSpeakerID = settings.getLocationSpeakerID();
 
             String[] settingLocations = settings.getLocations();
-            locations = settingLocations;
-            configurationFragment.setLocations(settingLocations);
+
+            if (settingLocations != null) {
+                locations = settingLocations;
+                configurationFragment.setLocations(settingLocations);
+            }
         }
     }
 }
