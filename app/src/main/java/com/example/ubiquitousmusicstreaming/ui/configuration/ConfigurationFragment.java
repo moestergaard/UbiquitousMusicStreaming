@@ -127,6 +127,7 @@ public class ConfigurationFragment extends Fragment {
                     addLocationToSettings(room);
 
                     scan = true;
+                    mainActivity.setInUseDataCollection(true);
                     startScanning();
 
                     setupSpeakerRoomSelection(spinSpeaker, spinRoom);
@@ -139,6 +140,7 @@ public class ConfigurationFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 scan = false;
+                mainActivity.setInUseDataCollection(false);
                 String message = "Scanning stoppet for: ";
                 textViewStartScanning.setText("");
                 textViewStopScanning.setText(message + room);

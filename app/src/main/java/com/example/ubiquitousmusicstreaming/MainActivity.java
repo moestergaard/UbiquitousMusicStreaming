@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
     private static ConfigurationFragment configurationFragment;
     private static LocationFragment locationFragment;
     private static MusicFragment musicFragment;
-    private static Boolean inUse = false, inUseTemp;
+    private static Boolean inUse = false, inUseTemp, inUseDataCollection = false;
     private static DataManagement dm;
     private static String predictedRoom, previousLocation = "";
     private static String[] locations = /* new String[]{}; = */ new String[]{"Kontor", "Stue", "Køkken"};
@@ -271,6 +271,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void setInUseDataCollection(Boolean bool) {
+        inUseDataCollection = bool;
+    }
+
     public void attachMusicFragment(MusicFragment musicFragment) { this.musicFragment = musicFragment; }
     public void attachConfigurationFragment(ConfigurationFragment configurationFragment) { this.configurationFragment = configurationFragment; }
 
@@ -280,8 +284,10 @@ public class MainActivity extends AppCompatActivity {
 
     public static void update() {
         if(!inUse) {
-            if(configurationFragment != null) {
-                configurationFragment.update();
+            if(inUseDataCollection) {
+                if(configurationFragment != null) {
+                    configurationFragment.update();
+                }
             }
         }
         else {
