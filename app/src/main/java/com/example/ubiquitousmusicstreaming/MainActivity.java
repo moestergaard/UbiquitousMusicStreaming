@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
     private static Boolean inUse = false, inUseTemp;
     private static DataManagement dm;
     private static String predictedRoom, previousLocation;
-    private static String[] locations = new String[]{}; // = new String[]{"Kontor", "Stue", "Køkken"};
+    private static String[] locations = /* new String[]{}; = */ new String[]{"Kontor", "Stue", "Køkken"};
 
     private static final String CLIENT_ID = "6e101d8a913048819b5af5e6ee372b59";
     //public static final String CLIENT_ID = "0bda033615af412eb05a8ce97d44fec2";

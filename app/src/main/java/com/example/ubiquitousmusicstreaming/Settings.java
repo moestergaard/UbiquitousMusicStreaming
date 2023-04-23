@@ -9,6 +9,12 @@ public class Settings implements Serializable {
     private static String[] locations;
     private static String fileName;
 
+    public Settings() {
+        locationSpeakerID = new Hashtable<>();
+        locations = new String[]{};
+        fileName = "";
+    }
+
     public Hashtable<String, String> getLocationSpeakerID() {
         return locationSpeakerID;
     }

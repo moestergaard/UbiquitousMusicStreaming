@@ -69,6 +69,7 @@ public class ConfigurationFragment extends Fragment {
     String room, displayGetScanResult, lastScanResults = "";
     String FILE_NAME = "";
     String[] locations = new String[]{};//{"","Kontor", "Stue", "Køkken"};
+    List<Device> devices = new ArrayList<>();
     String choosenSpeaker = "", choosenRoom = "";
     Hashtable<String, String> locationSpeakerID = new Hashtable<>();
     List<ScanResult> scanResults;
@@ -110,20 +111,27 @@ public class ConfigurationFragment extends Fragment {
         buttonStartScanning.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                room = editTextRoom.getText().toString();
-                // System.out.println(Arrays.asList(locations));
-                List<String> l = new ArrayList<String>(Arrays.asList(locations));
-                l.add(room);
-                locations = l.toArray(locations);
-                //System.out.println(Arrays.asList(locations));
-                editTextRoom.getText().clear();
-                String displayStartScanning = "Scanning startet af: ";
-                textViewStopScanning.setText("");
-                textViewStartScanning.setText(displayStartScanning + room);
-                addLocationToSettings(room);
+                if (FILE_NAME != null) {
+                    room = editTextRoom.getText().toString();
+                    // System.out.println(Arrays.asList(locations));
+                    List<String> l = new ArrayList<String>(Arrays.asList(locations));
+                    if (!l.contains(room)) {
+                        l.add(room);
+                    }
+                    locations = l.toArray(locations);
+                    //System.out.println(Arrays.asList(locations));
+                    editTextRoom.getText().clear();
+                    String displayStartScanning = "Scanning startet af: ";
+                    textViewStopScanning.setText("");
+                    textViewStartScanning.setText(displayStartScanning + room);
+                    addLocationToSettings(room);
 
-                scan = true;
-                startScanning();
+                    scan = true;
+                    startScanning();
+
+                    setupSpeakerRoomSelection(spinSpeaker, spinRoom);
+                }
+                else { textViewStartScanning.setText("Lav en ny datafil først"); }
             }
         });
 
@@ -301,7 +309,7 @@ public class ConfigurationFragment extends Fragment {
     }
 
     private void setupSpeakerRoomSelection(Spinner spinSpeaker, Spinner spinRoom) {
-        List<Device> devices = getAvailableSpeakers();
+        getAvailableSpeakers();
         List<String> rooms = new ArrayList<>();
 
         for (Device d : devices) {
@@ -415,13 +423,13 @@ public class ConfigurationFragment extends Fragment {
         }
     }
 
-    private List<Device> getAvailableSpeakers() {
+    private void getAvailableSpeakers() {
         final Request request = new Request.Builder()
                 .url("https://api.spotify.com/v1/me/player/devices")
                 .addHeader("Authorization","Bearer " + mainActivity.getAccessToken())
+                .addHeader("Content-Type", "application/json")
+                .get()
                 .build();
-
-        List<Device> devices = new ArrayList<>();
 
         cancelCall();
         mCall = mOkHttpClient.newCall(request);
@@ -434,16 +442,22 @@ public class ConfigurationFragment extends Fragment {
             }
             @Override
             public void onResponse(Call call, Response response) {
+                System.out.println("DER KOM RESPONS FRA SPOTIFY");
                 if (response.code() == 200) {
                     Gson gson = new Gson();
                     try {
                         JsonObject json = gson.fromJson(response.body().string(), JsonObject.class);
                         JsonArray devicesJson = json.getAsJsonArray("devices");
 
+                        List<Device> tmpDevices = new ArrayList<>();
+
                         for (JsonElement deviceJson : devicesJson) {
                             Device device = gson.fromJson(deviceJson, Device.class);
-                            devices.add(device);
+                            tmpDevices.add(device);
                         }
+
+                        devices = tmpDevices;
+
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -451,7 +465,7 @@ public class ConfigurationFragment extends Fragment {
             }
         });
 
-        return devices;
+        //return devices;
     }
 
     private void cancelCall() {
