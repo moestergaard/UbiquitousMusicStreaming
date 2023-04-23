@@ -442,7 +442,6 @@ public class ConfigurationFragment extends Fragment {
             }
             @Override
             public void onResponse(Call call, Response response) {
-                System.out.println("DER KOM RESPONS FRA SPOTIFY");
                 if (response.code() == 200) {
                     Gson gson = new Gson();
                     try {

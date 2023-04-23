@@ -17,7 +17,7 @@ import com.example.ubiquitousmusicstreaming.databinding.FragmentLocationBinding;
 public class LocationFragment extends Fragment {
 
     private FragmentLocationBinding binding;
-    private static TextView txtViewInUse;
+    private static TextView txtViewInUse, txtViewLocation;
     private static Button buttonInUse, buttonStop;
     private Boolean inUse = false, inUseTemp;
     private MainActivity mainActivity;
@@ -33,6 +33,7 @@ public class LocationFragment extends Fragment {
         mainActivity = (MainActivity) getParentFragment().getActivity();
 
         txtViewInUse = binding.textInUse;
+        txtViewLocation = binding.textLocation;
         buttonInUse = binding.btnUseSystem;
         buttonStop = binding.btnStopSystem;
 
@@ -47,8 +48,9 @@ public class LocationFragment extends Fragment {
                 mainActivity.attachLocationFragment(LocationFragment.this);
                 mainActivity.setInUse(true);
 
-                txtViewInUse.setText("Systemet er taget brug.");
+                //txtViewInUse.setText("Systemet er taget brug.");
                 mainActivity.getWifiManager().startScan();
+                updateTextView();
             }
         });
 
@@ -60,7 +62,9 @@ public class LocationFragment extends Fragment {
                 mainActivity.removeLocationFragment();
                 mainActivity.setInUse(false);
 
-                txtViewInUse.setText("Stoppet med at tracke.");
+                //txtViewInUse.setText("Stoppet med at tracke.");
+                txtViewLocation.setText("");
+                updateTextView();
             }
         });
         return root;
@@ -82,6 +86,6 @@ public class LocationFragment extends Fragment {
     }
 
     public static void SetTextView(String text) {
-        txtViewInUse.setText(text);
+        txtViewLocation.setText(text);
     }
 }

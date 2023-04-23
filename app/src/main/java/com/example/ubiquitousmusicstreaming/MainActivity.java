@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
     private static MusicFragment musicFragment;
     private static Boolean inUse = false, inUseTemp;
     private static DataManagement dm;
-    private static String predictedRoom, previousLocation;
+    private static String predictedRoom, previousLocation = "";
     private static String[] locations = /* new String[]{}; = */ new String[]{"Kontor", "Stue", "Køkken"};
 
     private static final String CLIENT_ID = "6e101d8a913048819b5af5e6ee372b59";
