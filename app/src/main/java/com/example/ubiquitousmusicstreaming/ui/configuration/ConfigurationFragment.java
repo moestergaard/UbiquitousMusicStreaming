@@ -158,6 +158,7 @@ public class ConfigurationFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         FILE_NAME = LocalDateTime.now().toString() + ".txt";
+                        makeFile(new View(mainActivity), FILE_NAME);
                         updateTextViewDataFile();
                         //makeFileSettings(new View(mainActivity), "Settings");
                         //Settings settings = new Settings();
@@ -180,7 +181,7 @@ public class ConfigurationFragment extends Fragment {
                         locationSpeakerID = new Hashtable<>();
 
                         //save(new View(mainActivity), Settings.convertToString(), FILE_NAME);
-                        makeFile(new View(mainActivity), FILE_NAME);
+
                     }
                 });
 

@@ -138,6 +138,9 @@ public class MainActivity extends AppCompatActivity {
         AuthorizationClient.openLoginActivity(this, REQUEST_CODE, request);
 
         loadSettings();
+        // Settings settings = FileSystem.readObjectFromFile(this);
+        // String fileName = settings.getFileName();
+        // int tmp = 2;
     }
 
     @Override

@@ -5,9 +5,9 @@ import java.util.Arrays;
 import java.util.Hashtable;
 
 public class Settings implements Serializable {
-    private static Hashtable<String, String> locationSpeakerID;
-    private static String[] locations;
-    private static String fileName;
+    private Hashtable<String, String> locationSpeakerID;
+    private String[] locations;
+    private String fileName;
 
     public Settings() {
         locationSpeakerID = new Hashtable<>();
@@ -39,6 +39,7 @@ public class Settings implements Serializable {
         this.fileName = fileName;
     }
 
+    /*
     public static String convertToString() {
         return "Settings{" +
                 "locationSpeakerID=" + locationSpeakerID +
@@ -46,5 +47,7 @@ public class Settings implements Serializable {
                 ", fileName='" + fileName + '\'' +
                 '}';
     }
+
+     */
 }
 

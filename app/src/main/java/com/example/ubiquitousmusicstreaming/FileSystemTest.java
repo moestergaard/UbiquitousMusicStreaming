@@ -12,6 +12,14 @@ public class FileSystemTest {
     }
 
     public void overAllTestMethod() {
+        Settings settings = FileSystem.readObjectFromFile(context);
+        String fileName = settings.getFileName();
+        System.out.println();
+        System.out.println("****");
+        System.out.println(fileName);
+        System.out.println();
+        System.out.println("****");
+
         boolean fileExists = TestCreate();
         System.out.println("File exists: " + fileExists);
         boolean fileExistsStill = TestCreate();
