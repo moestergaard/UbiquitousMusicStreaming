@@ -66,9 +66,9 @@ public class ConfigurationFragment extends Fragment {
     TextView textViewRoom, textViewDataFile;
     Spinner spinSpeaker, spinRoom;
     ArrayAdapter<String> adapterSpeakers, adapterRoom;
-    String room, displayGetScanResult, lastScanResults = "";
+    String room, lastScanResults = "";
     String FILE_NAME = "";
-    String[] locations = new String[]{};//{"","Kontor", "Stue", "Køkken"};
+    String[] locations = new String[]{};
     List<Device> devices = new ArrayList<>();
     String choosenSpeaker = "", choosenRoom = "";
     Hashtable<String, String> locationSpeakerID = new Hashtable<>();
@@ -98,7 +98,6 @@ public class ConfigurationFragment extends Fragment {
         buttonNewDataFile = binding.btnNewFile;
         buttonStoreSpeakerRoom = binding.btnStoreSpeakerRoom;
         textViewRoom = binding.textRoom;
-        // textViewStopScanning = binding.textStopScanning;
         textViewDataFile = binding.textFileName;
         spinSpeaker = binding.spinnerSpeaker;
         spinRoom = binding.spinnerRoom;
@@ -113,16 +112,13 @@ public class ConfigurationFragment extends Fragment {
             public void onClick(View view) {
                 if (FILE_NAME != null) {
                     room = editTextRoom.getText().toString();
-                    // System.out.println(Arrays.asList(locations));
                     List<String> l = new ArrayList<String>(Arrays.asList(locations));
                     if (!l.contains(room)) {
                         l.add(room);
                     }
                     locations = l.toArray(locations);
-                    //System.out.println(Arrays.asList(locations));
                     editTextRoom.getText().clear();
                     String displayStartScanning = "Scanning startet af: ";
-                    //textViewRoom.setText("");
                     textViewRoom.setText(displayStartScanning + room);
                     addLocationToSettings(room);
 
@@ -142,7 +138,6 @@ public class ConfigurationFragment extends Fragment {
                 scan = false;
                 mainActivity.setInUseDataCollection(false);
                 String message = "Scanning stoppet for: ";
-                //textViewStartScanning.setText("");
                 textViewRoom.setText(message + room);
             }
         });
@@ -160,28 +155,15 @@ public class ConfigurationFragment extends Fragment {
                         FILE_NAME = LocalDateTime.now().toString() + ".txt";
                         makeFile(new View(mainActivity), FILE_NAME);
                         updateTextViewDataFile();
-                        //makeFileSettings(new View(mainActivity), "Settings");
-                        //Settings settings = new Settings();
-                        //makeSettings();
-                        //saveSettings(new Settings());
                         FileSystem.createSettingFile(mainActivity);
                         Settings settings = new Settings();
                         settings.setFileName(FILE_NAME);
                         FileSystem.writeObjectToFile(mainActivity, settings);
 
-                        /*
-                        File result = new File("Settings").getAbsoluteFile();
-                        System.out.println("Path name: " + result);
-                        boolean canRead = new File("Settings").canRead();
-                        System.out.println("File can read: " + canRead);
-                         */
-
                         mainActivity.loadSettings();
                         locations = new String[]{};
                         locationSpeakerID = new Hashtable<>();
-
-                        //save(new View(mainActivity), Settings.convertToString(), FILE_NAME);
-
+                        setupSpeakerRoomSelection(spinSpeaker, spinRoom);
                     }
                 });
 
@@ -214,20 +196,7 @@ public class ConfigurationFragment extends Fragment {
     }
 
     private void addLocationToSettings(String room) {
-        //Settings settings = loadSettings(new View(mainActivity));
         Settings settings = FileSystem.readObjectFromFile(mainActivity);
-
-        /*
-        String newLocation = "New Location";
-        String newSpeakerID = "New Speaker ID";
-        settings.getLocationSpeakerID().put(newLocation, newSpeakerID);
-         */
-        /*
-        if (settings == null) {
-            String[] locations = new String[]{};
-        } else { String[] locations = settings.getLocations(); }
-
-         */
 
         if (settings != null) {
             String[] locations = settings.getLocations();
@@ -241,39 +210,18 @@ public class ConfigurationFragment extends Fragment {
             newLocations[newLocations.length - 1] = room;
             settings.setLocations(newLocations);
         }
-
-
-        //locations = newLocations;
-
-
-        //List<String> locationList
-        //settings.setLocations(Arrays.copyOf(settings.getLocations(), settings.getLocations().length + 1));
-        //settings.getLocations()[settings.getLocations().length - 1] = room;
-
         FileSystem.writeObjectToFile(mainActivity, settings);
-        //saveSettings(settings);
-
     }
 
     private void addLocationSpeakerID(String room, String speakerID) {
-        //Settings settings = loadSettings(new View(mainActivity));
         Settings settings = FileSystem.readObjectFromFile(mainActivity);
-
-        /*
-        if (settings == null) {
-            Hashtable<String, String> locationsSpeakerID = new Hashtable<String, String>();
-        } else { Hashtable<String, String> locationSpeakerID = settings.getLocationSpeakerID(); }
-
-         */
 
         if (settings != null) {
             Hashtable<String, String> locationSpeakerID = settings.getLocationSpeakerID();
             locationSpeakerID.put(room, speakerID);
             settings.setLocationSpeakerID(locationSpeakerID);
         }
-
         FileSystem.writeObjectToFile(mainActivity, settings);
-        //saveSettings(settings);
     }
 
     private void makeSettings() {
@@ -349,14 +297,6 @@ public class ConfigurationFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 choosenRoom = adapterView.getItemAtPosition(i).toString();
-                /*
-                String room = adapterView.getItemAtPosition(i).toString();
-                int indexRoom = rooms.indexOf(room);
-                choosenRoom = devices.get(indexRoom).getId();
-
-                 */
-                //adapterView.getItemAtPosition(i).toString();
-                //Toast.makeText(mainActivity, "Højtaler: " + item, Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -402,29 +342,15 @@ public class ConfigurationFragment extends Fragment {
             scanResultString += "SSID: " + result.SSID + "\n";
             scanResultString += "BSSID: " + result.BSSID + "\n";
             scanResultString += "ResultLevel: " + result.level + "\n";
-            // scanResultString += "SignalLevel: " + wifiManager.calculateSignalLevel(result.level) + "\n";
             scanResultString += "Frequency: " + result.frequency + "\n";
             scanResultString += "Timestamp: " + result.timestamp + "\n\n\n";
         }
-
         scanResultString += "************** \n\n";
-
         return scanResultString;
     }
 
     private void startScanning() {
         mainActivity.startScan();
-    }
-
-    private void writeUsingFiles(String data) {
-        String filename = "WifiData";
-        Context context = getActivity().getApplicationContext();
-        try (FileOutputStream fos = context.openFileOutput(filename, MODE_PRIVATE)) {
-            fos.write(data.getBytes());
-            System.out.println(data);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private void getAvailableSpeakers() {
@@ -467,8 +393,6 @@ public class ConfigurationFragment extends Fragment {
                 }
             }
         });
-
-        //return devices;
     }
 
     private void cancelCall() {
@@ -500,36 +424,12 @@ public class ConfigurationFragment extends Fragment {
         }
     }
 
-    public void makeFileSettings(View v, String fileName) {
-        FileOutputStream fos = null;
-
-        try {
-            fos = mainActivity.openFileOutput(fileName, MODE_PRIVATE);
-
-            Toast.makeText(mainActivity, "Fil oprettet med navn: " + fileName, Toast.LENGTH_LONG).show();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if(fos != null) {
-                try {
-                    fos.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
     public void save(View v, String data, String fileName) {
         FileOutputStream fos = null;
 
         try {
             fos = mainActivity.openFileOutput(fileName, MODE_APPEND);
             fos.write(data.getBytes());
-            //System.out.println(data);
-
             Toast.makeText(mainActivity, "Data tilføjet til: " + fileName, Toast.LENGTH_LONG).show();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -544,28 +444,5 @@ public class ConfigurationFragment extends Fragment {
                 }
             }
         }
-    }
-
-    public Settings loadSettings(View v) {
-        Settings settings = null;
-        try {
-            FileInputStream fileInputStream = new FileInputStream(new File("Settings"));
-            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-            settings = (Settings) objectInputStream.readObject();
-            objectInputStream.close();
-            fileInputStream.close();
-            // Do something with the loaded settings object
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return settings;
-    }
-
-    public void setFileName(String fileName) {
-        FILE_NAME = fileName;
-    }
-
-    public void setLocations(String[] settingLocations) {
-        locations = settingLocations;
     }
 }
