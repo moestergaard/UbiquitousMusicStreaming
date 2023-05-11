@@ -31,4 +31,8 @@
         <item name="android:minHeight">@dimen/cat_button_small_height</item>
     </style>
 
+    <style name="ButtonStyle" parent="@android:style/Widget.Button">
+        <item name="android:background">@color/spotifyGreen</item>
+    </style>
+
 </resources>

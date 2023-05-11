@@ -22,17 +22,18 @@
             app:layout_constraintBottom_toBottomOf="parent">
 
 
-
-
-
             <TextView
                 android:id="@+id/dataHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="8dp"
+                android:text="FØRSTE STEP: Indsaml data"
+                android:textColor="@color/textOnBackground"
                 android:textSize="20sp"
-                android:textStyle="bold"
-                android:layout_margin="8dp"
-                android:text="FØRSTE STEP: Indsaml data" />
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/dataSubHeader"
@@ -41,15 +42,8 @@
                 android:textSize="16sp"
                 android:layout_margin="8dp"
                 android:layout_marginBottom="16dp"
-                android:text="Lav en model til sporing ved at indsamle datapunkter. Dette gøres ved at indsamle i de ønskede rum et efter et. Indsaml i et rum ved at indtaste rummets navn og trykke start scanning. Gå derefter rundt i rummet uden at forlade denne side. Hvis der ønskes en ny model lav da en ny datafil og indsaml data på ny." />
-
-            <TextView
-                android:id="@+id/textRoom"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textSize="16sp"
-                android:layout_margin="8dp"/>
+                android:text="Lav en model til sporing ved at indsamle datapunkter. Dette gøres ved at indsamle i de ønskede rum et efter et. Indsaml i et rum ved at indtaste rummets navn og trykke start scanning. Gå derefter rundt i rummet uden at forlade denne side. Hvis der ønskes en ny model lav da en ny datafil og indsaml data på ny."
+                android:textColor="@color/textOnBackground"/>
 
             <EditText
                 android:id="@+id/editTextRoom"
@@ -64,29 +58,26 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_marginBottom="8dp"
-                android:textColorHint="@android:color/darker_gray"/>
+                android:textColorHint="@android:color/darker_gray"
+                android:textColor="@color/textOnBackground"/>
 
-
-            <TextView
-                android:id="@+id/textStopScanning"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textSize="16sp"
-                android:layout_margin="8dp"/>
 
             <Button
                 android:id="@+id/btnStartScanning"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
-                android:text="Start Wifi Scanning"/>
+                android:text="Start Wifi Scanning"
+                android:backgroundTint="@color/button"
+                android:textColor="@color/textOnButton"/>
             <Button
                 android:id="@+id/btnStopScanning"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
-                android:text="Stop Wifi Scanning"/>
+                android:text="Stop Wifi Scanning"
+                android:backgroundTint="@color/button"
+                android:textColor="@color/textOnButton"/>
 
             <TextView
                 android:id="@+id/textFileName"
@@ -97,7 +88,8 @@
                 android:layout_marginBottom="8dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
-                android:layout_marginTop="24dp"/>
+                android:layout_marginTop="24dp"
+                android:textColor="@color/textOnBackground"/>
 
             <Button
                 android:id="@+id/btnNewFile"
@@ -107,7 +99,9 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_marginBottom="60dp"
-                android:text="Lav ny datafil"/>
+                android:text="Lav ny datafil"
+                android:backgroundTint="@color/button"
+                android:textColor="@color/textOnButton"/>
 
             <TextView
                 android:id="@+id/speakerHeader"
@@ -116,7 +110,8 @@
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:layout_margin="8dp"
-                android:text="ANDET STEP: Vælg højtalere" />
+                android:text="ANDET STEP: Vælg højtalere"
+                android:textColor="@color/textOnBackground"/>
 
             <TextView
                 android:id="@+id/speakerSubHeader"
@@ -124,30 +119,37 @@
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
                 android:layout_margin="8dp"
-                android:text="Vælg den ønskede højtaler, og hvilket rum den hører til. Tryk derefter gem. Gør dette for alle højtalere." />
+                android:text="Vælg den ønskede højtaler, og hvilket rum den hører til. Tryk derefter gem. Gør dette for alle højtalere."
+                android:textColor="@color/textOnBackground"/>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
                 android:layout_margin="8dp"
-                android:text="Vælg højtaler" />
+                android:text="Vælg højtaler"
+                android:textColor="@color/textOnBackground"/>
             <Spinner
                 android:id="@+id/spinnerSpeaker"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp"/>
+                android:layout_margin="8dp"
+                android:backgroundTint="@color/button"
+                android:textColor="@color/textOnBackground"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
                 android:layout_margin="8dp"
-                android:text="Vælg lokale" />
+                android:text="Vælg lokale"
+                android:textColor="@color/textOnBackground"/>
             <Spinner
                 android:id="@+id/spinnerRoom"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp"/>
+                android:layout_margin="8dp"
+                android:backgroundTint="@color/button"
+                android:textColor="@color/textOnBackground"/>
             <Button
                 android:id="@+id/btnStoreSpeakerRoom"
                 android:layout_width="match_parent"
@@ -156,7 +158,9 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_marginBottom="60dp"
-                android:text="Gem"/>
+                android:text="Gem"
+                android:backgroundTint="@color/button"
+                android:textColor="@color/textOnButton"/>
 
         </LinearLayout>
     </ScrollView>

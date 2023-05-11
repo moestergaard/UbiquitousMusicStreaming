@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.Manifest;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 
 import com.example.ubiquitousmusicstreaming.ui.configuration.ConfigurationFragment;
 import com.example.ubiquitousmusicstreaming.ui.location.LocationFragment;
@@ -102,8 +103,14 @@ public class MainActivity extends AppCompatActivity {
         // fileSystemTest.overAllTestMethod();
 
         super.onCreate(savedInstanceState);
+        // setContentView(R.layout.activity_main);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
+
+        // Request window feature
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getSupportActionBar().hide();
+
         setContentView(binding.getRoot());
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -114,8 +121,10 @@ public class MainActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
-                .build();
+               R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
+               .build();
+        // AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder()
+        //         .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);

@@ -30,6 +30,8 @@ public class LocationFragment extends Fragment {
         binding = FragmentLocationBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        setHasOptionsMenu(false);
+
         mainActivity = (MainActivity) getParentFragment().getActivity();
 
         txtViewInUse = binding.textInUse;

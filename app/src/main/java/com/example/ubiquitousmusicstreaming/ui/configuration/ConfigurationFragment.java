@@ -97,8 +97,8 @@ public class ConfigurationFragment extends Fragment {
         buttonGetResultScanning = binding.btnStopScanning;
         buttonNewDataFile = binding.btnNewFile;
         buttonStoreSpeakerRoom = binding.btnStoreSpeakerRoom;
-        textViewStartScanning = binding.textRoom;
-        textViewStopScanning = binding.textStopScanning;
+        // textViewStartScanning = binding.textRoom;
+        // textViewStopScanning = binding.textStopScanning;
         textViewDataFile = binding.textFileName;
         spinSpeaker = binding.spinnerSpeaker;
         spinRoom = binding.spinnerRoom;

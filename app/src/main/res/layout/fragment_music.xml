@@ -18,21 +18,25 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            tools:text="Token: 089d841ccc194c10a77afad9e1c11d54" />
+            tools:text="Token: 089d841ccc194c10a77afad9e1c11d54"
+            android:textColor="@color/white"/>
 
         <Button
             android:id="@+id/token_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:text="Request Token" />
+            android:text="Request Token"
+            android:backgroundTint="@color/spotifyGreen"
+            android:textColor="@color/spotifyBlack"/>
 
         <TextView
             android:id="@+id/code_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            tools:text="Code: 089d841ccc194c10a77afad9e1c11d54" />
+            tools:text="Code: 089d841ccc194c10a77afad9e1c11d54"
+            android:textColor="@color/white"/>
 
         <ScrollView
             android:layout_width="match_parent"
@@ -45,7 +49,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="10sp"
-                tools:text="Line 1\nLine 2\nLine 3" />
+                tools:text="Line 1\nLine 2\nLine 3"
+                android:textColor="@color/white"/>
 
         </ScrollView>
 
@@ -54,14 +59,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:text="Get Speakers" />
+            android:text="Get Speakers"
+            android:backgroundTint="@color/spotifyGreen"
+            android:textColor="@color/spotifyBlack"/>
 
         <Button
             android:id="@+id/buttonGetProfile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:text="Get User Profile" />
+            android:text="Get User Profile"
+            android:backgroundTint="@color/spotifyGreen"
+            android:textColor="@color/spotifyBlack"/>
 
     </LinearLayout>
 
