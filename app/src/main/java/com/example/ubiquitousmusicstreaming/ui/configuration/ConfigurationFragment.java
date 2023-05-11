@@ -112,21 +112,22 @@ public class ConfigurationFragment extends Fragment {
             public void onClick(View view) {
                 if (FILE_NAME != null) {
                     room = editTextRoom.getText().toString();
-                    List<String> l = new ArrayList<String>(Arrays.asList(locations));
-                    if (!l.contains(room)) {
-                        l.add(room);
+                    if (!room.isEmpty()) {
+                        List<String> l = new ArrayList<String>(Arrays.asList(locations));
+                        if (!l.contains(room)) {
+                            l.add(room);
+                            addLocationToSettings(room);
+                        }
+                        locations = l.toArray(locations);
+                        editTextRoom.getText().clear();
+                        String displayStartScanning = "Scanning startet af: ";
+                        textViewRoom.setText(displayStartScanning + room);
+                        scan = true;
+                        mainActivity.setInUseDataCollection(true);
+                        startScanning();
+
+                        setupSpeakerRoomSelection(spinSpeaker, spinRoom);
                     }
-                    locations = l.toArray(locations);
-                    editTextRoom.getText().clear();
-                    String displayStartScanning = "Scanning startet af: ";
-                    textViewRoom.setText(displayStartScanning + room);
-                    addLocationToSettings(room);
-
-                    scan = true;
-                    mainActivity.setInUseDataCollection(true);
-                    startScanning();
-
-                    setupSpeakerRoomSelection(spinSpeaker, spinRoom);
                 }
                 else { textViewRoom.setText("Lav en ny datafil først"); }
             }
