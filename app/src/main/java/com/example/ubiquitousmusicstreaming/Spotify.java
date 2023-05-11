@@ -12,12 +12,24 @@ import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
 public class Spotify {
 
-    private void getAvailableSpeakers() {
+    private MainActivity mainActivity;
+    private Call mCall;
+    private OkHttpClient mOkHttpClient = new OkHttpClient();
+    private static List<Device> devices = new ArrayList<>();
+    private String responseMessage;
+
+    public Spotify(MainActivity _mainActivity) {
+        mainActivity = _mainActivity;
+        refreshSpeakers();
+    }
+
+    public void refreshSpeakers() {
         final Request request = new Request.Builder()
                 .url("https://api.spotify.com/v1/me/player/devices")
                 .addHeader("Authorization","Bearer " + mainActivity.getAccessToken())
@@ -32,7 +44,9 @@ public class Spotify {
 
             @Override
             public void onFailure(Call call, IOException e) {
+                responseMessage = "Failure";
                 System.out.println("Noget gik galt.");
+                refreshSpeakers();
             }
             @Override
             public void onResponse(Call call, Response response) {
@@ -44,6 +58,8 @@ public class Spotify {
 
                         List<Device> tmpDevices = new ArrayList<>();
 
+                        responseMessage = "Received";
+
                         for (JsonElement deviceJson : devicesJson) {
                             Device device = gson.fromJson(deviceJson, Device.class);
                             tmpDevices.add(device);
@@ -52,10 +68,29 @@ public class Spotify {
                         devices = tmpDevices;
 
                     } catch (IOException e) {
+                        refreshSpeakers();
                         throw new RuntimeException(e);
                     }
                 }
+                else { refreshSpeakers(); }
             }
         });
     }
+
+    private void cancelCall() {
+        if (mCall != null) {
+            mCall.cancel();
+        }
+    }
+
+    public List<Device> getAvailableSpeakers() {
+        // refreshSpeakers();
+        return devices;
+    }
+
+    public String getResponseMessage() {
+        return responseMessage;
+    }
+
+
 }

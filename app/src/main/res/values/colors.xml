@@ -15,4 +15,8 @@
     <color name="textOnButton">#191414</color>
     <color name="backgroundSpinner">#3e3e40</color>
     <color name="light_grey">#66ffffff</color>
+
+    <!--For navigation bar-->
+    <color name="selected_color">#FFFFFFFF</color>
+    <color name="unselected_color">#66ffffff</color>
 </resources>

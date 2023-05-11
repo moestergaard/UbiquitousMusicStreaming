@@ -9,6 +9,8 @@
         <!--item name="colorOnPrimary">@color/background</item-->
         <!--item name="android:windowBackground">@color/background</item-->
         <item name="android:statusBarColor" tools:ignore="NewApi">@android:color/transparent</item>
+        <!--item name="android:statusBarColor" tools:ignore="NewApi">#B3121212</item-->
+        <!--item name="android:navigationBarColor" tools:ignore="NewApi">#B3121212</item-->
         <item name="android:navigationBarColor" tools:ignore="NewApi">@android:color/transparent</item>
 
         <item name="android:windowBackground">@drawable/background</item>
@@ -20,4 +22,6 @@
         <!--item name="android:statusBarColor">?attr/colorOnPrimary</item-->
         <!-- Customize your theme here. -->
     </style>
+
+
 </resources>

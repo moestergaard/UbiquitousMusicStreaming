@@ -26,6 +26,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.ubiquitousmusicstreaming.FileSystem;
 import com.example.ubiquitousmusicstreaming.MainActivity;
 import com.example.ubiquitousmusicstreaming.R;
+import com.example.ubiquitousmusicstreaming.Spotify;
 import com.example.ubiquitousmusicstreaming.WifiReceiver;
 import com.example.ubiquitousmusicstreaming.databinding.FragmentConfigurationBinding;
 
@@ -76,6 +77,7 @@ public class ConfigurationFragment extends Fragment {
     Boolean scan = false;
     private Call mCall;
     private OkHttpClient mOkHttpClient = new OkHttpClient();
+    private Spotify spotify;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -91,6 +93,7 @@ public class ConfigurationFragment extends Fragment {
         locations = mainActivity.getLocation();
 
         wifiReceiver = mainActivity.getWifiReceiver();
+        spotify = mainActivity.getSpotify();
 
         editTextRoom = binding.editTextRoom;
         buttonStartScanning = binding.btnStartScanning;
@@ -232,16 +235,42 @@ public class ConfigurationFragment extends Fragment {
     }
 
     private void updateTextViewDataFile() {
-        String date = FILE_NAME.split("T")[0];
-        textViewDataFile.setText("Nuværende datafil er fra " + date);
+        if (!FILE_NAME.equals("")) {
+            String date = FILE_NAME.split("T")[0];
+            textViewDataFile.setText("Nuværende datafil er fra " + date);
+        }
     }
 
     private void setupSpeakerRoomSelection(Spinner spinSpeaker, Spinner spinRoom) {
-        getAvailableSpeakers();
+        devices = spotify.getAvailableSpeakers();
+
+        /*
+        while(!spotify.getResponseMessage().equals("Received")) {
+            devices = spotify.getAvailableSpeakers();
+        }
+         */
+
+
         List<String> rooms = new ArrayList<>();
 
-        for (Device d : devices) {
-            rooms.add(d.getName());
+        /*
+        int i = 0;
+        while(devices.isEmpty()) {
+            devices = spotify.getAvailableSpeakers();
+            //System.out.println(i);
+            i++;
+            if(i > 10000000) {
+                System.out.println("Ingen tilgængelige højtalere.");
+                break;
+            }
+        }
+
+         */
+
+        if (!devices.isEmpty()) {
+            for (Device d : devices) {
+                rooms.add(d.getName());
+            }
         }
 
         String[] roomsArray = new String[rooms.size()];

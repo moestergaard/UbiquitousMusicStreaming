@@ -73,8 +73,9 @@ public class MainActivity extends AppCompatActivity {
     private static SpotifyAppRemote mSpotifyAppRemote;
     private static String ACCESS_TOKEN;
     private Hashtable<String, String> locationSpeakerID;
-    private String fileName;
+    private String fileName = "";
     private static String lastLocationFragmentTextView = "";
+    private static Spotify spotify;
 
 
     @Override
@@ -134,6 +135,8 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         wifiReceiver.attach(this); // Adding this mainActivity as an observer.
         dm = new DataManagement();
+
+        spotify = new Spotify(this);
 
         //mOkHttpClient = new OkHttpClient();
 
@@ -412,4 +415,6 @@ public class MainActivity extends AppCompatActivity {
     public Boolean getInUseTemp() { return inUseTemp; }
 
     public String getLastLocationFragmentTextView() { return lastLocationFragmentTextView; }
+
+    public Spotify getSpotify() { return spotify; }
 }
