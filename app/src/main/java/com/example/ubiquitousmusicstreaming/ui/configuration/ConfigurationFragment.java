@@ -225,31 +225,6 @@ public class ConfigurationFragment extends Fragment {
         FileSystem.writeObjectToFile(mainActivity, settings);
     }
 
-    private void makeSettings() {
-        File settingsFile = new File("Settings");
-        settingsFile.setReadable(true);
-        settingsFile.setWritable(true);
-        try {
-            settingsFile.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    private void saveSettings(Settings settings) {
-        try {
-            FileOutputStream fileOutputStream = new FileOutputStream(new File("Settings"));
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-            objectOutputStream.writeObject(settings);
-            objectOutputStream.close();
-            fileOutputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
