@@ -39,7 +39,12 @@ public class LocationFragment extends Fragment {
         buttonInUse = binding.btnUseSystem;
         buttonStop = binding.btnStopSystem;
 
+        inUse = mainActivity.getInUse();
+        inUseTemp = mainActivity.getInUseTemp();
+
         updateTextView();
+
+        SetTextView(mainActivity.getLastLocationFragmentTextView());
 
         buttonInUse.setOnClickListener(new View.OnClickListener() {
             @Override

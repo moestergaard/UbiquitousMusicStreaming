@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/spotifyBlack">
+    android:layout_height="match_parent">
+    <!--android:background="@color/spotifyBlack"-->
 
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -13,14 +13,17 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="0dp"
         android:layout_marginEnd="0dp"
-        android:background="@color/background"
-        app:backgroundTint="@color/background"
+        android:background="@android:color/transparent"
+        android:backgroundTint="@android:color/transparent"
         app:itemIconTint="@color/white"
         app:itemTextColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:menu="@menu/bottom_nav_menu" />
+
+
+
 
     <fragment
         android:id="@+id/nav_host_fragment_activity_main"

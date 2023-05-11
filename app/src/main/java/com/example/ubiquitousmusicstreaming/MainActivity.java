@@ -66,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
     private static DataManagement dm;
     private static String predictedRoom, previousLocation = "";
     private static String[] locations = /* new String[]{}; = */ new String[]{"Kontor", "Stue", "Køkken"};
-
     private static final String CLIENT_ID = "6e101d8a913048819b5af5e6ee372b59";
     //public static final String CLIENT_ID = "0bda033615af412eb05a8ce97d44fec2";
     private static final String REDIRECT_URI = "ubiquitousmusicstreaming-login://callback";
@@ -75,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
     private static String ACCESS_TOKEN;
     private Hashtable<String, String> locationSpeakerID;
     private String fileName;
+    private static String lastLocationFragmentTextView = "";
 
 
     @Override
@@ -342,7 +342,8 @@ public class MainActivity extends AppCompatActivity {
             else {
                 quessedRoom = locations[index];
                 if(inUseTemp) {
-                    locationFragment.SetTextView("Gætter på: " + quessedRoom + ", men er stadigvæk: " + predictedRoom);
+                    lastLocationFragmentTextView = "Gætter på: " + quessedRoom + ", men er stadigvæk: " + predictedRoom;
+                    locationFragment.SetTextView(lastLocationFragmentTextView);
                 }
                 previousLocation = locations[index];
             }
@@ -350,7 +351,8 @@ public class MainActivity extends AppCompatActivity {
         if(inUseTemp) {
             if (quessedRoom.equals("")) {
                 musicFragment.updateSpeaker(predictedRoom);
-                locationFragment.SetTextView("Lokation: " + predictedRoom);
+                lastLocationFragmentTextView = "Lokation: " + predictedRoom;
+                locationFragment.SetTextView(lastLocationFragmentTextView);
             }
 
             //System.out.println("Lokation: " + location);
@@ -404,4 +406,10 @@ public class MainActivity extends AppCompatActivity {
     public String[] getLocation() {
         return locations;
     }
+
+    public Boolean getInUse() { return inUse; }
+
+    public Boolean getInUseTemp() { return inUseTemp; }
+
+    public String getLastLocationFragmentTextView() { return lastLocationFragmentTextView; }
 }

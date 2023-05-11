@@ -14,4 +14,5 @@
     <color name="button">#1DB954</color>
     <color name="textOnButton">#191414</color>
     <color name="backgroundSpinner">#3e3e40</color>
+    <color name="light_grey">#66ffffff</color>
 </resources>

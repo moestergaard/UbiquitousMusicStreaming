@@ -63,7 +63,7 @@ public class ConfigurationFragment extends Fragment {
     WifiReceiver wifiReceiver;
     EditText editTextRoom;
     Button buttonStartScanning, buttonGetResultScanning, buttonNewDataFile, buttonStoreSpeakerRoom;
-    TextView textViewStartScanning, textViewStopScanning, textViewDataFile;
+    TextView textViewRoom, textViewDataFile;
     Spinner spinSpeaker, spinRoom;
     ArrayAdapter<String> adapterSpeakers, adapterRoom;
     String room, displayGetScanResult, lastScanResults = "";
@@ -97,7 +97,7 @@ public class ConfigurationFragment extends Fragment {
         buttonGetResultScanning = binding.btnStopScanning;
         buttonNewDataFile = binding.btnNewFile;
         buttonStoreSpeakerRoom = binding.btnStoreSpeakerRoom;
-        // textViewStartScanning = binding.textRoom;
+        textViewRoom = binding.textRoom;
         // textViewStopScanning = binding.textStopScanning;
         textViewDataFile = binding.textFileName;
         spinSpeaker = binding.spinnerSpeaker;
@@ -122,8 +122,8 @@ public class ConfigurationFragment extends Fragment {
                     //System.out.println(Arrays.asList(locations));
                     editTextRoom.getText().clear();
                     String displayStartScanning = "Scanning startet af: ";
-                    textViewStopScanning.setText("");
-                    textViewStartScanning.setText(displayStartScanning + room);
+                    //textViewRoom.setText("");
+                    textViewRoom.setText(displayStartScanning + room);
                     addLocationToSettings(room);
 
                     scan = true;
@@ -132,7 +132,7 @@ public class ConfigurationFragment extends Fragment {
 
                     setupSpeakerRoomSelection(spinSpeaker, spinRoom);
                 }
-                else { textViewStartScanning.setText("Lav en ny datafil først"); }
+                else { textViewRoom.setText("Lav en ny datafil først"); }
             }
         });
 
@@ -142,8 +142,8 @@ public class ConfigurationFragment extends Fragment {
                 scan = false;
                 mainActivity.setInUseDataCollection(false);
                 String message = "Scanning stoppet for: ";
-                textViewStartScanning.setText("");
-                textViewStopScanning.setText(message + room);
+                //textViewStartScanning.setText("");
+                textViewRoom.setText(message + room);
             }
         });
 
@@ -308,7 +308,8 @@ public class ConfigurationFragment extends Fragment {
     }
 
     private void updateTextViewDataFile() {
-        textViewDataFile.setText("Nuværende datafil er: " + FILE_NAME);
+        String date = FILE_NAME.split("T")[0];
+        textViewDataFile.setText("Nuværende datafil er fra " + date);
     }
 
     private void setupSpeakerRoomSelection(Spinner spinSpeaker, Spinner spinRoom) {
