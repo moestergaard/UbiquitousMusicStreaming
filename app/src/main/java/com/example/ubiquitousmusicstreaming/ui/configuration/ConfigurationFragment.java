@@ -63,7 +63,7 @@ public class ConfigurationFragment extends Fragment {
     MainActivity mainActivity;
     WifiReceiver wifiReceiver;
     EditText editTextRoom;
-    Button buttonStartScanning, buttonGetResultScanning, buttonNewDataFile, buttonStoreSpeakerRoom;
+    Button buttonStartScanning, buttonStopScanning, buttonNewDataFile, buttonStoreSpeakerRoom;
     TextView textViewRoom, textViewDataFile;
     Spinner spinSpeaker, spinRoom;
     ArrayAdapter<String> adapterSpeakers, adapterRoom;
@@ -92,13 +92,15 @@ public class ConfigurationFragment extends Fragment {
         mainActivity.attachConfigurationFragment(this);
         FILE_NAME = mainActivity.getFileName();
         locations = mainActivity.getLocation();
+        room = mainActivity.getRoomCurrentlyScanning();
+
 
         wifiReceiver = mainActivity.getWifiReceiver();
         spotify = mainActivity.getSpotify();
 
         editTextRoom = binding.editTextRoom;
         buttonStartScanning = binding.btnStartScanning;
-        buttonGetResultScanning = binding.btnStopScanning;
+        buttonStopScanning = binding.btnStopScanning;
         buttonNewDataFile = binding.btnNewFile;
         buttonStoreSpeakerRoom = binding.btnStoreSpeakerRoom;
         textViewRoom = binding.textRoom;
@@ -110,6 +112,10 @@ public class ConfigurationFragment extends Fragment {
         setupSpeakerRoomSelection(spinSpeaker, spinRoom);
 
         updateTextViewDataFile();
+        updateTextViewRoom(room);
+
+        if (mainActivity.getInUseDataCollection()) { scan = true; startScanning(); }
+
 
         buttonStartScanning.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -124,10 +130,10 @@ public class ConfigurationFragment extends Fragment {
                         }
                         locations = l.toArray(locations);
                         editTextRoom.getText().clear();
-                        String displayStartScanning = "Scanning startet af: ";
-                        textViewRoom.setText(displayStartScanning + room);
+                        updateTextViewRoom(room);
                         scan = true;
                         mainActivity.setInUseDataCollection(true);
+                        mainActivity.setRoomCurrentlyScanning(room);
                         startScanning();
 
                         setupSpeakerRoomSelection(spinSpeaker, spinRoom);
@@ -137,11 +143,12 @@ public class ConfigurationFragment extends Fragment {
             }
         });
 
-        buttonGetResultScanning.setOnClickListener(new View.OnClickListener() {
+        buttonStopScanning.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 scan = false;
                 mainActivity.setInUseDataCollection(false);
+                mainActivity.setRoomCurrentlyScanning(null);
                 String message = "Scanning stoppet for: ";
                 textViewRoom.setText(message + room);
             }
@@ -243,6 +250,14 @@ public class ConfigurationFragment extends Fragment {
         }
     }
 
+    private void updateTextViewRoom(String room) {
+        if (room != null)
+        {
+            String displayStartScanning = "Scanning startet af: ";
+            textViewRoom.setText(displayStartScanning + room);
+        }
+    }
+
     private void setupSpeakerRoomSelection(Spinner spinSpeaker, Spinner spinRoom) {
         devices = spotify.getAvailableSpeakers();
         List<String> rooms = new ArrayList<>();
@@ -317,6 +332,8 @@ public class ConfigurationFragment extends Fragment {
         }
 
     }
+
+
 
     private String makeScanResultString(List<ScanResult> scanResults) {
 

@@ -43,10 +43,11 @@ public class MainActivity extends AppCompatActivity {
     private static String lastLocationFragmentTextView = "";
     private static Spotify spotify;
     private static Hashtable<String, String> locationSpeakerID = new Hashtable<>();
-    private static String trackName;
+    private String trackName;
     private String artistName;
     private ImageUri coverImage;
     private Boolean playing;
+    private String roomCurrentlyScanning;
 
 
     @Override
@@ -127,13 +128,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    /*
+
 
     /**
      * Will later be used to determine in which room the music are supposed to play.
      * @param scanResults
      */
-    /*
+
     private static void printLocation(List<ScanResult> scanResults) {
         double[] location = dm.getPredictionNN(scanResults);
         String quessedRoom = "";
@@ -179,8 +180,7 @@ public class MainActivity extends AppCompatActivity {
         else { inUse = false; }
     }
 
-     */
-
+    /*
     private static void printLocation(List<ScanResult> scanResults) {
         double[] location = dm.getPredictionNN(scanResults);
 
@@ -237,6 +237,8 @@ public class MainActivity extends AppCompatActivity {
         return guessedRoom;
     }
 
+     */
+
 
     public void updateLocationSpeakerID(Hashtable<String, String> _locationSpeakerID) {
         locationSpeakerID = _locationSpeakerID;
@@ -260,8 +262,11 @@ public class MainActivity extends AppCompatActivity {
 
     public static void update() {
         if(!inUse) {
+            System.out.println("in use er her: " + inUse);
             if(inUseDataCollection) {
+                System.out.println("inUseDataCollection er her: " + inUseDataCollection);
                 if(configurationFragment != null) {
+                    System.out.println("configurationFragment er her: " + configurationFragment);
                     configurationFragment.update();
                 }
             }
@@ -289,10 +294,12 @@ public class MainActivity extends AppCompatActivity {
     public static WifiManager getWifiManager() { return wifiManager; }
     public static String getAccessToken() { return spotify.getAccessToken(); }
     public static Hashtable<String, String> getLocationSpeakerID() { return locationSpeakerID; }
-    public static String getTrackName() { return trackName; }
+    public String getTrackName() { return trackName; }
     public String getArtistName() { return artistName; }
     public ImageUri getCoverImage() { return coverImage; }
     public Boolean getPlaying() { return playing; }
+    public String getRoomCurrentlyScanning() { return roomCurrentlyScanning; }
+    public Boolean getInUseDataCollection() { return inUseDataCollection; }
     public void attachMusicFragment(MusicFragment musicFragment) { this.musicFragment = musicFragment; }
     public void attachConfigurationFragment(ConfigurationFragment configurationFragment) { this.configurationFragment = configurationFragment; }
     public void attachLocationFragment(LocationFragment locationFragment) { this.locationFragment = locationFragment; }
@@ -301,5 +308,6 @@ public class MainActivity extends AppCompatActivity {
     public void setArtistName(String artistName) { this.artistName = artistName; }
     public void setCoverImage(ImageUri coverImage) { this.coverImage = coverImage; }
     public void setPlaying(Boolean playing) {this.playing = playing; }
+    public void setRoomCurrentlyScanning(String roomCurrentlyScanning) { this.roomCurrentlyScanning = roomCurrentlyScanning; }
     public void removeLocationFragment() {locationFragment = null ;}
 }
