@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private static Boolean inUse = false, inUseTemp, inUseDataCollection = false;
     private static DataManagement dm;
     private static String predictedRoom, previousLocation = "";
-    private static String[] locations = /* new String[]{}; = */ new String[]{"Kontor", "Stue", "Køkken"};
+    private static String[] locations; //= /* new String[]{}; = */ new String[]{"Kontor", "Stue", "Køkken"};
     private static final String CLIENT_ID = "6e101d8a913048819b5af5e6ee372b59";
     //public static final String CLIENT_ID = "0bda033615af412eb05a8ce97d44fec2";
     private static final String REDIRECT_URI = "ubiquitousmusicstreaming-login://callback";
@@ -106,6 +106,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         // setContentView(R.layout.activity_main);
 
+        loadSettings();
+
+        spotify = new Spotify(this);
+        spotify.connect();
+        spotify.refreshSpeakers();
+
         binding = ActivityMainBinding.inflate(getLayoutInflater());
 
         // Request window feature
@@ -136,10 +142,11 @@ public class MainActivity extends AppCompatActivity {
         wifiReceiver.attach(this); // Adding this mainActivity as an observer.
         dm = new DataManagement();
 
-        spotify = new Spotify(this);
+
 
         //mOkHttpClient = new OkHttpClient();
 
+        /*
         // Authorize spotify
         AuthorizationRequest.Builder builder =
                 new AuthorizationRequest.Builder(CLIENT_ID, AuthorizationResponse.Type.TOKEN, REDIRECT_URI);
@@ -149,11 +156,31 @@ public class MainActivity extends AppCompatActivity {
 
         AuthorizationClient.openLoginActivity(this, REQUEST_CODE, request);
 
-        loadSettings();
+         */
+
+
         // Settings settings = FileSystem.readObjectFromFile(this);
         // String fileName = settings.getFileName();
         // int tmp = 2;
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+
+        if (requestCode == REQUEST_CODE) {
+            spotify.handleAuthorizationResponse(resultCode, intent);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        spotify.disconnect();
+    }
+
+    /*
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -246,7 +273,8 @@ public class MainActivity extends AppCompatActivity {
                 });
 
          */
-    }
+/*
+}
 
     @Override
     protected void onStop() {
@@ -257,6 +285,7 @@ public class MainActivity extends AppCompatActivity {
         //mSpotifyAppRemote.getConnectApi().
 
     }
+    */
 
     public static WifiReceiver getWifiReceiver() {
         return wifiReceiver;
@@ -271,7 +300,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static String getAccessToken() {
-        return ACCESS_TOKEN;
+        return spotify.getAccessToken();
+        //return ACCESS_TOKEN;
     }
 
     public static SpotifyAppRemote getmSpotifyAppRemote() { return mSpotifyAppRemote; }
@@ -327,6 +357,10 @@ public class MainActivity extends AppCompatActivity {
                 index = i;
             }
         }
+
+        System.out.println(location);
+        System.out.println(temp);
+        System.out.println(index);
 
         if (location[index] < 0.70) {
             if (previousLocation.equals("Intet Rum")) {
