@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
     private static String lastLocationFragmentTextView = "";
     private static Spotify spotify;
     private static Hashtable<String, String> locationSpeakerName = new Hashtable<>();
-    private Hashtable<String, String> speakerNameId = new Hashtable<>();
     private String trackName;
     private String artistName;
     private ImageUri coverImage;
@@ -306,7 +305,6 @@ public class MainActivity extends AppCompatActivity {
     public Boolean getPlaying() { return playing; }
     public String getRoomCurrentlyScanning() { return roomCurrentlyScanning; }
     public Boolean getInUseDataCollection() { return inUseDataCollection; }
-    public Hashtable<String, String> getSpeakerNameId() { return speakerNameId; }
     public void attachMusicFragment(MusicFragment musicFragment) { this.musicFragment = musicFragment; }
     public void attachConfigurationFragment(ConfigurationFragment configurationFragment) { this.configurationFragment = configurationFragment; }
     public void attachLocationFragment(LocationFragment locationFragment) { this.locationFragment = locationFragment; }
@@ -316,7 +314,6 @@ public class MainActivity extends AppCompatActivity {
     public void setCoverImage(ImageUri coverImage) { this.coverImage = coverImage; }
     public void setPlaying(Boolean playing) {this.playing = playing; }
     public void setRoomCurrentlyScanning(String roomCurrentlyScanning) { this.roomCurrentlyScanning = roomCurrentlyScanning; }
-    public void setSpeakerNameId(Hashtable<String, String> speakerNameId) { this.speakerNameId = speakerNameId; }
     public void removeLocationFragment() {locationFragment = null ;}
     public void setLocations(String[] locations) { this.locations = locations; }
 }

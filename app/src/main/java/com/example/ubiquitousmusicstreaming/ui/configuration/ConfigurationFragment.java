@@ -186,7 +186,6 @@ public class ConfigurationFragment extends Fragment {
                         locationSpeakerName = new Hashtable<>();
                         speakersNameID = new Hashtable<>();
                         setupSpeakerRoomSelection(spinSpeaker, spinRoom);
-                        settings.setSpeakerNameId(speakersNameID);
                     }
                 });
 
@@ -254,6 +253,7 @@ public class ConfigurationFragment extends Fragment {
         FileSystem.writeObjectToFile(mainActivity, settings);
     }
 
+    /*
     private void addSpeakerNameId(String speakerName, String speakerId) {
         Settings settings = FileSystem.readObjectFromFile(mainActivity);
 
@@ -265,11 +265,13 @@ public class ConfigurationFragment extends Fragment {
 
             }
              */
+    /*
             speakerNameId.put(speakerName, speakerId);
             settings.setSpeakerNameId(speakerNameId);
         }
         FileSystem.writeObjectToFile(mainActivity, settings);
     }
+    */
 
     @Override
     public void onDestroyView() {
@@ -303,7 +305,6 @@ public class ConfigurationFragment extends Fragment {
             }
         }
 
-        mainActivity.setSpeakerNameId(speakersNameID);
         String[] deviceNamesArray = new String[deviceNames.size()];
         deviceNames.toArray(deviceNamesArray);
 

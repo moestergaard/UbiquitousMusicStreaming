@@ -39,7 +39,6 @@ public class LocationFragment extends Fragment {
     private Boolean inUse = false, inUseTemp;
     private static String playingLocation = "";
     private static Hashtable<String, String> locationSpeakerName = new Hashtable<>();
-    private Hashtable<String, String> speakerNameId = new Hashtable<>();
     private static MainActivity mainActivity;
     private Spotify spotify;
 
@@ -65,7 +64,6 @@ public class LocationFragment extends Fragment {
         inUseTemp = mainActivity.getInUseTemp();
         locationSpeakerName = mainActivity.getLocationSpeakerName();
         spotify = mainActivity.getSpotify();
-        speakerNameId = mainActivity.getSpeakerNameId();
 
         updateTextView();
 
