@@ -94,8 +94,8 @@ public class Spotify {
             // Get the cover image URL
             ImageUri coverImage = track.imageUri;
 
-
-            updateMusicFragment(trackName, artistName, coverImage);
+            Boolean playing = !playerState.isPaused;
+            updateMusicFragment(trackName, artistName, coverImage, playing);
             //updateTrackInformation();
             // Do something with the updated track information
             // ...
@@ -254,8 +254,18 @@ public class Spotify {
         return isPlaying[0];
     }
 
+    public void pause() {
+        spotifyAppRemote
+                .getPlayerApi()
+                .pause();
+    }
+
     public String getAccessToken() { return accessToken; }
     public SpotifyAppRemote getSpotifyAppRemote() { return spotifyAppRemote; }
     public void attachMusicFragment(MusicFragment musicFragment) { this.musicFragment = musicFragment; }
-    private void updateMusicFragment(String trackName, String artistName, ImageUri coverImage) { musicFragment.updateTrackInformation(trackName, artistName, coverImage); }
+    private void updateMusicFragment(String trackName, String artistName, ImageUri coverImage, Boolean playing)
+    {
+        musicFragment.updateTrackInformation(trackName, artistName, coverImage);
+        musicFragment.updatePlaying(playing);
+    }
 }

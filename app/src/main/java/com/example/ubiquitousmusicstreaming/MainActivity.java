@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private String trackName;
     private String artistName;
     private ImageUri coverImage;
-    private Boolean playing;
+    private static Boolean playing;
     private String roomCurrentlyScanning;
 
 
@@ -170,8 +170,13 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         if(inUseTemp) {
-            if (quessedRoom.equals("")) {
+            if (predictedRoom != null && predictedRoom.equals("Intet Rum")) {
+                spotify.pause();
+                playing = false;
+            }
+            else if (quessedRoom.equals("")) {
                 locationFragment.updateSpeaker(predictedRoom);
+                playing = true;
                 lastLocationFragmentTextView = "Lokation: " + predictedRoom;
                 locationFragment.SetTextView(lastLocationFragmentTextView);
             }

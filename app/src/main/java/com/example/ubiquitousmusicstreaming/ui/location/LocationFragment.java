@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -37,7 +38,7 @@ public class LocationFragment extends Fragment {
     private Boolean inUse = false, inUseTemp;
     private static String playingLocation = "";
     private static Hashtable<String, String> locationSpeakerID = new Hashtable<>();
-    private MainActivity mainActivity;
+    private static MainActivity mainActivity;
     private Spotify spotify;
 
     public View onCreateView(@NonNull LayoutInflater inflater,

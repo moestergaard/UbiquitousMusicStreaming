@@ -54,7 +54,9 @@ public class MusicFragment extends Fragment {
         spotify.attachMusicFragment(this);
 
         updateTrackInformationMainActivity();
-        updatePlaying();
+
+        Boolean playing = mainActivity.getPlaying();
+        updatePlaying(playing);
 
         playPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,9 +120,7 @@ public class MusicFragment extends Fragment {
 
     }
 
-    private void updatePlaying() {
-        Boolean playing = mainActivity.getPlaying();
-
+    public void updatePlaying(Boolean playing) {
         if (playing != null)
         {
             if (playing)
