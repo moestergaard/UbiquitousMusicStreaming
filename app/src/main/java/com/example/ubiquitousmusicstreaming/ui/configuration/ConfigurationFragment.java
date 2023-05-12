@@ -71,8 +71,9 @@ public class ConfigurationFragment extends Fragment {
     String FILE_NAME = "";
     String[] locations = new String[]{};
     List<Device> devices = new ArrayList<>();
-    String choosenSpeaker = "", choosenRoom = "";
+    String chosenSpeakerUniqueName = "", chosenSpeakerReadableName = "", chosenRoom = "";
     Hashtable<String, String> locationSpeakerID = new Hashtable<>();
+    Hashtable<String, String> speakersNameID = new Hashtable<>();
 
     List<ScanResult> scanResults;
     Boolean scan = false;
@@ -194,11 +195,11 @@ public class ConfigurationFragment extends Fragment {
         buttonStoreSpeakerRoom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!choosenSpeaker.equals("") && !choosenRoom.equals("")) {
-                    locationSpeakerID.put(choosenRoom, choosenSpeaker);
-                    addLocationSpeakerID(choosenRoom, choosenSpeaker);
+                if(!chosenSpeakerUniqueName.equals("") && !chosenRoom.equals("")) {
+                    locationSpeakerID.put(chosenRoom, chosenSpeakerUniqueName);
+                    addLocationSpeakerID(chosenRoom, chosenSpeakerUniqueName);
                     mainActivity.updateLocationSpeakerID(locationSpeakerID);
-                    Toast.makeText(mainActivity, "Højtaler: " + choosenSpeaker + ", rum: " + choosenRoom, Toast.LENGTH_LONG).show();
+                    Toast.makeText(mainActivity, "Rum: " + chosenRoom + "\nHøjtaler: " + chosenSpeakerReadableName, Toast.LENGTH_LONG).show();
                 }
                 else {
                     Toast.makeText(mainActivity, "Vælg både en højtaler og et rum.", Toast.LENGTH_LONG).show();
@@ -231,6 +232,12 @@ public class ConfigurationFragment extends Fragment {
 
         if (settings != null) {
             Hashtable<String, String> locationSpeakerID = settings.getLocationSpeakerID();
+            /*
+            while (locationSpeakerID.containsKey())
+            {
+
+            }
+             */
             locationSpeakerID.put(room, speakerID);
             settings.setLocationSpeakerID(locationSpeakerID);
         }
@@ -260,19 +267,20 @@ public class ConfigurationFragment extends Fragment {
 
     private void setupSpeakerRoomSelection(Spinner spinSpeaker, Spinner spinRoom) {
         devices = spotify.getAvailableSpeakers();
-        List<String> rooms = new ArrayList<>();
+        List<String> deviceNames = new ArrayList<>();
 
         if (!devices.isEmpty()) {
             for (Device d : devices) {
-                rooms.add(d.getName());
+                deviceNames.add(d.getName());
+                speakersNameID.put(d.getName(), d.getId());
             }
         }
 
-        String[] roomsArray = new String[rooms.size()];
-        rooms.toArray(roomsArray);
+        String[] deviceNamesArray = new String[deviceNames.size()];
+        deviceNames.toArray(deviceNamesArray);
 
 
-        adapterSpeakers = new ArrayAdapter<String>(mainActivity, R.layout.list_item, roomsArray);
+        adapterSpeakers = new ArrayAdapter<String>(mainActivity, R.layout.list_item, deviceNamesArray);
         adapterSpeakers.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinSpeaker.setAdapter(adapterSpeakers);
 
@@ -283,9 +291,13 @@ public class ConfigurationFragment extends Fragment {
         spinSpeaker.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                String room = adapterView.getItemAtPosition(i).toString();
-                int indexRoom = rooms.indexOf(room);
-                choosenSpeaker = devices.get(indexRoom).getId();
+                chosenSpeakerReadableName = adapterView.getItemAtPosition(i).toString();
+                chosenSpeakerUniqueName = speakersNameID.get(chosenSpeakerReadableName);
+
+                // int indexRoom = deviceNames.indexOf(chosenSpeakerReadableName);
+                // chosenSpeakerUniqueName = devices.get(indexRoom).getId();
+                System.out.println("readable name: " + chosenSpeakerReadableName);
+                System.out.println("unique name: " + chosenSpeakerUniqueName);
             }
 
             @Override
@@ -295,7 +307,7 @@ public class ConfigurationFragment extends Fragment {
         spinRoom.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                choosenRoom = adapterView.getItemAtPosition(i).toString();
+                chosenRoom = adapterView.getItemAtPosition(i).toString();
             }
 
             @Override
