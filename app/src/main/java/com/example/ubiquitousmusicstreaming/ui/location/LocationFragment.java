@@ -22,6 +22,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.Hashtable;
 
 import okhttp3.Call;
@@ -34,7 +35,7 @@ import okhttp3.Response;
 public class LocationFragment extends Fragment {
 
     private FragmentLocationBinding binding;
-    private static TextView txtViewInUse, txtViewLocation;
+    private static TextView txtViewInUse, txtViewLocation, txtViewRoom, txtViewSpeaker;
     private static Button buttonInUse, buttonStop;
     private Boolean inUse = false, inUseTemp;
     private static String playingLocation = "";
@@ -59,6 +60,8 @@ public class LocationFragment extends Fragment {
         txtViewLocation = binding.textLocation;
         buttonInUse = binding.btnUseSystem;
         buttonStop = binding.btnStopSystem;
+        txtViewRoom = binding.textRoom;
+        txtViewSpeaker = binding.textSpeaker;
 
         inUse = mainActivity.getInUse();
         inUseTemp = mainActivity.getInUseTemp();
@@ -66,6 +69,8 @@ public class LocationFragment extends Fragment {
         spotify = mainActivity.getSpotify();
 
         updateTextView();
+
+        updateLocationSpeakerTextView();
 
         SetTextView(mainActivity.getLastLocationFragmentTextView());
 
@@ -90,6 +95,7 @@ public class LocationFragment extends Fragment {
 
                 mainActivity.removeLocationFragment();
                 mainActivity.setInUse(false);
+                playingLocation = "";
 
                 txtViewLocation.setText("");
                 updateTextView();
@@ -107,6 +113,22 @@ public class LocationFragment extends Fragment {
         }
     }
 
+    private void updateLocationSpeakerTextView() {
+        String[] rooms = locationSpeakerName.keySet().toArray(new String[0]);
+        String roomTextView = "";
+        for (String r : rooms) {
+            roomTextView += r + "\n";
+        }
+        txtViewRoom.setText(roomTextView);
+
+        String[] speaker = locationSpeakerName.values().toArray(new String[0]);
+        String speakerTextView = "";
+        for (String s : speaker) {
+            speakerTextView += s + "\n";
+        }
+        txtViewSpeaker.setText(speakerTextView);
+    }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -117,18 +139,29 @@ public class LocationFragment extends Fragment {
         txtViewLocation.setText(text);
     }
 
-    public void updateSpeaker(String location) {
+    public boolean updateSpeaker(String location) {
         if (playingLocation != location) {
             playingLocation = location;
 
             String speakerName = locationSpeakerName.get(location);
-
+            if(speakerName == null) {
+                Toast.makeText(mainActivity, "Vælg hvilken højtaler, der hører til " + location, Toast.LENGTH_LONG).show();
+                return false;
+            }
             Hashtable<String, String> speakerNameId = spotify.getSpeakerNameId();
+            System.out.println("Dette er speakerNameId: " + speakerNameId);
+            System.out.println("Dette er speakerName: " + speakerName);
             String speakerId = speakerNameId.get(speakerName);
 
             if (speakerId == null) {
                 Toast.makeText(mainActivity, "Højtaleren " + speakerName + " er ikke tilgængelig.", Toast.LENGTH_LONG).show();
-            } else { spotify.changeSpeaker(speakerId); }
+                return false;
+            }
+            spotify.changeSpeaker(speakerId);
+            return true;
         }
+        return true;
     }
+
+
 }

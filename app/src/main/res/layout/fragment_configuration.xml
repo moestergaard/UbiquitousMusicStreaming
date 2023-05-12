@@ -171,11 +171,11 @@
                         android:layout_height="wrap_content"
                         android:textSize="16sp"
                         android:layout_marginStart="8dp"
-                        android:text="Vælg højtaler"
+                        android:text="Vælg rum"
                         android:textColor="@color/textOnBackground"/>
 
                     <Spinner
-                        android:id="@+id/spinnerSpeaker"
+                        android:id="@+id/spinnerRoom"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="8dp"
@@ -195,18 +195,17 @@
                         android:layout_height="wrap_content"
                         android:textSize="16sp"
                         android:layout_marginStart="8dp"
-                        android:text="Vælg lokale"
+                        android:text="Vælg højtaler"
                         android:textColor="@color/textOnBackground"/>
 
                     <Spinner
-                        android:id="@+id/spinnerRoom"
+                        android:id="@+id/spinnerSpeaker"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="8dp"
                         android:backgroundTint="@color/button"
                         android:textColor="@color/textOnBackground"/>
                 </LinearLayout>
-
             </LinearLayout>
 
             <Button

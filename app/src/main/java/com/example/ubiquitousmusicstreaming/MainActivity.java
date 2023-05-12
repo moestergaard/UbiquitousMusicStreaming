@@ -38,7 +38,8 @@ public class MainActivity extends AppCompatActivity {
     private static Boolean inUse = false, inUseTemp, inUseDataCollection = false;
     private static DataManagement dm;
     private static String predictedRoom, previousLocation = "";
-    private String[] locations; //= /* new String[]{}; = */ new String[]{"Kontor", "Stue", "Køkken"};
+    private String[] locations; // = /* new String[]{}; = */ new String[]{"Kontor", "Stue", "Køkken"};
+    private String[] locationsHardcodedForModelPurpose = new String[]{"Kontor", "Stue", "Køkken"};
     private String fileName = "";
     private static String lastLocationFragmentTextView = "";
     private static Spotify spotify;
@@ -135,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
      * @param scanResults
      */
 
-    private void printLocation(List<ScanResult> scanResults) {
+    private void determineLocation(List<ScanResult> scanResults) {
         double[] location = dm.getPredictionNN(scanResults);
         String quessedRoom = "";
 
@@ -157,16 +158,21 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         else {
-            if(locations[index].equals(previousLocation)) {
-                predictedRoom = locations[index];
+            if(locationsHardcodedForModelPurpose[index].equals(previousLocation)) {
+                predictedRoom = locationsHardcodedForModelPurpose[index];
             }
             else {
-                quessedRoom = locations[index];
+                quessedRoom = locationsHardcodedForModelPurpose[index];
+
+                /*
                 if(inUseTemp) {
+                    //lastLocationFragmentTextView = "Gætter på: " + quessedRoom + ", men er stadigvæk: " + predictedRoom;
                     lastLocationFragmentTextView = "Gætter på: " + quessedRoom + ", men er stadigvæk: " + predictedRoom;
                     locationFragment.SetTextView(lastLocationFragmentTextView);
                 }
-                previousLocation = locations[index];
+                 */
+                previousLocation = locationsHardcodedForModelPurpose[index];
+
             }
         }
         if(inUseTemp) {
@@ -175,10 +181,13 @@ public class MainActivity extends AppCompatActivity {
                 playing = false;
             }
             else if (quessedRoom.equals("")) {
-                locationFragment.updateSpeaker(predictedRoom);
-                playing = true;
-                lastLocationFragmentTextView = "Lokation: " + predictedRoom;
-                locationFragment.SetTextView(lastLocationFragmentTextView);
+                Boolean result = locationFragment.updateSpeaker(predictedRoom);
+                playing = result;
+                // lastLocationFragmentTextView = "Lokation: " + predictedRoom;
+                if (result) {
+                    lastLocationFragmentTextView = predictedRoom;
+                    locationFragment.SetTextView(lastLocationFragmentTextView);
+                }
             }
             wifiManager.startScan();
         }
@@ -266,19 +275,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void update() {
-        if(!inUse) {
-            System.out.println("in use er her: " + inUse);
+        if(inUse) {
+            List<ScanResult> scanResults = wifiManager.getScanResults();
+            determineLocation(scanResults);
+        } else {
             if(inUseDataCollection) {
-                System.out.println("inUseDataCollection er her: " + inUseDataCollection);
                 if(configurationFragment != null) {
-                    System.out.println("configurationFragment er her: " + configurationFragment);
                     configurationFragment.update();
                 }
             }
-        }
-        else {
-            List<ScanResult> scanResults = wifiManager.getScanResults();
-            printLocation(scanResults);
         }
     }
     public void setInUse(Boolean bool) {
