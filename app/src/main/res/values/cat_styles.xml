@@ -18,6 +18,8 @@
         <item name="android:ellipsize">end</item>
         <item name="android:gravity">center</item>
         <item name="android:textAppearance">@style/TextAppearance.Cat.Button</item>
+        <item name="android:textColor">@color/cat_button_text</item>
+        <item name="android:background">@drawable/cat_button_small</item>
         <item name="android:minHeight">@dimen/cat_button_height</item>
     </style>
 

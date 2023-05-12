@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         loadSettings();
 
         spotify = new Spotify(this);
-        spotify.connect();
+        //spotify.connect();
         spotify.refreshSpeakers();
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());

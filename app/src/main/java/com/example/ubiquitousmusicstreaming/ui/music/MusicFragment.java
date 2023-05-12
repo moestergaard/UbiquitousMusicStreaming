@@ -39,10 +39,13 @@ import com.example.ubiquitousmusicstreaming.ui.location.LocationFragment;
 import com.google.android.material.snackbar.Snackbar;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
 import com.spotify.protocol.client.Subscription;
+import com.spotify.protocol.types.Capabilities;
 import com.spotify.protocol.types.Image;
+import com.spotify.protocol.types.ImageUri;
 import com.spotify.protocol.types.PlayerContext;
 import com.spotify.protocol.types.PlayerState;
 import com.spotify.protocol.types.Repeat;
+import com.spotify.protocol.types.Track;
 import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
@@ -108,10 +111,18 @@ public class MusicFragment extends Fragment {
     private Button btnToken, btnProfile, btnSpeakers;
     private static TextView txtViewUserProfile;
     private static Hashtable<String, String> locationSpeakerID = new Hashtable<>();
+
+    private String trackName, artistName, coverImageUrl;
     Button playerContextButton, playerStateButton;
     ImageView coverImageView;
+    TextView txtViewTrackName, txtViewArtistName;
     AppCompatImageButton playPauseButton, shuffleButton, repeatButton, backButton, forwardButton, skipNext, skipPrevious;
 
+    Subscription<PlayerState> mPlayerStateSubscription;
+    Subscription<PlayerContext> mPlayerContextSubscription;
+    Subscription<Capabilities> mCapabilitiesSubscription;
+
+    /*
     private final Subscription.EventCallback<PlayerContext> mPlayerContextEventCallback =
             new Subscription.EventCallback<PlayerContext>() {
                 @Override
@@ -178,6 +189,8 @@ public class MusicFragment extends Fragment {
                 }
             };
 
+     */
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         MusicViewModel musicViewModel =
@@ -186,26 +199,31 @@ public class MusicFragment extends Fragment {
         binding = FragmentMusicBinding.inflate(inflater, container, false);
         mainActivity = (MainActivity) getParentFragment().getActivity();
         spotify = mainActivity.getSpotify();
-        while(spotifyAppRemote != null) {
-            spotifyAppRemote = spotify.getSpotifyAppRemote();
-        }
+        //while(spotifyAppRemote == null) {
+        spotifyAppRemote = spotify.getSpotifyAppRemote();
+        //}
 
         View root = binding.getRoot();
 
         coverImageView = binding.image;
         //playPauseButton = mainActivity.findViewById(R.id.play_pause_button);
         playPauseButton = binding.playPauseButton;
-        shuffleButton = binding.toggleShuffleButton;
-        repeatButton = binding.toggleRepeatButton;
-        backButton = binding.seekBackButton;
-        forwardButton = binding.seekForwardButton;
+        //shuffleButton = binding.toggleShuffleButton;
+        //repeatButton = binding.toggleRepeatButton;
+        //backButton = binding.seekBackButton;
+        //forwardButton = binding.seekForwardButton;
         skipNext = binding.skipNextButton;
         skipPrevious = binding.skipPrevButton;
-        playerContextButton = binding.currentContextLabel;
-        playerStateButton = binding.currentTrackLabel;
+        //playerContextButton = binding.currentContextLabel;
+        //playerStateButton = binding.currentTrackLabel;
+        txtViewArtistName = binding.currentArtist;
+        txtViewTrackName = binding.currentTrack;
 
         //SpotifyAppRemote.setDebugMode(true);
         onDisconnected();
+        spotify.attachMusicFragment(this);
+
+        //subscribeToTrack();
 
         playPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -220,6 +238,7 @@ public class MusicFragment extends Fragment {
                 spotifyAppRemote
                         .getPlayerApi()
                         .skipNext();
+                playPauseButton.setImageResource(R.drawable.btn_pause);
             }
         });
 
@@ -229,19 +248,9 @@ public class MusicFragment extends Fragment {
                 spotifyAppRemote
                         .getPlayerApi()
                         .skipPrevious();
+                playPauseButton.setImageResource(R.drawable.btn_pause);
             }
         });
-
-        repeatButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                spotifyAppRemote
-                        .getPlayerApi()
-                        .toggleRepeat();
-            }
-        });
-
-
 
         return root;
     }
@@ -271,18 +280,6 @@ public class MusicFragment extends Fragment {
          */
     }
 
-    public void onToggleShuffleButtonClicked(View view) {
-        spotifyAppRemote
-                .getPlayerApi()
-                .toggleShuffle();
-    }
-
-    public void onToggleRepeatButtonClicked(View view) {
-        spotifyAppRemote
-                .getPlayerApi()
-                .toggleRepeat();
-    }
-
     private void changePlayPause() {
         spotifyAppRemote = spotify.getSpotifyAppRemote();
         spotifyAppRemote
@@ -304,6 +301,103 @@ public class MusicFragment extends Fragment {
                         });
 
     }
+
+    /*
+    private void subscribeToTrack() {
+        // Subscribe to player state updates
+        spotifyAppRemote = spotify.getSpotifyAppRemote();
+        //System.out.println(spotifyAppRemote);
+        //while(spotifyAppRemote == null) {
+        spotifyAppRemote = spotify.getSpotifyAppRemote();
+        //    System.out.println(spotifyAppRemote);
+        //}
+        spotifyAppRemote.getPlayerApi().subscribeToPlayerState().setEventCallback(playerState -> {
+            // Get the track object from the player state
+            Track track = playerState.track;
+
+            // Get the name of the track
+            String trackName = track.name;
+
+            // Get the artist name
+            String artistName = track.artist.name;
+
+            // Get the cover image URL
+            String coverImageUrl = track.imageUri.raw;
+
+            updateTrackInformation();
+            // Do something with the updated track information
+            // ...
+        });
+
+    }
+
+     */
+
+    public void updateTrackInformation(String trackName, String artistName, ImageUri coverImage) {
+        txtViewArtistName.setText(artistName);
+        txtViewTrackName.setText(trackName);
+
+
+        spotifyAppRemote = spotify.getSpotifyAppRemote();
+        spotifyAppRemote
+                .getImagesApi()
+                .getImage(coverImage, Image.Dimension.LARGE)
+                .setResultCallback(
+                        bitmap -> {
+                            coverImageView.setImageBitmap(bitmap);
+                        });
+
+        /*
+        playerStateButton.setText(
+                String.format(
+                        Locale.US, "%s\n%s", trackName, artistName));
+
+         */
+    }
+
+    /*
+    public void onSubscribeToCapabilitiesClicked(View view) {
+
+        if (mCapabilitiesSubscription != null && !mCapabilitiesSubscription.isCanceled()) {
+            mCapabilitiesSubscription.cancel();
+            mCapabilitiesSubscription = null;
+        }
+
+        mCapabilitiesSubscription =
+                (Subscription<Capabilities>)
+                        spotifyAppRemote
+                                .getUserApi()
+                                .subscribeToCapabilities();
+
+
+        spotifyAppRemote
+                .getUserApi()
+                .getCapabilities();
+    }
+
+    public void onSubscribedToPlayerContextButtonClicked(View view) {
+        if (mPlayerContextSubscription != null && !mPlayerContextSubscription.isCanceled()) {
+            mPlayerContextSubscription.cancel();
+            mPlayerContextSubscription = null;
+        }
+
+        playerContextButton.setVisibility(View.VISIBLE);
+        playerContextButton.setVisibility(View.INVISIBLE);
+
+        mPlayerContextSubscription =
+                (Subscription<PlayerContext>)
+                        spotifyAppRemote
+                                .getPlayerApi()
+                                .subscribeToPlayerContext()
+                                .setEventCallback(mPlayerContextEventCallback)
+                                .setErrorCallback(
+                                        throwable -> {
+                                            playerContextButton.setVisibility(View.INVISIBLE);
+                                            playerContextButton.setVisibility(View.VISIBLE);
+                                        });
+    }
+
+     */
 
     private void initializeLocationSpeakerID() {
         locationSpeakerID.put("Stue", "1af54257b625e17733f383612d7e027ad658bee2");

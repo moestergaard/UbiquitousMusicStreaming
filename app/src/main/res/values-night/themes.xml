@@ -4,7 +4,7 @@
         <!-- Primary brand color. -->
         <!-- item name="colorPrimary">@color/purple_200</item-->
         <!--item name="colorPrimaryVariant">@color/purple_700</item-->
-        <item name="colorOnPrimary">@color/background</item>
+        <!--item name="colorOnPrimary">@color/background</item-->
         <!-- Secondary brand color. -->
         <!--item name="colorSecondary">@color/teal_200</item-->
         <!--item name="colorSecondaryVariant">@color/teal_200</item-->
@@ -12,10 +12,10 @@
 
         <!-- Status bar color. -->
         <!--item name="android:statusBarColor">?attr/colorOnPrimary</item-->
-        <!--item name="android:statusBarColor" tools:ignore="NewApi">@android:color/transparent</item-->
-        <item name="android:statusBarColor" tools:ignore="NewApi">#B3121212</item>
-        <item name="android:navigationBarColor" tools:ignore="NewApi">#B3121212</item>
-        <!--item name="android:navigationBarColor" tools:ignore="NewApi">@android:color/transparent</item-->
+        <item name="android:statusBarColor" tools:ignore="NewApi">@android:color/transparent</item>
+        <!--item name="android:statusBarColor" tools:ignore="NewApi">#B3121212</item-->
+        <!--item name="android:navigationBarColor" tools:ignore="NewApi">#B3121212</item-->
+        <item name="android:navigationBarColor" tools:ignore="NewApi">@android:color/transparent</item>
         <!-- Customize your theme here. -->
     </style>
 

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.example.ubiquitousmusicstreaming.ui.configuration.Device;
+import com.example.ubiquitousmusicstreaming.ui.music.MusicFragment;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -12,6 +13,8 @@ import com.google.gson.JsonObject;
 import com.spotify.android.appremote.api.ConnectionParams;
 import com.spotify.android.appremote.api.Connector;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
+import com.spotify.protocol.types.ImageUri;
+import com.spotify.protocol.types.Track;
 import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
@@ -45,8 +48,12 @@ public class Spotify {
     private Integer REQUEST_CODE = 42;
     private static SpotifyAppRemote spotifyAppRemote;
     private String accessToken;
+    private MusicFragment musicFragment;
 
-    public Spotify(Context context) { this.context = context; }
+    public Spotify(Context context) {
+        this.context = context;
+        connect();
+    }
 
     public void connect() {
         SpotifyAppRemote.connect(context, new ConnectionParams.Builder(CLIENT_ID)
@@ -57,11 +64,41 @@ public class Spotify {
             @Override
             public void onConnected(SpotifyAppRemote _spotifyAppRemote) {
                 spotifyAppRemote = _spotifyAppRemote;
+                subscribeToTrack();
                 retrieveAccessToken();
             }
 
             @Override
             public void onFailure(Throwable throwable) { }
+        });
+    }
+
+    private void subscribeToTrack() {
+        // Subscribe to player state updates
+        //spotifyAppRemote = spotify.getSpotifyAppRemote();
+        //System.out.println(spotifyAppRemote);
+        //while(spotifyAppRemote == null) {
+        //spotifyAppRemote = spotify.getSpotifyAppRemote();
+        //    System.out.println(spotifyAppRemote);
+        //}
+        spotifyAppRemote.getPlayerApi().subscribeToPlayerState().setEventCallback(playerState -> {
+            // Get the track object from the player state
+            Track track = playerState.track;
+
+            // Get the name of the track
+            String trackName = track.name;
+
+            // Get the artist name
+            String artistName = track.artist.name;
+
+            // Get the cover image URL
+            ImageUri coverImage = track.imageUri;
+
+
+            updateMusicFragment(trackName, artistName, coverImage);
+            //updateTrackInformation();
+            // Do something with the updated track information
+            // ...
         });
     }
 
@@ -219,4 +256,6 @@ public class Spotify {
 
     public String getAccessToken() { return accessToken; }
     public SpotifyAppRemote getSpotifyAppRemote() { return spotifyAppRemote; }
+    public void attachMusicFragment(MusicFragment musicFragment) { this.musicFragment = musicFragment; }
+    private void updateMusicFragment(String trackName, String artistName, ImageUri coverImage) { musicFragment.updateTrackInformation(trackName, artistName, coverImage); }
 }
