@@ -61,70 +61,6 @@
                 android:textColor="@color/textOnButton"/>
         </LinearLayout>
 
-        <!--LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="75dp"
-            android:orientation="horizontal"
-            android:gravity="center_horizontal">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_gravity="right">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="17sp"
-                    android:textStyle="bold"
-                    android:layout_margin="8dp"
-                    android:text="Rum"
-                    android:layout_weight="1"
-                    android:textColor="@color/textOnBackground"/>
-
-                <TextView
-                    android:id="@+id/textRoom"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
-                    android:textSize="16sp"
-                    android:layout_weight="1"
-                    android:textColor="@color/textOnBackground"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="17sp"
-                    android:textStyle="bold"
-                    android:textAlignment="viewStart"
-                    android:layout_margin="8dp"
-                    android:text="Højtalere"
-                    android:layout_weight="1"
-                    android:textColor="@color/textOnBackground"/>
-
-                <TextView
-                    android:id="@+id/textSpeaker"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
-                    android:textAlignment="viewStart"
-                    android:textSize="16sp"
-                    android:layout_weight="1"
-                    android:textColor="@color/textOnBackground"/>
-            </LinearLayout>
-        </LinearLayout-->
-
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -181,7 +117,5 @@
                     android:textColor="@color/textOnBackground"/>
             </LinearLayout>
         </LinearLayout>
-
-
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
