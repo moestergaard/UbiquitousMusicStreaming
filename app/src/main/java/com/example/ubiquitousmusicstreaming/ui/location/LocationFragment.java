@@ -9,6 +9,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.collection.CircularArray;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -37,9 +38,11 @@ public class LocationFragment extends Fragment {
     private static Button buttonInUse, buttonStop;
     private Boolean inUse = false, inUseTemp;
     private static String playingLocation = "";
-    private static Hashtable<String, String> locationSpeakerID = new Hashtable<>();
+    private static Hashtable<String, String> locationSpeakerName = new Hashtable<>();
+    private Hashtable<String, String> speakerNameId = new Hashtable<>();
     private static MainActivity mainActivity;
     private Spotify spotify;
+
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -60,8 +63,9 @@ public class LocationFragment extends Fragment {
 
         inUse = mainActivity.getInUse();
         inUseTemp = mainActivity.getInUseTemp();
-        locationSpeakerID = mainActivity.getLocationSpeakerID();
+        locationSpeakerName = mainActivity.getLocationSpeakerName();
         spotify = mainActivity.getSpotify();
+        speakerNameId = mainActivity.getSpeakerNameId();
 
         updateTextView();
 
@@ -119,9 +123,14 @@ public class LocationFragment extends Fragment {
         if (playingLocation != location) {
             playingLocation = location;
 
-            String speakerID = locationSpeakerID.get(location);
+            String speakerName = locationSpeakerName.get(location);
 
-            spotify.changeSpeaker(speakerID);
+            Hashtable<String, String> speakerNameId = spotify.getSpeakerNameId();
+            String speakerId = speakerNameId.get(speakerName);
+
+            if (speakerId == null) {
+                Toast.makeText(mainActivity, "Højtaleren " + speakerName + " er ikke tilgængelig.", Toast.LENGTH_LONG).show();
+            } else { spotify.changeSpeaker(speakerId); }
         }
     }
 }

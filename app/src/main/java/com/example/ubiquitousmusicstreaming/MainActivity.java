@@ -38,11 +38,12 @@ public class MainActivity extends AppCompatActivity {
     private static Boolean inUse = false, inUseTemp, inUseDataCollection = false;
     private static DataManagement dm;
     private static String predictedRoom, previousLocation = "";
-    private static String[] locations; //= /* new String[]{}; = */ new String[]{"Kontor", "Stue", "Køkken"};
+    private String[] locations; //= /* new String[]{}; = */ new String[]{"Kontor", "Stue", "Køkken"};
     private String fileName = "";
     private static String lastLocationFragmentTextView = "";
     private static Spotify spotify;
-    private static Hashtable<String, String> locationSpeakerID = new Hashtable<>();
+    private static Hashtable<String, String> locationSpeakerName = new Hashtable<>();
+    private Hashtable<String, String> speakerNameId = new Hashtable<>();
     private String trackName;
     private String artistName;
     private ImageUri coverImage;
@@ -135,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
      * @param scanResults
      */
 
-    private static void printLocation(List<ScanResult> scanResults) {
+    private void printLocation(List<ScanResult> scanResults) {
         double[] location = dm.getPredictionNN(scanResults);
         String quessedRoom = "";
 
@@ -245,8 +246,8 @@ public class MainActivity extends AppCompatActivity {
      */
 
 
-    public void updateLocationSpeakerID(Hashtable<String, String> _locationSpeakerID) {
-        locationSpeakerID = _locationSpeakerID;
+    public void updateLocationSpeakerName(Hashtable<String, String> _locationSpeakerName) {
+        locationSpeakerName = _locationSpeakerName;
     }
 
     public void loadSettings(){
@@ -257,7 +258,7 @@ public class MainActivity extends AppCompatActivity {
             if (fileName != null) {
                 this.fileName = fileName;
             }
-            locationSpeakerID = settings.getLocationSpeakerID();
+            locationSpeakerName = settings.getLocationSpeakerName();
             String[] settingLocations = settings.getLocations();
             if (settingLocations != null) {
                 locations = settingLocations;
@@ -265,7 +266,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static void update() {
+    public void update() {
         if(!inUse) {
             System.out.println("in use er her: " + inUse);
             if(inUseDataCollection) {
@@ -298,13 +299,14 @@ public class MainActivity extends AppCompatActivity {
     public WifiReceiver getWifiReceiver() { return wifiReceiver; }
     public static WifiManager getWifiManager() { return wifiManager; }
     public static String getAccessToken() { return spotify.getAccessToken(); }
-    public static Hashtable<String, String> getLocationSpeakerID() { return locationSpeakerID; }
+    public static Hashtable<String, String> getLocationSpeakerName() { return locationSpeakerName; }
     public String getTrackName() { return trackName; }
     public String getArtistName() { return artistName; }
     public ImageUri getCoverImage() { return coverImage; }
     public Boolean getPlaying() { return playing; }
     public String getRoomCurrentlyScanning() { return roomCurrentlyScanning; }
     public Boolean getInUseDataCollection() { return inUseDataCollection; }
+    public Hashtable<String, String> getSpeakerNameId() { return speakerNameId; }
     public void attachMusicFragment(MusicFragment musicFragment) { this.musicFragment = musicFragment; }
     public void attachConfigurationFragment(ConfigurationFragment configurationFragment) { this.configurationFragment = configurationFragment; }
     public void attachLocationFragment(LocationFragment locationFragment) { this.locationFragment = locationFragment; }
@@ -314,5 +316,7 @@ public class MainActivity extends AppCompatActivity {
     public void setCoverImage(ImageUri coverImage) { this.coverImage = coverImage; }
     public void setPlaying(Boolean playing) {this.playing = playing; }
     public void setRoomCurrentlyScanning(String roomCurrentlyScanning) { this.roomCurrentlyScanning = roomCurrentlyScanning; }
+    public void setSpeakerNameId(Hashtable<String, String> speakerNameId) { this.speakerNameId = speakerNameId; }
     public void removeLocationFragment() {locationFragment = null ;}
+    public void setLocations(String[] locations) { this.locations = locations; }
 }

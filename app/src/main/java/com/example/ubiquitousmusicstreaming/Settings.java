@@ -5,23 +5,29 @@ import java.util.Arrays;
 import java.util.Hashtable;
 
 public class Settings implements Serializable {
-    private Hashtable<String, String> locationSpeakerID;
+    private Hashtable<String, String> locationSpeakerName;
+    private Hashtable<String, String> speakerNameId;
     private String[] locations;
     private String fileName;
 
     public Settings() {
-        locationSpeakerID = new Hashtable<>();
+        locationSpeakerName = new Hashtable<>();
+        speakerNameId = new Hashtable<>();
         locations = new String[]{};
         fileName = "";
     }
 
-    public Hashtable<String, String> getLocationSpeakerID() {
-        return locationSpeakerID;
+    public Hashtable<String, String> getLocationSpeakerName() {
+        return locationSpeakerName;
     }
 
-    public void setLocationSpeakerID(Hashtable<String, String> locationSpeakerID) {
-        this.locationSpeakerID = locationSpeakerID;
+    public Hashtable<String, String> getSpeakerNameId() { return speakerNameId; }
+
+    public void setLocationSpeakerName(Hashtable<String, String> locationSpeakerName) {
+        this.locationSpeakerName = locationSpeakerName;
     }
+
+    public void setSpeakerNameId(Hashtable<String, String> speakerNameId) { this.speakerNameId = speakerNameId; }
 
     public String[] getLocations() {
         return locations;

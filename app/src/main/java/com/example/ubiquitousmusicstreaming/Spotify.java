@@ -25,6 +25,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -49,6 +50,7 @@ public class Spotify {
     private static SpotifyAppRemote spotifyAppRemote;
     private String accessToken;
     private MusicFragment musicFragment;
+    private Hashtable<String, String> speakerNameId = new Hashtable<String, String>();
 
     public Spotify(Context context) {
         this.context = context;
@@ -176,6 +178,8 @@ public class Spotify {
 
                         devices = tmpDevices;
 
+                        updateSpeakerNameId();
+
                     } catch (IOException e) {
                         refreshSpeakers();
                         throw new RuntimeException(e);
@@ -260,8 +264,17 @@ public class Spotify {
                 .pause();
     }
 
+    private void updateSpeakerNameId() {
+        if (!devices.isEmpty()) {
+            for (Device d : devices) {
+                speakerNameId.put(d.getName(), d.getId());
+            }
+        }
+    }
+
     public String getAccessToken() { return accessToken; }
     public SpotifyAppRemote getSpotifyAppRemote() { return spotifyAppRemote; }
+    public Hashtable<String, String> getSpeakerNameId() { return speakerNameId; }
     public void attachMusicFragment(MusicFragment musicFragment) { this.musicFragment = musicFragment; }
     private void updateMusicFragment(String trackName, String artistName, ImageUri coverImage, Boolean playing)
     {

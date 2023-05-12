@@ -72,7 +72,7 @@ public class ConfigurationFragment extends Fragment {
     String[] locations = new String[]{};
     List<Device> devices = new ArrayList<>();
     String chosenSpeakerUniqueName = "", chosenSpeakerReadableName = "", chosenRoom = "";
-    Hashtable<String, String> locationSpeakerID = new Hashtable<>();
+    Hashtable<String, String> locationSpeakerName = new Hashtable<>();
     Hashtable<String, String> speakersNameID = new Hashtable<>();
 
     List<ScanResult> scanResults;
@@ -124,15 +124,23 @@ public class ConfigurationFragment extends Fragment {
                 if (FILE_NAME != null) {
                     room = editTextRoom.getText().toString();
                     if (!room.isEmpty()) {
-                        List<String> l = new ArrayList<String>(Arrays.asList(locations));
+                        List<String> l;
+                        if (locations != null) {
+                            l = new ArrayList<String>(Arrays.asList(locations));
+                        } else { l = new ArrayList<>(); }
+
                         if (!l.contains(room)) {
                             l.add(room);
                             addLocationToSettings(room);
                         }
-                        locations = l.toArray(locations);
+                        if (locations != null) {
+                            locations = l.toArray(locations);
+                        } else { locations = l.toArray(new String[]{}); }
+
                         editTextRoom.getText().clear();
                         updateTextViewRoom(room);
                         scan = true;
+                        mainActivity.setLocations(locations);
                         mainActivity.setInUseDataCollection(true);
                         mainActivity.setRoomCurrentlyScanning(room);
                         startScanning();
@@ -175,8 +183,10 @@ public class ConfigurationFragment extends Fragment {
 
                         mainActivity.loadSettings();
                         locations = new String[]{};
-                        locationSpeakerID = new Hashtable<>();
+                        locationSpeakerName = new Hashtable<>();
+                        speakersNameID = new Hashtable<>();
                         setupSpeakerRoomSelection(spinSpeaker, spinRoom);
+                        settings.setSpeakerNameId(speakersNameID);
                     }
                 });
 
@@ -196,9 +206,9 @@ public class ConfigurationFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if(!chosenSpeakerUniqueName.equals("") && !chosenRoom.equals("")) {
-                    locationSpeakerID.put(chosenRoom, chosenSpeakerUniqueName);
-                    addLocationSpeakerID(chosenRoom, chosenSpeakerUniqueName);
-                    mainActivity.updateLocationSpeakerID(locationSpeakerID);
+                    locationSpeakerName.put(chosenRoom, chosenSpeakerReadableName);
+                    addLocationSpeakerName(chosenRoom, chosenSpeakerReadableName);
+                    mainActivity.updateLocationSpeakerName(locationSpeakerName);
                     Toast.makeText(mainActivity, "Rum: " + chosenRoom + "\nHøjtaler: " + chosenSpeakerReadableName, Toast.LENGTH_LONG).show();
                 }
                 else {
@@ -227,19 +237,36 @@ public class ConfigurationFragment extends Fragment {
         FileSystem.writeObjectToFile(mainActivity, settings);
     }
 
-    private void addLocationSpeakerID(String room, String speakerID) {
+    private void addLocationSpeakerName(String room, String speakerName) {
         Settings settings = FileSystem.readObjectFromFile(mainActivity);
 
         if (settings != null) {
-            Hashtable<String, String> locationSpeakerID = settings.getLocationSpeakerID();
+            Hashtable<String, String> locationSpeakerName = settings.getLocationSpeakerName();
             /*
             while (locationSpeakerID.containsKey())
             {
 
             }
              */
-            locationSpeakerID.put(room, speakerID);
-            settings.setLocationSpeakerID(locationSpeakerID);
+            locationSpeakerName.put(room, speakerName);
+            settings.setLocationSpeakerName(locationSpeakerName);
+        }
+        FileSystem.writeObjectToFile(mainActivity, settings);
+    }
+
+    private void addSpeakerNameId(String speakerName, String speakerId) {
+        Settings settings = FileSystem.readObjectFromFile(mainActivity);
+
+        if (settings != null) {
+            Hashtable<String, String> speakerNameId = settings.getSpeakerNameId();
+            /*
+            while (locationSpeakerID.containsKey())
+            {
+
+            }
+             */
+            speakerNameId.put(speakerName, speakerId);
+            settings.setSpeakerNameId(speakerNameId);
         }
         FileSystem.writeObjectToFile(mainActivity, settings);
     }
@@ -276,17 +303,23 @@ public class ConfigurationFragment extends Fragment {
             }
         }
 
+        mainActivity.setSpeakerNameId(speakersNameID);
         String[] deviceNamesArray = new String[deviceNames.size()];
         deviceNames.toArray(deviceNamesArray);
 
+        if (deviceNamesArray != null) {
+            adapterSpeakers = new ArrayAdapter<String>(mainActivity, R.layout.list_item, deviceNamesArray);
+            adapterSpeakers.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinSpeaker.setAdapter(adapterSpeakers);
+        }
 
-        adapterSpeakers = new ArrayAdapter<String>(mainActivity, R.layout.list_item, deviceNamesArray);
-        adapterSpeakers.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinSpeaker.setAdapter(adapterSpeakers);
+        if (locations != null) {
+            adapterRoom = new ArrayAdapter<String>(mainActivity, R.layout.list_item, locations);
+            adapterRoom.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinRoom.setAdapter(adapterRoom);
+        }
 
-        adapterRoom = new ArrayAdapter<String>(mainActivity, R.layout.list_item, locations);
-        adapterRoom.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinRoom.setAdapter(adapterRoom);
+
 
         spinSpeaker.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
