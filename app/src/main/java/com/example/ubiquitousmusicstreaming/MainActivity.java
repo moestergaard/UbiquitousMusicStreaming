@@ -24,6 +24,7 @@ import com.example.ubiquitousmusicstreaming.databinding.ActivityMainBinding;
 import java.util.Hashtable;
 import java.util.List;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
+import com.spotify.protocol.types.ImageUri;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -42,6 +43,10 @@ public class MainActivity extends AppCompatActivity {
     private static String lastLocationFragmentTextView = "";
     private static Spotify spotify;
     private static Hashtable<String, String> locationSpeakerID = new Hashtable<>();
+    private static String trackName;
+    private String artistName;
+    private ImageUri coverImage;
+    private Boolean playing;
 
 
     @Override
@@ -284,9 +289,17 @@ public class MainActivity extends AppCompatActivity {
     public static WifiManager getWifiManager() { return wifiManager; }
     public static String getAccessToken() { return spotify.getAccessToken(); }
     public static Hashtable<String, String> getLocationSpeakerID() { return locationSpeakerID; }
+    public static String getTrackName() { return trackName; }
+    public String getArtistName() { return artistName; }
+    public ImageUri getCoverImage() { return coverImage; }
+    public Boolean getPlaying() { return playing; }
     public void attachMusicFragment(MusicFragment musicFragment) { this.musicFragment = musicFragment; }
     public void attachConfigurationFragment(ConfigurationFragment configurationFragment) { this.configurationFragment = configurationFragment; }
     public void attachLocationFragment(LocationFragment locationFragment) { this.locationFragment = locationFragment; }
     public void setInUseDataCollection(Boolean bool) { inUseDataCollection = bool; }
+    public void setTrackName(String trackName) { this.trackName = trackName; }
+    public void setArtistName(String artistName) { this.artistName = artistName; }
+    public void setCoverImage(ImageUri coverImage) { this.coverImage = coverImage; }
+    public void setPlaying(Boolean playing) {this.playing = playing; }
     public void removeLocationFragment() {locationFragment = null ;}
 }

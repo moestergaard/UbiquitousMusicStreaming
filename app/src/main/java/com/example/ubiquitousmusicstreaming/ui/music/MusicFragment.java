@@ -223,6 +223,9 @@ public class MusicFragment extends Fragment {
         onDisconnected();
         spotify.attachMusicFragment(this);
 
+        updateTrackInformationMainActivity();
+        updatePlaying();
+
         //subscribeToTrack();
 
         playPauseButton.setOnClickListener(new View.OnClickListener() {
@@ -239,6 +242,7 @@ public class MusicFragment extends Fragment {
                         .getPlayerApi()
                         .skipNext();
                 playPauseButton.setImageResource(R.drawable.btn_pause);
+                mainActivity.setPlaying(true);
             }
         });
 
@@ -249,6 +253,7 @@ public class MusicFragment extends Fragment {
                         .getPlayerApi()
                         .skipPrevious();
                 playPauseButton.setImageResource(R.drawable.btn_pause);
+                mainActivity.setPlaying(true);
             }
         });
 
@@ -292,11 +297,13 @@ public class MusicFragment extends Fragment {
                                         .getPlayerApi()
                                         .resume();
                                 playPauseButton.setImageResource(R.drawable.btn_pause);
+                                mainActivity.setPlaying(true);
                             } else {
                                 spotifyAppRemote
                                         .getPlayerApi()
                                         .pause();
                                 playPauseButton.setImageResource(R.drawable.btn_play);
+                                mainActivity.setPlaying(false);
                             }
                         });
 
@@ -332,11 +339,32 @@ public class MusicFragment extends Fragment {
     }
 
      */
+    private void updatePlaying() {
+        Boolean playing = mainActivity.getPlaying();
+
+        if (playing != null)
+        {
+            if (playing)
+            {
+                playPauseButton.setImageResource(R.drawable.btn_pause);
+            }
+            else {playPauseButton.setImageResource(R.drawable.btn_play); }
+        }
+    }
+
+    private void updateTrackInformationMainActivity() {
+        String trackName = mainActivity.getTrackName();
+        String artistName = mainActivity.getArtistName();
+        ImageUri coverImage = mainActivity.getCoverImage();
+        if (trackName != null && artistName != null && coverImage != null)
+        {
+            updateTrackInformation(trackName, artistName, coverImage);
+        }
+    }
 
     public void updateTrackInformation(String trackName, String artistName, ImageUri coverImage) {
         txtViewArtistName.setText(artistName);
         txtViewTrackName.setText(trackName);
-
 
         spotifyAppRemote = spotify.getSpotifyAppRemote();
         spotifyAppRemote
@@ -346,6 +374,10 @@ public class MusicFragment extends Fragment {
                         bitmap -> {
                             coverImageView.setImageBitmap(bitmap);
                         });
+
+        mainActivity.setTrackName(trackName);
+        mainActivity.setArtistName(artistName);
+        mainActivity.setCoverImage(coverImage);
 
         /*
         playerStateButton.setText(
