@@ -42,7 +42,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
                 android:layout_margin="8dp"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="8dp"
                 android:text="Lav en model til sporing ved at indsamle datapunkter. Dette gøres ved at indsamle i de ønskede rum et efter et. Indsaml i et rum ved at indtaste rummets navn og trykke start scanning. Gå derefter rundt i rummet uden at forlade denne side. Hvis der ønskes en ny model lav da en ny datafil og indsaml data på ny."
                 android:textColor="@color/textOnBackground"/>
 
@@ -58,7 +58,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
-                android:layout_marginBottom="8dp"
+                android:layout_marginBottom="4dp"
                 android:textColorHint="@android:color/darker_gray"
                 android:textColor="@color/textOnBackground"/>
 
@@ -73,7 +73,10 @@
                     android:id="@+id/btnStartScanning"
                     android:layout_width="wrap_content"
                     android:layout_height="60sp"
-                    android:layout_margin="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginLeft="8dp"
                     android:layout_weight="1"
                     android:text="Start Wifi Scanning"
                     android:backgroundTint="@color/button"
@@ -83,7 +86,10 @@
                     android:id="@+id/btnStopScanning"
                     android:layout_width="wrap_content"
                     android:layout_height="60sp"
-                    android:layout_margin="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginLeft="8dp"
                     android:layout_weight="1"
                     android:text="Stop Wifi Scanning"
                     android:backgroundTint="@color/button"
@@ -96,7 +102,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
-                android:layout_margin="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginLeft="8dp"
                 android:gravity="center"
                 android:textColor="@color/textOnBackground"/>
 
@@ -106,41 +115,23 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textSize="16sp"
-                android:layout_marginBottom="8dp"
+                android:layout_marginBottom="4dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_marginTop="8dp"
                 android:textColor="@color/textOnBackground"/>
 
-            <LinearLayout
+            <Button
+                android:id="@+id/btnNewFile"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center">
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="60sp"
-                    android:layout_margin="8dp"
-                    android:layout_weight="1"
-                    android:backgroundTint="@android:color/transparent"
-                    android:textColor="@android:color/transparent"
-                    android:text="Start Wifi Scanning"/>
-
-                <Button
-                    android:id="@+id/btnNewFile"
-                    android:layout_width="wrap_content"
-                    android:layout_height="60sp"
-                    android:layout_weight="1"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_marginBottom="16dp"
-                    android:text="Lav ny datafil"
-                    android:backgroundTint="@color/button"
-                    android:textColor="@color/textOnButton"/>
-
-            </LinearLayout>
+                android:layout_height="60sp"
+                android:layout_marginTop="4dp"
+                android:layout_marginLeft="105dp"
+                android:layout_marginRight="105dp"
+                android:layout_marginBottom="16dp"
+                android:text="Lav ny datafil"
+                android:backgroundTint="@color/button"
+                android:textColor="@color/textOnButton"/>
 
             <TextView
                 android:id="@+id/speakerHeader"
@@ -218,34 +209,18 @@
 
             </LinearLayout>
 
-            <LinearLayout
+            <Button
+                android:id="@+id/btnStoreSpeakerRoom"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_horizontal">
+                android:layout_height="60sp"
+                android:layout_marginTop="0dp"
+                android:layout_marginLeft="105dp"
+                android:layout_marginRight="105dp"
+                android:layout_marginBottom="8dp"
+                android:text="Gem"
+                android:backgroundTint="@color/button"
+                android:textColor="@color/textOnButton"/>
 
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="60sp"
-                    android:layout_margin="0dp"
-                    android:layout_weight="1"
-                    android:backgroundTint="@android:color/transparent"
-                    android:textColor="@android:color/transparent"/>
-
-                <Button
-                    android:id="@+id/btnStoreSpeakerRoom"
-                    android:layout_width="wrap_content"
-                    android:layout_height="60sp"
-                    android:layout_weight="1"
-                    android:layout_marginTop="0dp"
-                    android:layout_marginLeft="0dp"
-                    android:layout_marginRight="0dp"
-                    android:layout_marginBottom="8dp"
-                    android:text="Gem"
-                    android:backgroundTint="@color/button"
-                    android:textColor="@color/textOnButton"/>
-
-            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 
