@@ -119,10 +119,14 @@ public class MainActivity extends AppCompatActivity {
         spotify.disconnect();
     }
 
+
+    /*
+
     /**
      * Will later be used to determine in which room the music are supposed to play.
      * @param scanResults
      */
+    /*
     private static void printLocation(List<ScanResult> scanResults) {
         double[] location = dm.getPredictionNN(scanResults);
         String quessedRoom = "";
@@ -159,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
         }
         if(inUseTemp) {
             if (quessedRoom.equals("")) {
-                musicFragment.updateSpeaker(predictedRoom);
+                locationFragment.updateSpeaker(predictedRoom);
                 lastLocationFragmentTextView = "Lokation: " + predictedRoom;
                 locationFragment.SetTextView(lastLocationFragmentTextView);
             }
@@ -167,6 +171,65 @@ public class MainActivity extends AppCompatActivity {
         }
         else { inUse = false; }
     }
+
+     */
+
+    private static void printLocation(List<ScanResult> scanResults) {
+        double[] location = dm.getPredictionNN(scanResults);
+
+        int index = getMaxIndex(location);
+        String predictedRoom = getPredictedRoom(index, location);
+        String guessedRoom = getGuessedRoom(index, location, predictedRoom);
+
+        if (inUseTemp) {
+            if (!guessedRoom.isEmpty()) {
+                String lastLocation = "Gætter på: " + guessedRoom + ", men er stadigvæk: " + predictedRoom;
+                locationFragment.SetTextView(lastLocation);
+                previousLocation = guessedRoom;
+            } else {
+                String currentLocation = "Lokation: " + predictedRoom;
+                locationFragment.updateSpeaker(predictedRoom);
+                locationFragment.SetTextView(currentLocation);
+                previousLocation = predictedRoom;
+            }
+            wifiManager.startScan();
+        } else {
+            inUse = false;
+        }
+    }
+
+    private static int getMaxIndex(double[] array) {
+        int maxIndex = 0;
+        for (int i = 1; i < array.length; i++) {
+            if (array[i] > array[maxIndex]) {
+                maxIndex = i;
+            }
+        }
+        return maxIndex;
+    }
+
+    private static String getPredictedRoom(int index, double[] location) {
+        if (location[index] < 0.70) {
+            return "Intet Rum";
+        } else {
+            return locations[index];
+        }
+    }
+
+    private static String getGuessedRoom(int index, double[] location, String predictedRoom) {
+        String guessedRoom = "";
+        if (location[index] < 0.70) {
+            if (!previousLocation.equals("Intet Rum")) {
+                guessedRoom = "Intet Rum";
+            }
+        } else {
+            if (!locations[index].equals(previousLocation)) {
+                guessedRoom = locations[index];
+            }
+        }
+        return guessedRoom;
+    }
+
 
     public void updateLocationSpeakerID(Hashtable<String, String> _locationSpeakerID) {
         locationSpeakerID = _locationSpeakerID;
@@ -224,6 +287,4 @@ public class MainActivity extends AppCompatActivity {
     public void attachLocationFragment(LocationFragment locationFragment) { this.locationFragment = locationFragment; }
     public void setInUseDataCollection(Boolean bool) { inUseDataCollection = bool; }
     public void removeLocationFragment() {locationFragment = null ;}
-
-
 }

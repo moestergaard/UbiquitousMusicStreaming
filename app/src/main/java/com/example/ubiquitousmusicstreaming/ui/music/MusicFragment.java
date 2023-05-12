@@ -110,188 +110,21 @@ public class MusicFragment extends Fragment {
 
         binding = FragmentMusicBinding.inflate(inflater, container, false);
         mainActivity = (MainActivity) getParentFragment().getActivity();
-        mainActivity.attachMusicFragment(MusicFragment.this);
         spotify = mainActivity.getSpotify();
-        ACCESS_TOKEN = spotify.getAccessToken();
         spotifyAppRemote = spotify.getSpotifyAppRemote();
         View root = binding.getRoot();
 
-        btnToken = binding.tokenButton;
-        btnProfile = binding.buttonGetProfile;
-        btnSpeakers = binding.buttonGetSpeakers;
-        txtViewUserProfile = binding.responseTextView;
-
-        locationSpeakerID = mainActivity.getLocationSpeakerID();
-        // initializeLocationSpeakerID();
-
-
-        btnToken.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final TextView textView = binding.tokenTextView;
-                ACCESS_TOKEN = mainActivity.getAccessToken();
-                textView.setText(ACCESS_TOKEN);
-                System.out.println(ACCESS_TOKEN);
-            }
-        });
-
-        btnProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final Request request = new Request.Builder()
-                        .url("https://api.spotify.com/v1/me")
-                        .addHeader("Authorization","Bearer " + mainActivity.getAccessToken())
-                        .build();
-
-                cancelCall();
-                mCall = mOkHttpClient.newCall(request);
-
-                mCall.enqueue(new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                        setResponse("Failed to fetch data: " + e);
-                    }
-
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        try {
-                            final JSONObject jsonObject = new JSONObject(response.body().string());
-                            setResponse(jsonObject.toString(3));
-                        } catch (JSONException e) {
-                            setResponse("Failed to parse data: " + e);
-                        }
-                    }
-                });
-            }
-        });
-
-
-        btnSpeakers.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final Request request = new Request.Builder()
-                        .url("https://api.spotify.com/v1/me/player/devices")
-                        .addHeader("Authorization","Bearer " + mainActivity.getAccessToken())
-                        .build();
-
-                cancelCall();
-                mCall = mOkHttpClient.newCall(request);
-
-                mCall.enqueue(new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                        setResponse("Failed to fetch data: " + e);
-                    }
-
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        try {
-                            final JSONObject jsonObject = new JSONObject(response.body().string());
-                            setResponse(jsonObject.toString(3));
-                        } catch (JSONException e) {
-                            setResponse("Failed to parse data: " + e);
-                        }
-                    }
-                });
-            }
-        });
         return root;
     }
-
-    private void initializeLocationSpeakerID() {
-        locationSpeakerID.put("Stue", "1af54257b625e17733f383612d7e027ad658bee2");
-        locationSpeakerID.put("Kontor", "9421d826c2f75f49a95085a1063b9f74c8581cbb");
-        locationSpeakerID.put("Køkken", "55ee551079c70a6e720fb7af7ed1455b050f0c37");
-    }
-
-    // Converting InputStream to String
-
-    private String readStream(InputStream in) {
-        BufferedReader reader = null;
-        StringBuffer response = new StringBuffer();
-        try {
-            reader = new BufferedReader(new InputStreamReader(in));
-            String line = "";
-            while ((line = reader.readLine()) != null) {
-                response.append(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return response.toString();
-    }
-
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
     }
 
-    public void updateSpeaker(String location) {
-        if(playingLocation != location) {
-            playingLocation = location;
-
-            String speakerID = locationSpeakerID.get(location);
-
-            JSONArray device = new JSONArray();
-            device.put(speakerID);
-
-            JSONObject body = new JSONObject();
-            try {
-                body.put("device_ids", device);
-                body.put("play", true);
-            } catch (JSONException e) {
-                throw new RuntimeException(e);
-            }
-
-            MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-            RequestBody requestBody = RequestBody.create(JSON, String.valueOf(body));
-
-            final Request request = new Request.Builder()
-                    .url("https://api.spotify.com/v1/me/player")
-                    .put(requestBody)
-                    .addHeader("Authorization","Bearer " + mainActivity.getAccessToken())
-                    .build();
-
-            cancelCall();
-            mCall = mOkHttpClient.newCall(request);
-
-            mCall.enqueue(new Callback() {
-
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    setResponse("Noget gik galt.");
-                }
-                @Override
-                public void onResponse(Call call, Response response) {
-                    System.out.println("Der kom response");
-                }
-            });
-        }
-    }
-
-    private void cancelCall() {
-        if (mCall != null) {
-            mCall.cancel();
-        }
-    }
-
-    private void setResponse(String response) {
-        System.out.println("Reponse to put in txt view: " + response);
-        mainActivity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                txtViewUserProfile.setText(response);
-            }
-        });
+    private void initializeLocationSpeakerID() {
+        locationSpeakerID.put("Stue", "1af54257b625e17733f383612d7e027ad658bee2");
+        locationSpeakerID.put("Kontor", "9421d826c2f75f49a95085a1063b9f74c8581cbb");
+        locationSpeakerID.put("Køkken", "55ee551079c70a6e720fb7af7ed1455b050f0c37");
     }
 }

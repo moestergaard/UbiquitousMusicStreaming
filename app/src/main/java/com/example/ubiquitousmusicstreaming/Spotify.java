@@ -3,8 +3,6 @@ package com.example.ubiquitousmusicstreaming;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
-import android.util.Log;
 
 import com.example.ubiquitousmusicstreaming.ui.configuration.Device;
 import com.google.gson.Gson;
@@ -17,7 +15,10 @@ import com.spotify.android.appremote.api.SpotifyAppRemote;
 import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
-import com.spotify.protocol.types.PlayerState;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,8 +26,10 @@ import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class Spotify {
@@ -42,11 +45,7 @@ public class Spotify {
     private static SpotifyAppRemote spotifyAppRemote;
     private String accessToken;
 
-    public Spotify(Context context) {
-        this.context = context;
-        //authorize();
-        //refreshSpeakers();
-    }
+    public Spotify(Context context) { this.context = context; }
 
     public void connect() {
         SpotifyAppRemote.connect(context, new ConnectionParams.Builder(CLIENT_ID)
@@ -57,18 +56,11 @@ public class Spotify {
             @Override
             public void onConnected(SpotifyAppRemote _spotifyAppRemote) {
                 spotifyAppRemote = _spotifyAppRemote;
-                // Now you can start interacting with App Remote
-                // ...
-
-                // Retrieve access token after connecting
                 retrieveAccessToken();
             }
 
             @Override
-            public void onFailure(Throwable throwable) {
-                // Something went wrong when attempting to connect
-                // ...
-            }
+            public void onFailure(Throwable throwable) { }
         });
     }
 
@@ -88,14 +80,10 @@ public class Spotify {
         switch (response.getType()) {
             case TOKEN:
                 accessToken = response.getAccessToken();
-                // Access token has been retrieved
-                // ...
                 break;
             case ERROR:
-                // Handle error response
                 break;
             default:
-                // Handle other cases
         }
     }
 
@@ -106,20 +94,11 @@ public class Spotify {
         }
     }
 
-    /*
-
-    public void authorize() {
-        // Authorize spotify
-        AuthorizationRequest.Builder builder =
-                new AuthorizationRequest.Builder(CLIENT_ID, AuthorizationResponse.Type.TOKEN, REDIRECT_URI);
-
-        builder.setScopes(new String[]{"streaming", "user-read-email", "user-read-currently-playing", "user-read-playback-state"});
-        AuthorizationRequest request = builder.build();
-
-        AuthorizationClient.openLoginActivity((Activity) context, REQUEST_CODE, request);
+    private void cancelCall() {
+        if (mCall != null) {
+            mCall.cancel();
+        }
     }
-
-     */
 
     public void refreshSpeakers() {
         final Request request = new Request.Builder()
@@ -169,16 +148,7 @@ public class Spotify {
         });
     }
 
-    private void cancelCall() {
-        if (mCall != null) {
-            mCall.cancel();
-        }
-    }
-
-    public List<Device> getAvailableSpeakers() {
-        // refreshSpeakers();
-        return devices;
-    }
+    public List<Device> getAvailableSpeakers() { return devices; }
 
     public void playPlaylist(String uri) {
         if (spotifyAppRemote != null) {
@@ -186,130 +156,43 @@ public class Spotify {
         }
     }
 
-    /*
-    public void subscribeToPlayerState(SpotifyAppRemote.PlayerStateCallback callback) {
-        if (spotifyAppRemote != null) {
-            spotifyAppRemote.getPlayerApi().subscribeToPlayerState().setEventCallback(callback);
-        }
-    }
-
-     */
-
-
     public String getResponseMessage() {
         return responseMessage;
     }
 
+    public void changeSpeaker(String speakerID) {
+        JSONArray device = new JSONArray();
+        device.put(speakerID);
+
+        JSONObject body = new JSONObject();
+        try {
+            body.put("device_ids", device);
+            body.put("play", true);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        RequestBody requestBody = RequestBody.create(JSON, String.valueOf(body));
+
+        final Request request = new Request.Builder()
+                .url("https://api.spotify.com/v1/me/player")
+                .put(requestBody)
+                .addHeader("Authorization","Bearer " + accessToken)
+                .build();
+
+        cancelCall();
+        mCall = mOkHttpClient.newCall(request);
+
+        mCall.enqueue(new Callback() {
+
+            @Override
+            public void onFailure(Call call, IOException e) { e.printStackTrace(); }
+            @Override
+            public void onResponse(Call call, Response response) { }
+        });
+    }
+
     public String getAccessToken() { return accessToken; }
     public SpotifyAppRemote getSpotifyAppRemote() { return spotifyAppRemote; }
-
-    /*
-    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        mainActivity.onActivityResult(requestCode, resultCode, intent);
-
-        // Check if result comes from the correct activity
-        if (requestCode == REQUEST_CODE) {
-            AuthorizationResponse response = AuthorizationClient.getResponse(resultCode, intent);
-
-            switch (response.getType()) {
-                // Response was successful and contains auth token
-                case TOKEN:
-                    ACCESS_TOKEN = response.getAccessToken();
-                    // Handle successful response
-                    break;
-
-                // Auth flow returned an error
-                case ERROR:
-                    // Handle error response
-                    break;
-
-                // Most likely auth flow was cancelled
-                default:
-                    // Handle other cases
-            }
-        }
-    }
-
-     */
-
-    /*
-    protected void onStart() {
-        mainActivity.super.onStart();
-        // We will start writing our code here.
-        // Set the connection parameters
-        ConnectionParams connectionParams =
-                new ConnectionParams.Builder(CLIENT_ID)
-                        .setRedirectUri(REDIRECT_URI)
-                        .showAuthView(true)
-                        .build();
-
-        SpotifyAppRemote.connect(this, connectionParams,
-                new Connector.ConnectionListener() {
-
-                    @Override
-                    public void onConnected(SpotifyAppRemote spotifyAppRemote) {
-                        mSpotifyAppRemote = spotifyAppRemote;
-                        Log.d("MainActivity", "Connected! Yay!");
-
-                        // Now you can start interacting with App Remote
-                        connected();
-                    }
-
-                    @Override
-                    public void onFailure(Throwable throwable) {
-                        Log.e("MainActivity", throwable.getMessage(), throwable);
-
-                        // Something went wrong when attempting to connect! Handle errors here
-                    }
-                });
-    }
-
-    private Uri getRedirectUri() {
-        return new Uri.Builder()
-                .scheme(getString(R.string.com_spotify_sdk_redirect_scheme))
-                .authority(getString(R.string.com_spotify_sdk_redirect_host))
-                .build();
-    }
-
-
-    private void connected() {
-        // Then we will write some more code here.
-        // Play a playlist
-
-        //mSpotifyAppRemote.getPlayerApi().play("spotify:playlist:37i9dQZF1DX7K31D69s4M1");
-
-
-        System.out.println(mSpotifyAppRemote.getConnectApi());
-
-
-
-        // Subscribe to PlayerState
-        /*
-        mSpotifyAppRemote.getPlayerApi()
-                .subscribeToPlayerState()
-                .setEventCallback(playerState -> {
-                    final Track track = playerState.track;
-                    if (track != null) {
-                        Log.d("MainActivity", track.name + " by " + track.artist.name);
-                    }
-                });
-
-         */
-/*
-}
-
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        SpotifyAppRemote.disconnect(mSpotifyAppRemote);
-        // Aaand we will finish off here.
-
-        //mSpotifyAppRemote.getConnectApi().
-
-    }
-
-
- */
-
 }

@@ -243,29 +243,7 @@ public class ConfigurationFragment extends Fragment {
 
     private void setupSpeakerRoomSelection(Spinner spinSpeaker, Spinner spinRoom) {
         devices = spotify.getAvailableSpeakers();
-
-        /*
-        while(!spotify.getResponseMessage().equals("Received")) {
-            devices = spotify.getAvailableSpeakers();
-        }
-         */
-
-
         List<String> rooms = new ArrayList<>();
-
-        /*
-        int i = 0;
-        while(devices.isEmpty()) {
-            devices = spotify.getAvailableSpeakers();
-            //System.out.println(i);
-            i++;
-            if(i > 10000000) {
-                System.out.println("Ingen tilgængelige højtalere.");
-                break;
-            }
-        }
-
-         */
 
         if (!devices.isEmpty()) {
             for (Device d : devices) {
@@ -291,7 +269,6 @@ public class ConfigurationFragment extends Fragment {
                 String room = adapterView.getItemAtPosition(i).toString();
                 int indexRoom = rooms.indexOf(room);
                 choosenSpeaker = devices.get(indexRoom).getId();
-                //Toast.makeText(mainActivity, "Højtaler: " + item, Toast.LENGTH_SHORT).show();
             }
 
             @Override

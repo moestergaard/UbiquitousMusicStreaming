@@ -12,7 +12,22 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.ubiquitousmusicstreaming.MainActivity;
+import com.example.ubiquitousmusicstreaming.Spotify;
 import com.example.ubiquitousmusicstreaming.databinding.FragmentLocationBinding;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.Hashtable;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class LocationFragment extends Fragment {
 
@@ -20,7 +35,10 @@ public class LocationFragment extends Fragment {
     private static TextView txtViewInUse, txtViewLocation;
     private static Button buttonInUse, buttonStop;
     private Boolean inUse = false, inUseTemp;
+    private static String playingLocation = "";
+    private static Hashtable<String, String> locationSpeakerID = new Hashtable<>();
     private MainActivity mainActivity;
+    private Spotify spotify;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -41,6 +59,8 @@ public class LocationFragment extends Fragment {
 
         inUse = mainActivity.getInUse();
         inUseTemp = mainActivity.getInUseTemp();
+        locationSpeakerID = mainActivity.getLocationSpeakerID();
+        spotify = mainActivity.getSpotify();
 
         updateTextView();
 
@@ -92,5 +112,15 @@ public class LocationFragment extends Fragment {
 
     public static void SetTextView(String text) {
         txtViewLocation.setText(text);
+    }
+
+    public void updateSpeaker(String location) {
+        if (playingLocation != location) {
+            playingLocation = location;
+
+            String speakerID = locationSpeakerID.get(location);
+
+            spotify.changeSpeaker(speakerID);
+        }
     }
 }
