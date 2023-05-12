@@ -15,14 +15,6 @@
         android:layout_marginBottom="60dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
-
-
-
-    <!-- Player Context -->
-
-    <!-- Image cover art -->
-
-
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/image"
         android:layout_width="300dp"
@@ -31,222 +23,6 @@
         android:scaleType="fitCenter"
         tools:srcCompat="@drawable/widget_placeholder" />
 
-        <!-- app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"-->
-
-
-    <!--androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/image_label"
-        style="@style/Widget.Cat.Button.Small"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:onClick="onImageClicked"
-        android:text="@string/title_image_size"
-        android:textAllCaps="false"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/image"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/subscribe_to_player_context_button"
-        app:layout_constraintTop_toTopOf="@+id/image"
-        app:layout_constraintVertical_bias="0.0" /-->
-
-    <!--androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/image_scale_type_label"
-        style="@style/Widget.Cat.Button.Small"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:onClick="onImageScaleTypeClicked"
-        android:text="@string/title_image_scale_type"
-        android:textAllCaps="false"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/image"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/image"
-        app:layout_constraintTop_toBottomOf="@+id/subscribe_to_player_context_button"
-        app:layout_constraintTop_toTopOf="@+id/image"
-        app:layout_constraintVertical_bias="0.0" /-->
-
-    <!-- Current Track -->
-
-
-    <!--Button
-        android:id="@+id/current_track_label"
-        style="@style/Widget.Cat.Button.Small"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:lines="2"
-        android:onClick="showCurrentPlayerState"
-        android:text="@string/title_current_track"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/image"
-        app:layout_constraintVertical_bias="0.05" />
-
-    <Button
-        android:id="@+id/subscribe_to_player_state_button"
-        style="@style/Widget.Cat.Button.Small"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:filterTouchesWhenObscured="false"
-        android:onClick="onSubscribedToPlayerStateButtonClicked"
-        android:text="@string/subscribe_to_current_track"
-        android:textAllCaps="false"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/image"
-        app:layout_constraintVertical_bias="0.05" /-->
-
-    <!-- Playback controls -->
-
-    <!--androidx.appcompat.widget.AppCompatImageButton
-        android:id="@+id/playback_speed_button"
-        android:layout_width="48dp"
-        android:layout_height="24dp"
-        android:layout_marginBottom="8dp"
-        android:background="?attr/actionBarItemBackground"
-        android:onClick="onPlaybackSpeedButtonClicked"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.95"
-        app:layout_constraintStart_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/subscribe_to_player_state_button"
-        app:layout_constraintVertical_bias="0.2"
-        app:srcCompat="@drawable/ic_playback_speed_100" /-->
-
-    <!--LinearLayout
-        android:layout_width="match_parent"
-        app:layout_constraintTop_toBottomOf="@+id/subscribe_to_player_state_button"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/toggle_shuffle_button"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:background="?attr/actionBarItemBackground"
-            android:onClick="onToggleShuffleButtonClicked"
-            app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.05"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/subscribe_to_player_state_button"
-            app:layout_constraintVertical_bias="0.2"
-            android:layout_weight="1"
-            android:layout_margin="8dp"
-            app:srcCompat="@drawable/btn_shuffle" />
-
-        <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/seek_back_button"
-            android:layout_width="0dp"
-            android:layout_height="96dp"
-            android:background="?attr/actionBarItemBackground"
-            android:onClick="onSeekBack"
-            app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.20"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/subscribe_to_player_state_button"
-            app:layout_constraintVertical_bias="0.2"
-            android:layout_weight="1"
-            android:layout_margin="8dp"
-            app:srcCompat="@drawable/btn_seek_back" />
-
-        <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/skip_prev_button"
-            android:layout_width="0dp"
-            android:layout_height="96dp"
-            android:background="?attr/actionBarItemBackground"
-            android:onClick="onSkipPreviousButtonClicked"
-            app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.35"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/subscribe_to_player_state_button"
-            app:layout_constraintVertical_bias="0.2"
-            android:layout_weight="1"
-            android:layout_margin="8dp"
-            app:srcCompat="@drawable/btn_prev" />
-
-        <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/play_pause_button"
-            android:layout_width="0dp"
-            android:layout_height="96dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:onClick="onPlayPauseButtonClicked"
-            app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/subscribe_to_player_state_button"
-            app:layout_constraintVertical_bias="0.2"
-            android:layout_weight="1"
-            android:layout_margin="8dp"
-            app:srcCompat="@drawable/btn_play" />
-
-        <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/skip_next_button"
-            android:layout_width="0dp"
-            android:layout_height="96dp"
-            android:background="?attr/actionBarItemBackground"
-            android:onClick="onSkipNextButtonClicked"
-            app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.65"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/subscribe_to_player_state_button"
-            app:layout_constraintVertical_bias="0.2"
-            android:layout_weight="1"
-            android:layout_margin="8dp"
-            app:srcCompat="@drawable/btn_next" />
-
-        <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/seek_forward_button"
-            android:layout_width="0dp"
-            android:layout_height="96dp"
-            android:background="?attr/actionBarItemBackground"
-            android:onClick="onSeekForward"
-            app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.80"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/subscribe_to_player_state_button"
-            app:layout_constraintVertical_bias="0.2"
-            android:layout_weight="1"
-            android:layout_margin="8dp"
-            app:srcCompat="@drawable/btn_seek_forward" />
-
-        <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/toggle_repeat_button"
-            android:layout_width="0dp"
-            android:layout_height="96dp"
-            android:background="?attr/actionBarItemBackground"
-            android:onClick="onToggleRepeatButtonClicked"
-            app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.95"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/subscribe_to_player_state_button"
-            app:layout_constraintVertical_bias="0.2"
-            android:layout_weight="1"
-            android:layout_margin="8dp"
-            app:srcCompat="@drawable/btn_repeat" />
-    </LinearLayout-->
         <TextView
             android:id="@+id/current_track"
             android:layout_width="wrap_content"
@@ -270,8 +46,6 @@
             android:textAlignment="center"
             android:textColor="@color/textOnBackground"/>
 
-
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -281,28 +55,6 @@
             android:layout_marginRight="90dp"
             android:layout_marginTop="60dp"
             tools:ignore="MissingConstraints">
-
-            <!-- app:layout_constraintTop_toBottomOf="@+id/subscribe_to_player_state_button"-->
-
-            <!--androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/toggle_shuffle_button"
-                android:layout_width="0dp"
-                android:layout_height="96dp"
-                android:layout_weight="1"
-                android:layout_margin="8dp"
-                android:background="?attr/actionBarItemBackground"
-                android:scaleType="fitCenter"
-                app:srcCompat="@drawable/btn_shuffle" /-->
-
-            <!--androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/seek_back_button"
-                android:layout_width="0dp"
-                android:layout_height="96dp"
-                android:layout_weight="1"
-                android:layout_margin="8dp"
-                android:background="?attr/actionBarItemBackground"
-                android:scaleType="fitCenter"
-                app:srcCompat="@drawable/btn_seek_back" /-->
 
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/skip_prev_button"
@@ -323,7 +75,6 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:scaleType="fitCenter"
                 app:srcCompat="@drawable/btn_play" />
-            <!-- android:onClick="onPlayPauseButtonClicked"-->
 
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/skip_next_button"
@@ -335,128 +86,6 @@
                 android:scaleType="fitCenter"
                 app:srcCompat="@drawable/btn_next" />
 
-            <!--androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/seek_forward_button"
-                android:layout_width="0dp"
-                android:layout_height="96dp"
-                android:layout_weight="1"
-                android:layout_margin="8dp"
-                android:background="?attr/actionBarItemBackground"
-                android:scaleType="fitCenter"
-                app:srcCompat="@drawable/btn_seek_forward" /-->
-
-            <!--androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/toggle_repeat_button"
-                android:layout_width="0dp"
-                android:layout_height="96dp"
-                android:layout_weight="1"
-                android:layout_margin="8dp"
-                android:background="?attr/actionBarItemBackground"
-                android:scaleType="fitCenter"
-                app:srcCompat="@drawable/btn_repeat" /-->
-
         </LinearLayout>
     </LinearLayout>
-
-
-
-    <!--LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/horizontalScrollView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:orientation="horizontal">
-    </LinearLayout-->
-
-    <!--HorizontalScrollView
-        android:id="@+id/horizontalScrollView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/activity_horizontal_margin"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-        </LinearLayout>
-    </HorizontalScrollView-->
-
-    <!--LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="8dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <TextView
-            android:id="@+id/token_text_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            tools:text="Token: 089d841ccc194c10a77afad9e1c11d54"
-            android:textColor="@color/white"/>
-
-        <Button
-            android:id="@+id/token_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:text="Request Token"
-            android:backgroundTint="@color/spotifyGreen"
-            android:textColor="@color/spotifyBlack"/>
-
-        <TextView
-            android:id="@+id/code_text_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            tools:text="Code: 089d841ccc194c10a77afad9e1c11d54"
-            android:textColor="@color/white"/>
-
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="8dp"
-            android:layout_weight="1">
-
-            <TextView
-                android:id="@+id/response_text_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="10sp"
-                tools:text="Line 1\nLine 2\nLine 3"
-                android:textColor="@color/white"/>
-
-        </ScrollView>
-
-        <Button
-            android:id="@+id/buttonGetSpeakers"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:text="Get Speakers"
-            android:backgroundTint="@color/spotifyGreen"
-            android:textColor="@color/spotifyBlack"/>
-
-        <Button
-            android:id="@+id/buttonGetProfile"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:text="Get User Profile"
-            android:backgroundTint="@color/spotifyGreen"
-            android:textColor="@color/spotifyBlack"/>
-
-    </LinearLayout-->
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>
