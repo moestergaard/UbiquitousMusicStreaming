@@ -70,6 +70,11 @@ public class MainActivity extends AppCompatActivity {
         // fileSystemTest.overAllTestMethod();
 
         super.onCreate(savedInstanceState);
+        // Request window feature
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getSupportActionBar().hide();
+
+
         loadSettings();
 
         spotify = new Spotify(this);
@@ -77,12 +82,9 @@ public class MainActivity extends AppCompatActivity {
         spotify.refreshSpeakers();
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
-
-        // Request window feature
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getSupportActionBar().hide();
-
         setContentView(binding.getRoot());
+
+
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // Permission is not granted, request it

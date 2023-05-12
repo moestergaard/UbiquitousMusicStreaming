@@ -38,6 +38,11 @@ import com.example.ubiquitousmusicstreaming.databinding.FragmentMusicBinding;
 import com.example.ubiquitousmusicstreaming.ui.location.LocationFragment;
 import com.google.android.material.snackbar.Snackbar;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
+import com.spotify.protocol.client.Subscription;
+import com.spotify.protocol.types.Image;
+import com.spotify.protocol.types.PlayerContext;
+import com.spotify.protocol.types.PlayerState;
+import com.spotify.protocol.types.Repeat;
 import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
@@ -61,6 +66,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
 
 import okhttp3.Callback;
 import okhttp3.MediaType;
@@ -102,6 +108,75 @@ public class MusicFragment extends Fragment {
     private Button btnToken, btnProfile, btnSpeakers;
     private static TextView txtViewUserProfile;
     private static Hashtable<String, String> locationSpeakerID = new Hashtable<>();
+    Button playerContextButton, playerStateButton;
+    ImageView coverImageView;
+    AppCompatImageButton playPauseButton, shuffleButton, repeatButton, backButton, forwardButton, skipNext, skipPrevious;
+
+    private final Subscription.EventCallback<PlayerContext> mPlayerContextEventCallback =
+            new Subscription.EventCallback<PlayerContext>() {
+                @Override
+                public void onEvent(PlayerContext playerContext) {
+                    playerContextButton.setText(
+                            String.format(Locale.US, "%s\n%s", playerContext.title, playerContext.subtitle));
+                    playerContextButton.setTag(playerContext);
+                }
+            };
+
+    private final Subscription.EventCallback<PlayerState> mPlayerStateEventCallback =
+            new Subscription.EventCallback<PlayerState>() {
+                @Override
+                public void onEvent(PlayerState playerState) {
+
+                    Drawable drawable =
+                            ResourcesCompat.getDrawable(
+                                    getResources(), R.drawable.mediaservice_shuffle, mainActivity.getTheme());
+                    if (!playerState.playbackOptions.isShuffling) {
+                        shuffleButton.setImageDrawable(drawable);
+                        DrawableCompat.setTint(shuffleButton.getDrawable(), Color.WHITE);
+                    } else {
+                        shuffleButton.setImageDrawable(drawable);
+                        DrawableCompat.setTint(
+                                shuffleButton.getDrawable(),
+                                getResources().getColor(R.color.cat_medium_green));
+                    }
+
+                    if (playerState.playbackOptions.repeatMode == Repeat.ALL) {
+                        repeatButton.setImageResource(R.drawable.mediaservice_repeat_all);
+                        DrawableCompat.setTint(
+                                repeatButton.getDrawable(),
+                                getResources().getColor(R.color.cat_medium_green));
+                    } else if (playerState.playbackOptions.repeatMode == Repeat.ONE) {
+                        repeatButton.setImageResource(R.drawable.mediaservice_repeat_one);
+                        DrawableCompat.setTint(
+                                repeatButton.getDrawable(),
+                                getResources().getColor(R.color.cat_medium_green));
+                    } else {
+                        repeatButton.setImageResource(R.drawable.mediaservice_repeat_off);
+                        DrawableCompat.setTint(repeatButton.getDrawable(), Color.WHITE);
+                    }
+
+                    if (playerState.track != null) {
+                        playerStateButton.setText(
+                                String.format(
+                                        Locale.US, "%s\n%s", playerState.track.name, playerState.track.artist.name));
+                        playerStateButton.setTag(playerState);
+                    }
+
+                    // Invalidate play / pause
+
+
+                    if (playerState.track != null) {
+                        // Get image from track
+                        spotifyAppRemote
+                                .getImagesApi()
+                                .getImage(playerState.track.imageUri, Image.Dimension.LARGE)
+                                .setResultCallback(
+                                        bitmap -> {
+                                            coverImageView.setImageBitmap(bitmap);
+                                        });
+                    }
+                }
+            };
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -111,8 +186,62 @@ public class MusicFragment extends Fragment {
         binding = FragmentMusicBinding.inflate(inflater, container, false);
         mainActivity = (MainActivity) getParentFragment().getActivity();
         spotify = mainActivity.getSpotify();
-        spotifyAppRemote = spotify.getSpotifyAppRemote();
+        while(spotifyAppRemote != null) {
+            spotifyAppRemote = spotify.getSpotifyAppRemote();
+        }
+
         View root = binding.getRoot();
+
+        coverImageView = binding.image;
+        //playPauseButton = mainActivity.findViewById(R.id.play_pause_button);
+        playPauseButton = binding.playPauseButton;
+        shuffleButton = binding.toggleShuffleButton;
+        repeatButton = binding.toggleRepeatButton;
+        backButton = binding.seekBackButton;
+        forwardButton = binding.seekForwardButton;
+        skipNext = binding.skipNextButton;
+        skipPrevious = binding.skipPrevButton;
+        playerContextButton = binding.currentContextLabel;
+        playerStateButton = binding.currentTrackLabel;
+
+        //SpotifyAppRemote.setDebugMode(true);
+        onDisconnected();
+
+        playPauseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changePlayPause();
+            }
+        });
+
+        skipNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                spotifyAppRemote
+                        .getPlayerApi()
+                        .skipNext();
+            }
+        });
+
+        skipPrevious.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                spotifyAppRemote
+                        .getPlayerApi()
+                        .skipPrevious();
+            }
+        });
+
+        repeatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                spotifyAppRemote
+                        .getPlayerApi()
+                        .toggleRepeat();
+            }
+        });
+
+
 
         return root;
     }
@@ -120,6 +249,60 @@ public class MusicFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    private void onDisconnected() {
+        /*
+        for (View view : mViews) {
+            view.setEnabled(false);
+        }
+        coverImageView.setImageResource(R.drawable.widget_placeholder);
+        mPlayerContextButton.setText(R.string.title_player_context);
+        mPlayerStateButton.setText(R.string.title_current_track);
+        mToggleRepeatButton.clearColorFilter();
+        mToggleRepeatButton.setImageResource(R.drawable.btn_repeat);
+        mToggleShuffleButton.clearColorFilter();
+        mToggleShuffleButton.setImageResource(R.drawable.btn_shuffle);
+        mPlayerContextButton.setVisibility(View.INVISIBLE);
+        mSubscribeToPlayerContextButton.setVisibility(View.VISIBLE);
+        mPlayerStateButton.setVisibility(View.INVISIBLE);
+        mSubscribeToPlayerStateButton.setVisibility(View.VISIBLE);
+
+         */
+    }
+
+    public void onToggleShuffleButtonClicked(View view) {
+        spotifyAppRemote
+                .getPlayerApi()
+                .toggleShuffle();
+    }
+
+    public void onToggleRepeatButtonClicked(View view) {
+        spotifyAppRemote
+                .getPlayerApi()
+                .toggleRepeat();
+    }
+
+    private void changePlayPause() {
+        spotifyAppRemote = spotify.getSpotifyAppRemote();
+        spotifyAppRemote
+                .getPlayerApi()
+                .getPlayerState()
+                .setResultCallback(
+                        playerState -> {
+                            if (playerState.isPaused) {
+                                spotifyAppRemote
+                                        .getPlayerApi()
+                                        .resume();
+                                playPauseButton.setImageResource(R.drawable.btn_pause);
+                            } else {
+                                spotifyAppRemote
+                                        .getPlayerApi()
+                                        .pause();
+                                playPauseButton.setImageResource(R.drawable.btn_play);
+                            }
+                        });
+
     }
 
     private void initializeLocationSpeakerID() {

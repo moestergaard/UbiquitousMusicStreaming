@@ -23,6 +23,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -191,6 +192,29 @@ public class Spotify {
             @Override
             public void onResponse(Call call, Response response) { }
         });
+    }
+
+    public Boolean changePlayPause() {
+        final Boolean[] isPlaying = {true};
+        spotifyAppRemote
+                .getPlayerApi()
+                .getPlayerState()
+                .setResultCallback(
+                        playerState -> {
+                            if (playerState.isPaused) {
+                                spotifyAppRemote
+                                        .getPlayerApi()
+                                        .resume();
+                                isPlaying[0] = false;
+                                System.out.println("I spotify:" + isPlaying[0]);
+                            } else {
+                                spotifyAppRemote
+                                        .getPlayerApi()
+                                        .pause();
+                            }
+                        });
+        System.out.println("end of method: " + isPlaying[0]);
+        return isPlaying[0];
     }
 
     public String getAccessToken() { return accessToken; }

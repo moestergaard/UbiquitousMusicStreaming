@@ -73,6 +73,7 @@ public class ConfigurationFragment extends Fragment {
     List<Device> devices = new ArrayList<>();
     String choosenSpeaker = "", choosenRoom = "";
     Hashtable<String, String> locationSpeakerID = new Hashtable<>();
+
     List<ScanResult> scanResults;
     Boolean scan = false;
     private Call mCall;
@@ -190,6 +191,7 @@ public class ConfigurationFragment extends Fragment {
                     locationSpeakerID.put(choosenRoom, choosenSpeaker);
                     addLocationSpeakerID(choosenRoom, choosenSpeaker);
                     mainActivity.updateLocationSpeakerID(locationSpeakerID);
+                    Toast.makeText(mainActivity, "Højtaler: " + choosenSpeaker + ", rum: " + choosenRoom, Toast.LENGTH_LONG).show();
                 }
                 else {
                     Toast.makeText(mainActivity, "Vælg både en højtaler og et rum.", Toast.LENGTH_LONG).show();

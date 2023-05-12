@@ -58,7 +58,7 @@
         app:layout_constraintVertical_bias="0.05"
         tools:srcCompat="@drawable/widget_placeholder" />
 
-    <androidx.appcompat.widget.AppCompatTextView
+    <!--androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/image_label"
         style="@style/Widget.Cat.Button.Small"
         android:layout_width="wrap_content"
@@ -75,9 +75,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/subscribe_to_player_context_button"
         app:layout_constraintTop_toTopOf="@+id/image"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.0" /-->
 
-    <androidx.appcompat.widget.AppCompatTextView
+    <!--androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/image_scale_type_label"
         style="@style/Widget.Cat.Button.Small"
         android:layout_width="wrap_content"
@@ -94,7 +94,7 @@
         app:layout_constraintStart_toStartOf="@+id/image"
         app:layout_constraintTop_toBottomOf="@+id/subscribe_to_player_context_button"
         app:layout_constraintTop_toTopOf="@+id/image"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.0" /-->
 
     <!-- Current Track -->
 
@@ -283,7 +283,7 @@
             android:layout_weight="1"
             android:layout_margin="8dp"
             android:background="?attr/actionBarItemBackground"
-            android:onClick="onToggleShuffleButtonClicked"
+            android:scaleType="fitCenter"
             app:srcCompat="@drawable/btn_shuffle" />
 
         <androidx.appcompat.widget.AppCompatImageButton
@@ -293,7 +293,7 @@
             android:layout_weight="1"
             android:layout_margin="8dp"
             android:background="?attr/actionBarItemBackground"
-            android:onClick="onSeekBack"
+            android:scaleType="fitCenter"
             app:srcCompat="@drawable/btn_seek_back" />
 
         <androidx.appcompat.widget.AppCompatImageButton
@@ -303,7 +303,7 @@
             android:layout_weight="1"
             android:layout_margin="8dp"
             android:background="?attr/actionBarItemBackground"
-            android:onClick="onSkipPreviousButtonClicked"
+            android:scaleType="fitCenter"
             app:srcCompat="@drawable/btn_prev" />
 
         <androidx.appcompat.widget.AppCompatImageButton
@@ -313,8 +313,9 @@
             android:layout_weight="1"
             android:layout_margin="8dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:onClick="onPlayPauseButtonClicked"
+            android:scaleType="fitCenter"
             app:srcCompat="@drawable/btn_play" />
+        <!-- android:onClick="onPlayPauseButtonClicked"-->
 
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/skip_next_button"
@@ -323,7 +324,7 @@
             android:layout_weight="1"
             android:layout_margin="8dp"
             android:background="?attr/actionBarItemBackground"
-            android:onClick="onSkipNextButtonClicked"
+            android:scaleType="fitCenter"
             app:srcCompat="@drawable/btn_next" />
 
         <androidx.appcompat.widget.AppCompatImageButton
@@ -333,7 +334,7 @@
             android:layout_weight="1"
             android:layout_margin="8dp"
             android:background="?attr/actionBarItemBackground"
-            android:onClick="onSeekForward"
+            android:scaleType="fitCenter"
             app:srcCompat="@drawable/btn_seek_forward" />
 
         <androidx.appcompat.widget.AppCompatImageButton
@@ -343,7 +344,7 @@
             android:layout_weight="1"
             android:layout_margin="8dp"
             android:background="?attr/actionBarItemBackground"
-            android:onClick="onToggleRepeatButtonClicked"
+            android:scaleType="fitCenter"
             app:srcCompat="@drawable/btn_repeat" />
 
     </LinearLayout>
