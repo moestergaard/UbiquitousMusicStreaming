@@ -33,6 +33,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.ubiquitousmusicstreaming.MainActivity;
 import com.example.ubiquitousmusicstreaming.R;
+import com.example.ubiquitousmusicstreaming.Spotify;
 import com.example.ubiquitousmusicstreaming.databinding.FragmentMusicBinding;
 import com.example.ubiquitousmusicstreaming.ui.location.LocationFragment;
 import com.google.android.material.snackbar.Snackbar;
@@ -95,7 +96,8 @@ public class MusicFragment extends Fragment {
     private Call mCall;
 
     private MainActivity mainActivity;
-    private SpotifyAppRemote mSpotifyAppRemote;
+    private SpotifyAppRemote spotifyAppRemote;
+    private Spotify spotify;
     private static String ACCESS_TOKEN, playingLocation = "";
     private Button btnToken, btnProfile, btnSpeakers;
     private static TextView txtViewUserProfile;
@@ -109,9 +111,9 @@ public class MusicFragment extends Fragment {
         binding = FragmentMusicBinding.inflate(inflater, container, false);
         mainActivity = (MainActivity) getParentFragment().getActivity();
         mainActivity.attachMusicFragment(MusicFragment.this);
-
-        ACCESS_TOKEN = mainActivity.getAccessToken();
-        mSpotifyAppRemote = mainActivity.getmSpotifyAppRemote();
+        spotify = mainActivity.getSpotify();
+        ACCESS_TOKEN = spotify.getAccessToken();
+        spotifyAppRemote = spotify.getSpotifyAppRemote();
         View root = binding.getRoot();
 
         btnToken = binding.tokenButton;
@@ -119,8 +121,8 @@ public class MusicFragment extends Fragment {
         btnSpeakers = binding.buttonGetSpeakers;
         txtViewUserProfile = binding.responseTextView;
 
-        //locationSpeakerID = mainActivity.getLocationSpeakerID();
-        initializeLocationSpeakerID();
+        locationSpeakerID = mainActivity.getLocationSpeakerID();
+        // initializeLocationSpeakerID();
 
 
         btnToken.setOnClickListener(new View.OnClickListener() {

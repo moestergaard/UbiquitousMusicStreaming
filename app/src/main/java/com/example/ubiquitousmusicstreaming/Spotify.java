@@ -201,6 +201,7 @@ public class Spotify {
     }
 
     public String getAccessToken() { return accessToken; }
+    public SpotifyAppRemote getSpotifyAppRemote() { return spotifyAppRemote; }
 
     /*
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {

@@ -4,20 +4,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.Manifest;
-import android.util.Log;
-import android.view.View;
 import android.view.Window;
-
 import com.example.ubiquitousmusicstreaming.ui.configuration.ConfigurationFragment;
 import com.example.ubiquitousmusicstreaming.ui.location.LocationFragment;
 import com.example.ubiquitousmusicstreaming.ui.music.MusicFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -25,36 +20,13 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-
 import com.example.ubiquitousmusicstreaming.databinding.ActivityMainBinding;
-
 import java.util.Hashtable;
 import java.util.List;
-
-import com.spotify.android.appremote.api.ConnectionParams;
-import com.spotify.android.appremote.api.Connector;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
-
-import com.spotify.protocol.client.Subscription;
-import com.spotify.protocol.types.PlayerState;
-import com.spotify.protocol.types.Track;
-import com.spotify.sdk.android.auth.AuthorizationClient;
-import com.spotify.sdk.android.auth.AuthorizationRequest;
-import com.spotify.sdk.android.auth.AuthorizationResponse;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import okhttp3.OkHttpClient;
-//import com.spotify.sdk.android.auth.AuthorizationClient;
-//import com.spotify.sdk.android.auth.AuthorizationRequest;
-//import com.spotify.sdk.android.auth.AuthorizationResponse;
-
 
 public class MainActivity extends AppCompatActivity {
 
-    //static OkHttpClient mOkHttpClient;
     private ActivityMainBinding binding;
     private Integer REQUEST_CODE = 42;
     private static WifiReceiver wifiReceiver;
@@ -66,16 +38,10 @@ public class MainActivity extends AppCompatActivity {
     private static DataManagement dm;
     private static String predictedRoom, previousLocation = "";
     private static String[] locations; //= /* new String[]{}; = */ new String[]{"Kontor", "Stue", "Køkken"};
-    private static final String CLIENT_ID = "6e101d8a913048819b5af5e6ee372b59";
-    //public static final String CLIENT_ID = "0bda033615af412eb05a8ce97d44fec2";
-    private static final String REDIRECT_URI = "ubiquitousmusicstreaming-login://callback";
-    //private static final String REDIRECT_URI = "http://com.yourdomain.yourapp/callback";
-    private static SpotifyAppRemote mSpotifyAppRemote;
-    private static String ACCESS_TOKEN;
-    private Hashtable<String, String> locationSpeakerID;
     private String fileName = "";
     private static String lastLocationFragmentTextView = "";
     private static Spotify spotify;
+    private static Hashtable<String, String> locationSpeakerID = new Hashtable<>();
 
 
     @Override
@@ -104,8 +70,6 @@ public class MainActivity extends AppCompatActivity {
         // fileSystemTest.overAllTestMethod();
 
         super.onCreate(savedInstanceState);
-        // setContentView(R.layout.activity_main);
-
         loadSettings();
 
         spotify = new Spotify(this);
@@ -130,8 +94,6 @@ public class MainActivity extends AppCompatActivity {
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
                .build();
-        // AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder()
-        //         .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
@@ -141,33 +103,11 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         wifiReceiver.attach(this); // Adding this mainActivity as an observer.
         dm = new DataManagement();
-
-
-
-        //mOkHttpClient = new OkHttpClient();
-
-        /*
-        // Authorize spotify
-        AuthorizationRequest.Builder builder =
-                new AuthorizationRequest.Builder(CLIENT_ID, AuthorizationResponse.Type.TOKEN, REDIRECT_URI);
-
-        builder.setScopes(new String[]{"streaming", "user-read-email", "user-read-currently-playing", "user-read-playback-state"});
-        AuthorizationRequest request = builder.build();
-
-        AuthorizationClient.openLoginActivity(this, REQUEST_CODE, request);
-
-         */
-
-
-        // Settings settings = FileSystem.readObjectFromFile(this);
-        // String fileName = settings.getFileName();
-        // int tmp = 2;
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-
         if (requestCode == REQUEST_CODE) {
             spotify.handleAuthorizationResponse(resultCode, intent);
         }
@@ -176,169 +116,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
         spotify.disconnect();
-    }
-
-    /*
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        super.onActivityResult(requestCode, resultCode, intent);
-
-        // Check if result comes from the correct activity
-        if (requestCode == REQUEST_CODE) {
-            AuthorizationResponse response = AuthorizationClient.getResponse(resultCode, intent);
-
-            switch (response.getType()) {
-                // Response was successful and contains auth token
-                case TOKEN:
-                    ACCESS_TOKEN = response.getAccessToken();
-                    // Handle successful response
-                    break;
-
-                // Auth flow returned an error
-                case ERROR:
-                    // Handle error response
-                    break;
-
-                // Most likely auth flow was cancelled
-                default:
-                    // Handle other cases
-            }
-        }
-    }
-
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        // We will start writing our code here.
-        // Set the connection parameters
-        ConnectionParams connectionParams =
-                new ConnectionParams.Builder(CLIENT_ID)
-                        .setRedirectUri(REDIRECT_URI)
-                        .showAuthView(true)
-                        .build();
-
-        SpotifyAppRemote.connect(this, connectionParams,
-                new Connector.ConnectionListener() {
-
-                    @Override
-                    public void onConnected(SpotifyAppRemote spotifyAppRemote) {
-                        mSpotifyAppRemote = spotifyAppRemote;
-                        Log.d("MainActivity", "Connected! Yay!");
-
-                        // Now you can start interacting with App Remote
-                        connected();
-                    }
-
-                    @Override
-                    public void onFailure(Throwable throwable) {
-                        Log.e("MainActivity", throwable.getMessage(), throwable);
-
-                        // Something went wrong when attempting to connect! Handle errors here
-                    }
-                });
-    }
-
-    private Uri getRedirectUri() {
-        return new Uri.Builder()
-                .scheme(getString(R.string.com_spotify_sdk_redirect_scheme))
-                .authority(getString(R.string.com_spotify_sdk_redirect_host))
-                .build();
-    }
-
-
-    private void connected() {
-        // Then we will write some more code here.
-        // Play a playlist
-
-        //mSpotifyAppRemote.getPlayerApi().play("spotify:playlist:37i9dQZF1DX7K31D69s4M1");
-
-
-        System.out.println(mSpotifyAppRemote.getConnectApi());
-
-
-
-        // Subscribe to PlayerState
-        /*
-        mSpotifyAppRemote.getPlayerApi()
-                .subscribeToPlayerState()
-                .setEventCallback(playerState -> {
-                    final Track track = playerState.track;
-                    if (track != null) {
-                        Log.d("MainActivity", track.name + " by " + track.artist.name);
-                    }
-                });
-
-         */
-/*
-}
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        SpotifyAppRemote.disconnect(mSpotifyAppRemote);
-        // Aaand we will finish off here.
-
-        //mSpotifyAppRemote.getConnectApi().
-
-    }
-    */
-
-    public static WifiReceiver getWifiReceiver() {
-        return wifiReceiver;
-    }
-
-    public static WifiManager getWifiManager() {
-        return wifiManager;
-    }
-
-    public static void startScan() {
-        wifiManager.startScan();
-    }
-
-    public static String getAccessToken() {
-        return spotify.getAccessToken();
-        //return ACCESS_TOKEN;
-    }
-
-    public static SpotifyAppRemote getmSpotifyAppRemote() { return mSpotifyAppRemote; }
-
-    //public static OkHttpClient getOkHttpClient() { return mOkHttpClient; }
-
-    public void setInUse(Boolean bool) {
-        if (bool) {
-            inUse = inUseTemp = true;
-        } else {
-            inUseTemp = false;
-        }
-    }
-
-    public void setInUseDataCollection(Boolean bool) {
-        inUseDataCollection = bool;
-    }
-
-    public void attachMusicFragment(MusicFragment musicFragment) { this.musicFragment = musicFragment; }
-    public void attachConfigurationFragment(ConfigurationFragment configurationFragment) { this.configurationFragment = configurationFragment; }
-
-    public void attachLocationFragment(LocationFragment locationFragment) { this.locationFragment = locationFragment; }
-
-    public void removeLocationFragment() {locationFragment = null ;}
-
-    public static void update() {
-        if(!inUse) {
-            if(inUseDataCollection) {
-                if(configurationFragment != null) {
-                    configurationFragment.update();
-                }
-            }
-        }
-        else {
-            List<ScanResult> scanResults = wifiManager.getScanResults();
-            printLocation(scanResults);
-        }
     }
 
     /**
@@ -357,15 +135,9 @@ public class MainActivity extends AppCompatActivity {
                 index = i;
             }
         }
-
-        System.out.println(location);
-        System.out.println(temp);
-        System.out.println(index);
-
         if (location[index] < 0.70) {
             if (previousLocation.equals("Intet Rum")) {
                 predictedRoom = "Intet Rum";
-
             }
             else {
                 quessedRoom = "Intet Rum";
@@ -391,14 +163,7 @@ public class MainActivity extends AppCompatActivity {
                 lastLocationFragmentTextView = "Lokation: " + predictedRoom;
                 locationFragment.SetTextView(lastLocationFragmentTextView);
             }
-
-            //System.out.println("Lokation: " + location);
-            //System.out.println("Lokation string: " + location.toString());
-            //System.out.println("Lokation length: " + location.length);
             wifiManager.startScan();
-            //for (double d : location) {
-            //    System.out.println("Value: " + d);
-            //}
         }
         else { inUse = false; }
     }
@@ -407,48 +172,58 @@ public class MainActivity extends AppCompatActivity {
         locationSpeakerID = _locationSpeakerID;
     }
 
-    public Hashtable<String, String> getLocationSpeakerID() {
-        return locationSpeakerID;
-    }
-
     public void loadSettings(){
         Settings settings = FileSystem.readObjectFromFile(this);
-        //Settings settings = FileSystem.loadSettings(new View(this));
 
         if (settings != null) {
             String fileName = settings.getFileName();
             if (fileName != null) {
                 this.fileName = fileName;
-                /*
-                if (configurationFragment != null) {
-                    configurationFragment.setFileName(fileName);
-                }
-                */
             }
-
             locationSpeakerID = settings.getLocationSpeakerID();
-
             String[] settingLocations = settings.getLocations();
-
             if (settingLocations != null) {
                 locations = settingLocations;
             }
         }
     }
 
-    public String getFileName() {
-        return fileName;
+    public static void update() {
+        if(!inUse) {
+            if(inUseDataCollection) {
+                if(configurationFragment != null) {
+                    configurationFragment.update();
+                }
+            }
+        }
+        else {
+            List<ScanResult> scanResults = wifiManager.getScanResults();
+            printLocation(scanResults);
+        }
     }
-
-    public String[] getLocation() {
-        return locations;
+    public void setInUse(Boolean bool) {
+        if (bool) {
+            inUse = inUseTemp = true;
+        } else {
+            inUseTemp = false;
+        }
     }
-
+    public static void startScan() { wifiManager.startScan(); }
+    public String getFileName() { return fileName; }
+    public String[] getLocation() { return locations; }
     public Boolean getInUse() { return inUse; }
-
     public Boolean getInUseTemp() { return inUseTemp; }
-
     public String getLastLocationFragmentTextView() { return lastLocationFragmentTextView; }
-
     public Spotify getSpotify() { return spotify; }
+    public WifiReceiver getWifiReceiver() { return wifiReceiver; }
+    public static WifiManager getWifiManager() { return wifiManager; }
+    public static String getAccessToken() { return spotify.getAccessToken(); }
+    public static Hashtable<String, String> getLocationSpeakerID() { return locationSpeakerID; }
+    public void attachMusicFragment(MusicFragment musicFragment) { this.musicFragment = musicFragment; }
+    public void attachConfigurationFragment(ConfigurationFragment configurationFragment) { this.configurationFragment = configurationFragment; }
+    public void attachLocationFragment(LocationFragment locationFragment) { this.locationFragment = locationFragment; }
+    public void setInUseDataCollection(Boolean bool) { inUseDataCollection = bool; }
+    public void removeLocationFragment() {locationFragment = null ;}
+
+
 }

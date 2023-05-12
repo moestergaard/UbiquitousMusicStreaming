@@ -55,7 +55,6 @@ public class LocationFragment extends Fragment {
                 mainActivity.attachLocationFragment(LocationFragment.this);
                 mainActivity.setInUse(true);
 
-                //txtViewInUse.setText("Systemet er taget brug.");
                 mainActivity.getWifiManager().startScan();
                 updateTextView();
             }
@@ -69,7 +68,6 @@ public class LocationFragment extends Fragment {
                 mainActivity.removeLocationFragment();
                 mainActivity.setInUse(false);
 
-                //txtViewInUse.setText("Stoppet med at tracke.");
                 txtViewLocation.setText("");
                 updateTextView();
             }
