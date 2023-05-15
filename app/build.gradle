@@ -43,6 +43,8 @@ dependencies {
     implementation files('libs/spotify-app-remote-release-0.7.2.aar')
     implementation project(path: ':spotify-app-remote')
     implementation 'androidx.test:core:1.4.0'
+    implementation 'com.google.firebase:firebase-crashlytics-buildtools:2.8.1'
+    implementation files('/Users/signethomsen/AndroidStudioProjects/UbiquitousMusicStreaming 2/app/libs/libsvm.jar')
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'

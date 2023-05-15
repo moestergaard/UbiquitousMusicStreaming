@@ -40,6 +40,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.time.LocalDateTime;
 
@@ -114,6 +115,7 @@ public class ConfigurationFragment extends Fragment {
 
         updateTextViewDataFile();
         updateTextViewRoom(room);
+        locationSpeakerName = mainActivity.getLocationSpeakerName();
 
         if (mainActivity.getInUseDataCollection()) { scan = true; startScanning(); }
 
@@ -205,8 +207,12 @@ public class ConfigurationFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if(!chosenSpeakerUniqueName.equals("") && !chosenRoom.equals("")) {
-                    locationSpeakerName.put(chosenRoom, chosenSpeakerReadableName);
-                    addLocationSpeakerName(chosenRoom, chosenSpeakerReadableName);
+                    changeLocationSpeakerName();
+
+                    // System.out.println("Hashtable old: " + locationSpeakerName);
+                    // locationSpeakerName.put(chosenRoom, chosenSpeakerReadableName);
+                    // System.out.println("Hashtable old: " + locationSpeakerName);
+                    addLocationSpeakerNameToSettings();
                     mainActivity.updateLocationSpeakerName(locationSpeakerName);
                     Toast.makeText(mainActivity, "Rum: " + chosenRoom + "\nHøjtaler: " + chosenSpeakerReadableName, Toast.LENGTH_LONG).show();
                 }
@@ -236,19 +242,21 @@ public class ConfigurationFragment extends Fragment {
         FileSystem.writeObjectToFile(mainActivity, settings);
     }
 
-    private void addLocationSpeakerName(String room, String speakerName) {
+    private void addLocationSpeakerNameToSettings() {
         Settings settings = FileSystem.readObjectFromFile(mainActivity);
 
         if (settings != null) {
-            Hashtable<String, String> locationSpeakerName = settings.getLocationSpeakerName();
+            // Hashtable<String, String> locationSpeakerName = settings.getLocationSpeakerName();
+            // System.out.println("Hashtable from settings: " + locationSpeakerName);
             /*
             while (locationSpeakerID.containsKey())
             {
 
             }
              */
-            locationSpeakerName.put(room, speakerName);
+            // locationSpeakerName.put(room, speakerName);
             settings.setLocationSpeakerName(locationSpeakerName);
+            // System.out.println("Hashtable to settings: " + locationSpeakerName);
         }
         FileSystem.writeObjectToFile(mainActivity, settings);
     }
@@ -347,6 +355,21 @@ public class ConfigurationFragment extends Fragment {
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {}
         });
+    }
+
+    private void changeLocationSpeakerName() {
+        Boolean containsChosenSpeaker = locationSpeakerName.containsValue(chosenSpeakerReadableName);
+        while (containsChosenSpeaker) {
+            Iterator<String> iterator = locationSpeakerName.keySet().iterator();
+            while (iterator.hasNext()) {
+                String key = iterator.next();
+                if (locationSpeakerName.get(key).equals(chosenSpeakerReadableName)) {
+                    iterator.remove();
+                }
+            }
+            containsChosenSpeaker = locationSpeakerName.containsValue(chosenSpeakerReadableName);
+        }
+        locationSpeakerName.put(chosenRoom, chosenSpeakerReadableName);
     }
 
     public void update() {

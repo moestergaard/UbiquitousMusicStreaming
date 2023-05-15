@@ -96,6 +96,7 @@ public class LocationFragment extends Fragment {
                 mainActivity.removeLocationFragment();
                 mainActivity.setInUse(false);
                 playingLocation = "";
+                mainActivity.setLastLocationFragmentTextView("");
 
                 txtViewLocation.setText("");
                 updateTextView();
@@ -142,6 +143,9 @@ public class LocationFragment extends Fragment {
     public boolean updateSpeaker(String location) {
         if (playingLocation != location) {
             playingLocation = location;
+
+            System.out.println(location);
+            System.out.println(locationSpeakerName);
 
             String speakerName = locationSpeakerName.get(location);
             if(speakerName == null) {

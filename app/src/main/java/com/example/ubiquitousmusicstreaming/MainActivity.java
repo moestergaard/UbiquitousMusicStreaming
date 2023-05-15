@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private static MusicFragment musicFragment;
     private static Boolean inUse = false, inUseTemp, inUseDataCollection = false;
     private static DataManagement dm;
+    private static DataManagementSVM dmSVM;
     private static String predictedRoom, previousLocation = "";
     private String[] locations; // = /* new String[]{}; = */ new String[]{"Kontor", "Stue", "Køkken"};
     private String[] locationsHardcodedForModelPurpose = new String[]{"Kontor", "Stue", "Køkken"};
@@ -112,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         wifiReceiver.attach(this); // Adding this mainActivity as an observer.
         dm = new DataManagement();
+        dmSVM = new DataManagementSVM();
     }
 
     @Override
@@ -137,7 +139,34 @@ public class MainActivity extends AppCompatActivity {
      */
 
     private void determineLocation(List<ScanResult> scanResults) {
+        int locationIndex = dmSVM.getPredictionSVM(scanResults);
+        // boolean isOutsideArea = ...(scanResults);
+        // if (isOutsideArea) ...
+
+        System.out.println("Room: " + locationsHardcodedForModelPurpose[locationIndex]);
+
+        predictedRoom = locationsHardcodedForModelPurpose[locationIndex];
+
+        if(inUseTemp) {
+            if (predictedRoom.equals(previousLocation)) {
+                Boolean result = locationFragment.updateSpeaker(predictedRoom);
+                playing = result;
+                if (result) {
+                    lastLocationFragmentTextView = predictedRoom;
+                    locationFragment.SetTextView(lastLocationFragmentTextView);
+                }
+            } else previousLocation = predictedRoom;
+            wifiManager.startScan();
+        }
+        else { inUse = false; }
+    }
+
+
+    private void determineLocation2(List<ScanResult> scanResults) {
         double[] location = dm.getPredictionNN(scanResults);
+        int locationIndex = dmSVM.getPredictionSVM(scanResults);
+        System.out.println("Room: " + locationsHardcodedForModelPurpose[locationIndex]);
+
         String quessedRoom = "";
 
         double temp = 0;
@@ -255,7 +284,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void updateLocationSpeakerName(Hashtable<String, String> _locationSpeakerName) {
+        System.out.println("Hashtable mainactivity old: " + locationSpeakerName);
         locationSpeakerName = _locationSpeakerName;
+        System.out.println("Hashtable mainactivity updated: " + locationSpeakerName);
     }
 
     public void loadSettings(){
@@ -313,6 +344,7 @@ public class MainActivity extends AppCompatActivity {
     public void attachMusicFragment(MusicFragment musicFragment) { this.musicFragment = musicFragment; }
     public void attachConfigurationFragment(ConfigurationFragment configurationFragment) { this.configurationFragment = configurationFragment; }
     public void attachLocationFragment(LocationFragment locationFragment) { this.locationFragment = locationFragment; }
+    public void setLastLocationFragmentTextView(String lastLocation) { lastLocationFragmentTextView = lastLocation; }
     public void setInUseDataCollection(Boolean bool) { inUseDataCollection = bool; }
     public void setTrackName(String trackName) { this.trackName = trackName; }
     public void setArtistName(String artistName) { this.artistName = artistName; }
