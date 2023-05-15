@@ -147,8 +147,10 @@ public class MainActivity extends AppCompatActivity {
 
         if(inUseTemp) {
             if (isOutsideArea && previousWasOutside) {
+                System.out.println("Den angiver tidligere og nuværende som udenfor.");
                 spotify.pause();
                 playing = false;
+                locationFragment.SetTextView("");
             } else {
                 if (predictedRoom.equals(previousLocation)) {
                     Boolean result = locationFragment.updateSpeaker(predictedRoom);
@@ -171,17 +173,16 @@ public class MainActivity extends AppCompatActivity {
 
         boolean outside = true;
 
-        float eps = 1.0f;
-        while (1.0f + eps != 1.0f) {
-            eps /= 2.0f;
-        }
-        double treshold = 1/location.length + eps;
+        double epsilon = Math.ulp(1.0);
+        double treshold = 1.0/location.length + epsilon;
 
         for (int i = 0; i < location.length; i++) {
             if(location[i] > treshold) {
                 outside = false;
             }
         }
+
+        System.out.println("Den prædikterer udenfor: " + outside);
         return outside;
     }
 
