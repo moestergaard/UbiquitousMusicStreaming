@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         wifiReceiver.attach(this); // Adding this mainActivity as an observer.
         dm = new DataManagement();
-        dmSVM = new DataManagementSVM();
+        dmSVM = new DataManagementSVM(this);
     }
 
     @Override
@@ -150,7 +150,8 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println("Den angiver tidligere og nuværende som udenfor.");
                 spotify.pause();
                 playing = false;
-                locationFragment.SetTextView("");
+                lastLocationFragmentTextView = "";
+                locationFragment.SetTextView(lastLocationFragmentTextView);
             } else {
                 if (predictedRoom.equals(previousLocation)) {
                     Boolean result = locationFragment.updateSpeaker(predictedRoom);
