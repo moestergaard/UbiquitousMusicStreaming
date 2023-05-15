@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageUri coverImage;
     private static Boolean playing;
     private String roomCurrentlyScanning;
+    private Boolean previousWasOutside = false;
 
 
     @Override
@@ -140,25 +141,48 @@ public class MainActivity extends AppCompatActivity {
 
     private void determineLocation(List<ScanResult> scanResults) {
         int locationIndex = dmSVM.getPredictionSVM(scanResults);
-        // boolean isOutsideArea = ...(scanResults);
-        // if (isOutsideArea) ...
-
         System.out.println("Room: " + locationsHardcodedForModelPurpose[locationIndex]);
-
         predictedRoom = locationsHardcodedForModelPurpose[locationIndex];
+        boolean isOutsideArea = checkIfOutsideArea(scanResults);
 
         if(inUseTemp) {
-            if (predictedRoom.equals(previousLocation)) {
-                Boolean result = locationFragment.updateSpeaker(predictedRoom);
-                playing = result;
-                if (result) {
-                    lastLocationFragmentTextView = predictedRoom;
-                    locationFragment.SetTextView(lastLocationFragmentTextView);
-                }
-            } else previousLocation = predictedRoom;
-            wifiManager.startScan();
+            if (isOutsideArea && previousWasOutside) {
+                spotify.pause();
+                playing = false;
+            } else {
+                if (predictedRoom.equals(previousLocation)) {
+                    Boolean result = locationFragment.updateSpeaker(predictedRoom);
+                    playing = result;
+                    if (result) {
+                        lastLocationFragmentTextView = predictedRoom;
+                        locationFragment.SetTextView(lastLocationFragmentTextView);
+                    }
+                } else previousLocation = predictedRoom;
+                previousWasOutside = isOutsideArea;
+                wifiManager.startScan();
+
+            }
         }
         else { inUse = false; }
+    }
+
+    private Boolean checkIfOutsideArea(List<ScanResult> scanResults) {
+        double[] location = dm.getPredictionNN(scanResults);
+
+        boolean outside = true;
+
+        float eps = 1.0f;
+        while (1.0f + eps != 1.0f) {
+            eps /= 2.0f;
+        }
+        double treshold = 1/location.length + eps;
+
+        for (int i = 0; i < location.length; i++) {
+            if(location[i] > treshold) {
+                outside = false;
+            }
+        }
+        return outside;
     }
 
 

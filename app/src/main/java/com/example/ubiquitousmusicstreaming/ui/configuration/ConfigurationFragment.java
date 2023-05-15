@@ -244,42 +244,11 @@ public class ConfigurationFragment extends Fragment {
 
     private void addLocationSpeakerNameToSettings() {
         Settings settings = FileSystem.readObjectFromFile(mainActivity);
-
         if (settings != null) {
-            // Hashtable<String, String> locationSpeakerName = settings.getLocationSpeakerName();
-            // System.out.println("Hashtable from settings: " + locationSpeakerName);
-            /*
-            while (locationSpeakerID.containsKey())
-            {
-
-            }
-             */
-            // locationSpeakerName.put(room, speakerName);
             settings.setLocationSpeakerName(locationSpeakerName);
-            // System.out.println("Hashtable to settings: " + locationSpeakerName);
         }
         FileSystem.writeObjectToFile(mainActivity, settings);
     }
-
-    /*
-    private void addSpeakerNameId(String speakerName, String speakerId) {
-        Settings settings = FileSystem.readObjectFromFile(mainActivity);
-
-        if (settings != null) {
-            Hashtable<String, String> speakerNameId = settings.getSpeakerNameId();
-            /*
-            while (locationSpeakerID.containsKey())
-            {
-
-            }
-             */
-    /*
-            speakerNameId.put(speakerName, speakerId);
-            settings.setSpeakerNameId(speakerNameId);
-        }
-        FileSystem.writeObjectToFile(mainActivity, settings);
-    }
-    */
 
     @Override
     public void onDestroyView() {
