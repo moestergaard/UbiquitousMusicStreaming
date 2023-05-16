@@ -63,7 +63,7 @@
                 android:filterTouchesWhenObscured="false"
                 android:state_focused="true"
                 android:layout_weight="1"
-                android:text="Aktiver sporing" />
+                android:text="Aktiver      sporing" />
 
             <Button
                 android:id="@+id/btnStopSystem"

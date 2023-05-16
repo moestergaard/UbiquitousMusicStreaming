@@ -63,8 +63,6 @@ public class LocationFragment extends Fragment {
         txtViewRoom = binding.textRoom;
         txtViewSpeaker = binding.textSpeaker;
 
-        buttonInUse.setEnabled(true);
-        buttonStop.setEnabled(false);
         inUse = mainActivity.getInUse();
         inUseTemp = mainActivity.getInUseTemp();
         locationSpeakerName = mainActivity.getLocationSpeakerName();
@@ -87,8 +85,7 @@ public class LocationFragment extends Fragment {
 
                 mainActivity.getWifiManager().startScan();
                 updateTextView();
-                buttonInUse.setEnabled(false);
-                buttonStop.setEnabled(true);
+                updateButtons(true);
             }
         });
 
@@ -104,8 +101,7 @@ public class LocationFragment extends Fragment {
 
                 txtViewLocation.setText("");
                 updateTextView();
-                buttonStop.setEnabled(false);
-                buttonInUse.setEnabled(true);
+                updateButtons(false);
             }
         });
         return root;
@@ -114,10 +110,17 @@ public class LocationFragment extends Fragment {
     private void updateTextView() {
         if(inUse) {
             txtViewInUse.setText("Sporing er aktiveret");
+            updateButtons(true);
         }
         else {
             txtViewInUse.setText("Sporing er deaktiveret");
+            updateButtons(false);
         }
+    }
+
+    private void updateButtons(Boolean activated) {
+        buttonInUse.setEnabled(!activated);
+        buttonStop.setEnabled(activated);
     }
 
     private void updateLocationSpeakerTextView() {
