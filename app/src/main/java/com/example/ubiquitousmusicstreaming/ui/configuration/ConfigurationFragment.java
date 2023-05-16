@@ -114,6 +114,8 @@ public class ConfigurationFragment extends Fragment {
         setupSpeakerRoomSelection(spinSpeaker, spinRoom);
 
         updateTextViewDataFile();
+        buttonStartScanning.setEnabled(true);
+        buttonStopScanning.setEnabled(false);
         updateTextViewRoom(room);
         locationSpeakerName = mainActivity.getLocationSpeakerName();
 
@@ -148,7 +150,7 @@ public class ConfigurationFragment extends Fragment {
                         startScanning();
 
                         setupSpeakerRoomSelection(spinSpeaker, spinRoom);
-                    }
+                    } else { Toast.makeText(mainActivity, "Angiv rummets navn", Toast.LENGTH_LONG).show(); }
                 }
                 else { textViewRoom.setText("Lav en ny datafil først"); }
             }
@@ -162,6 +164,8 @@ public class ConfigurationFragment extends Fragment {
                 mainActivity.setRoomCurrentlyScanning(null);
                 String message = "Scanning stoppet for: ";
                 textViewRoom.setText(message + room);
+                buttonStartScanning.setEnabled(true);
+                buttonStopScanning.setEnabled(false);
             }
         });
 
@@ -268,6 +272,8 @@ public class ConfigurationFragment extends Fragment {
         {
             String displayStartScanning = "Scanning startet af: ";
             textViewRoom.setText(displayStartScanning + room);
+            buttonStartScanning.setEnabled(false);
+            buttonStopScanning.setEnabled(true);
         }
     }
 

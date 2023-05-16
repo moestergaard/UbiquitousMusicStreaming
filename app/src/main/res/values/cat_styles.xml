@@ -19,14 +19,15 @@
         <item name="android:gravity">center</item>
         <item name="android:textAppearance">@style/TextAppearance.Cat.Button</item>
         <item name="android:textColor">@color/cat_button_text</item>
-        <item name="android:background">@drawable/cat_button_small</item>
+        <item name="android:backgroundTint">@drawable/cat_button_small</item>
         <item name="android:minHeight">@dimen/cat_button_height</item>
     </style>
 
     <style name="Widget.Cat.Button.Small">
-        <item name="android:layout_margin">4dp</item>
+        <item name="android:layout_margin">8dp</item>
         <item name="android:gravity">center</item>
         <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
         <item name="android:paddingTop">4dp</item>
         <item name="android:paddingBottom">4dp</item>
         <!--item name="android:background">@drawable/cat_button_small</item-->
