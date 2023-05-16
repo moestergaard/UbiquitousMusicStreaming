@@ -63,6 +63,8 @@ public class LocationFragment extends Fragment {
         txtViewRoom = binding.textRoom;
         txtViewSpeaker = binding.textSpeaker;
 
+        buttonInUse.setEnabled(true);
+        buttonStop.setEnabled(false);
         inUse = mainActivity.getInUse();
         inUseTemp = mainActivity.getInUseTemp();
         locationSpeakerName = mainActivity.getLocationSpeakerName();
@@ -85,6 +87,8 @@ public class LocationFragment extends Fragment {
 
                 mainActivity.getWifiManager().startScan();
                 updateTextView();
+                buttonInUse.setEnabled(false);
+                buttonStop.setEnabled(true);
             }
         });
 
@@ -100,6 +104,8 @@ public class LocationFragment extends Fragment {
 
                 txtViewLocation.setText("");
                 updateTextView();
+                buttonStop.setEnabled(false);
+                buttonInUse.setEnabled(true);
             }
         });
         return root;

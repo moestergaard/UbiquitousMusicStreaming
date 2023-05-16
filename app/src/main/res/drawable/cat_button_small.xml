@@ -5,4 +5,5 @@
     <item android:drawable="@drawable/cat_button_small_state_pressed" android:state_pressed="true" />
     <item android:drawable="@drawable/cat_button_small_state_checked" android:state_checked="true" />
     <item android:drawable="@drawable/cat_button_small_state_default" />
+    <!--item android:drawable="@color/white" /-->
 </selector>

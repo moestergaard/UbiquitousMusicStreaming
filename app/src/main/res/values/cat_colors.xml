@@ -16,10 +16,14 @@
 
     <color name="cat_text_link">@color/cat_white</color>
 
-    <color name="cat_button_background_default">@android:color/transparent</color>
-    <color name="cat_button_background_disabled">@android:color/transparent</color>
-    <color name="cat_button_background_focused">@android:color/transparent</color>
-    <color name="cat_button_background_pressed">@android:color/transparent</color>
+    <!--color name="cat_button_background_default">@android:color/transparent</color-->
+    <!--color name="cat_button_background_disabled">@android:color/transparent</color-->
+    <!--color name="cat_button_background_focused">@android:color/transparent</color-->
+    <!--color name="cat_button_background_pressed">@android:color/transparent</color-->
+    <color name="cat_button_background_default">@android:color/holo_green_light</color>
+    <color name="cat_button_background_disabled">@android:color/holo_green_light</color>
+    <color name="cat_button_background_focused">@android:color/holo_green_light</color>
+    <color name="cat_button_background_pressed">@android:color/holo_green_light</color>
     <color name="cat_button_text_default">@color/cat_white</color>
     <color name="cat_button_text_disabled">@color/cat_white_40</color>
     <color name="cat_button_text_focused">@color/cat_white</color>

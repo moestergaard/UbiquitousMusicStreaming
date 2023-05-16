@@ -12,10 +12,15 @@
 
         <!-- Status bar color. -->
         <!--item name="android:statusBarColor">?attr/colorOnPrimary</item-->
+
         <item name="android:statusBarColor" tools:ignore="NewApi">@android:color/transparent</item>
+
         <!--item name="android:statusBarColor" tools:ignore="NewApi">#B3121212</item-->
         <!--item name="android:navigationBarColor" tools:ignore="NewApi">#B3121212</item-->
+
         <item name="android:navigationBarColor" tools:ignore="NewApi">@android:color/transparent</item>
+        <item name="android:windowBackground">@drawable/background</item>
+
         <!-- Customize your theme here. -->
     </style>
 

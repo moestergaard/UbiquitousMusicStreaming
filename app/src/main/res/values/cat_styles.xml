@@ -26,10 +26,13 @@
     <style name="Widget.Cat.Button.Small">
         <item name="android:layout_margin">4dp</item>
         <item name="android:gravity">center</item>
-        <item name="android:textSize">10sp</item>
+        <item name="android:textSize">12sp</item>
         <item name="android:paddingTop">4dp</item>
         <item name="android:paddingBottom">4dp</item>
+        <!--item name="android:background">@drawable/cat_button_small</item-->
         <item name="android:background">@drawable/cat_button_small</item>
+        <!--item name="android:backgroundTint">@color/spotifyGreen</item-->
+        <!--item name="android:background">@color/spotifyGreen</item-->
         <item name="android:minHeight">@dimen/cat_button_small_height</item>
     </style>
 
