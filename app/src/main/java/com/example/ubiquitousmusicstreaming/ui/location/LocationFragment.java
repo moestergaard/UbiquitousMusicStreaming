@@ -161,6 +161,7 @@ public class LocationFragment extends Fragment {
                 Toast.makeText(mainActivity, "Højtaleren " + speakerName + " er ikke tilgængelig.", Toast.LENGTH_LONG).show();
                 return false;
             }
+            mainActivity.setPlayingSpeaker(speakerName);
             spotify.changeSpeaker(speakerId);
             return true;
         }

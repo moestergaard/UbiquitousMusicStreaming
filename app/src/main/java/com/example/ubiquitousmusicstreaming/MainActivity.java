@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private static Boolean playing;
     private String roomCurrentlyScanning;
     private Boolean previousWasOutside = false;
+    private String playingSpeaker = "";
 
 
     @Override
@@ -118,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
         wifiReceiver.attach(this); // Adding this mainActivity as an observer.
         dm = new DataManagement();
         dmSVM = new DataManagementSVM(this);
+        // playingSpeaker = spotify.getPlayingSpeaker();
     }
 
     @Override
@@ -370,6 +372,7 @@ public class MainActivity extends AppCompatActivity {
     public Boolean getPlaying() { return playing; }
     public String getRoomCurrentlyScanning() { return roomCurrentlyScanning; }
     public Boolean getInUseDataCollection() { return inUseDataCollection; }
+    public String getPlayingSpeaker() { return playingSpeaker; }
     public void attachMusicFragment(MusicFragment musicFragment) { this.musicFragment = musicFragment; }
     public void attachConfigurationFragment(ConfigurationFragment configurationFragment) { this.configurationFragment = configurationFragment; }
     public void attachLocationFragment(LocationFragment locationFragment) { this.locationFragment = locationFragment; }
@@ -378,6 +381,7 @@ public class MainActivity extends AppCompatActivity {
     public void setTrackName(String trackName) { this.trackName = trackName; }
     public void setArtistName(String artistName) { this.artistName = artistName; }
     public void setCoverImage(ImageUri coverImage) { this.coverImage = coverImage; }
+    public void setPlayingSpeaker(String speakerName) { playingSpeaker = speakerName; }
     public void setPlaying(Boolean playing) {this.playing = playing; }
     public void setRoomCurrentlyScanning(String roomCurrentlyScanning) { this.roomCurrentlyScanning = roomCurrentlyScanning; }
     public void removeLocationFragment() {locationFragment = null ;}

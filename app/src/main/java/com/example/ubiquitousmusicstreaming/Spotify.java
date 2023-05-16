@@ -18,6 +18,10 @@ import com.spotify.protocol.types.Track;
 import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
+import com.spotify.android.appremote.api.SpotifyAppRemote;
+import com.spotify.protocol.client.Subscription;
+import com.spotify.protocol.types.PlayerState;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,6 +56,7 @@ public class Spotify {
     private MusicFragment musicFragment;
     private Hashtable<String, String> speakerNameId = new Hashtable<String, String>();
     private Boolean playing;
+    private String playingSpeaker = "";
 
     public Spotify(Context context) {
         this.context = context;
@@ -67,10 +72,14 @@ public class Spotify {
             @Override
             public void onConnected(SpotifyAppRemote _spotifyAppRemote) {
                 spotifyAppRemote = _spotifyAppRemote;
+                System.out.println("Connected playing speaker");
                 subscribeToTrack();
+                //getCurrentSpeaker();
                 retrieveAccessToken();
                 //playing = checkIfPlaying();
+                refreshSpeakers();
                 updateMusicFragmentPlaying();
+                updatePlayingSpeaker();
             }
 
             @Override
@@ -101,12 +110,28 @@ public class Spotify {
 
             playing = !playerState.isPaused;
 
+            // String activeDeviceName = playerState.context.name;
+
+            // String activeDeviceName = playerState.playbackOptions().device().name();
+
+            // spotifyAppRemote.getConnectApi().getConnectedDevice().setResultCallback(device -> {
+            //    String activeDeviceName = device.name;
+                // Do something with the device name
+            // });
+
             updateMusicFragment(trackName, artistName, coverImage, playing);
             //updateTrackInformation();
             // Do something with the updated track information
             // ...
         });
     }
+
+    /*
+    private void getCurrentSpeaker() {
+        return playingSpeaker;
+    }
+
+     */
 
     public void retrieveAccessToken() {
         AuthorizationRequest.Builder builder =
@@ -182,7 +207,10 @@ public class Spotify {
 
                         devices = tmpDevices;
 
+                        System.out.println("updatespeaker name id now playing speaker - refreshSpeakers");
+
                         updateSpeakerNameId();
+
 
                     } catch (IOException e) {
                         refreshSpeakers();
@@ -287,14 +315,84 @@ public class Spotify {
         if (!devices.isEmpty()) {
             for (Device d : devices) {
                 speakerNameId.put(d.getName(), d.getId());
+                if (d.isActive()) {
+                    playingSpeaker = d.getName();
+                    updateMusicFragmentSpeaker();
+                }
+                // System.out.println("device: " + d.getName() + " active: " + d.isActive());
+                // if(d.isActive()) {
+                    // System.out.println("Name of current playing speaker: " + d.getName());
+                    // playingSpeaker = d.getName();
+                    // updateMusicFragmentSpeaker();
+                // }
             }
         }
+    }
+
+    public void updatePlayingSpeaker() {
+        /*
+        JSONArray device = new JSONArray();
+        device.put(speakerID);
+
+        JSONObject body = new JSONObject();
+        try {
+            body.put("device_ids", device);
+            body.put("play", true);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+         */
+
+        //MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        //RequestBody requestBody = RequestBody.create(JSON, String.valueOf(body));
+
+        final Request request = new Request.Builder()
+                .url("https://api.spotify.com/v1/me/player/devices")
+                //.put(requestBody)
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Authorization","Bearer " + accessToken)
+                .build();
+
+        System.out.println("access token: " + accessToken);
+        cancelCall();
+        mCall = mOkHttpClient.newCall(request);
+
+        mCall.enqueue(new Callback() {
+
+            @Override
+            public void onFailure(Call call, IOException e) { e.printStackTrace(); }
+            @Override
+            public void onResponse(Call call, Response response) {
+                if (response.code() == 200) {
+                    Gson gson = new Gson();
+                    try {
+                        JsonObject json = gson.fromJson(response.body().string(), JsonObject.class);
+                        JsonArray devicesJson = json.getAsJsonArray("devices");
+
+                        for (JsonElement deviceJson : devicesJson) {
+                            Device device = gson.fromJson(deviceJson, Device.class);
+                            // System.out.println("updatePlayingSpeaker: device: " + device.getName() + ", active: " + device.isActive());
+                            if (device.isActive()) {
+                                playingSpeaker = device.getName();
+                                updateMusicFragmentSpeaker();
+                            }
+                        }
+                        // System.out.println("updatespeaker name id now playing speaker - updateSpeakerPlaying");
+                    } catch (IOException e) {
+                        refreshSpeakers();
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        });
     }
 
     public String getAccessToken() { return accessToken; }
     public SpotifyAppRemote getSpotifyAppRemote() { return spotifyAppRemote; }
     public Hashtable<String, String> getSpeakerNameId() { return speakerNameId; }
-    public Boolean getPlaying() {return playing;}
+    //public Boolean getPlaying() {return playing;}
+    //public String getPlayingSpeaker() {return playingSpeaker;}
     public void attachMusicFragment(MusicFragment musicFragment) { this.musicFragment = musicFragment; }
     private void updateMusicFragment(String trackName, String artistName, ImageUri coverImage, Boolean playing)
     {
@@ -302,4 +400,8 @@ public class Spotify {
         musicFragment.updatePlaying(playing);
     }
     private void updateMusicFragmentPlaying() {musicFragment.updatePlaying(playing);}
+    private void updateMusicFragmentSpeaker() {
+        System.out.println("ready to call musicfragment playing speaker: " + playingSpeaker);
+        musicFragment.updatePlayingSpeaker(playingSpeaker);
+    }
 }
