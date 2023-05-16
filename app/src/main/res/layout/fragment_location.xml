@@ -80,6 +80,7 @@
                     android:textSize="17sp"
                     android:textStyle="bold"
                     android:layout_margin="8dp"
+                    android:textAlignment="viewEnd"
                     android:text="Rum"
                     android:textColor="@color/textOnBackground"/>
 
@@ -88,6 +89,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="8dp"
+                    android:textAlignment="viewEnd"
                     android:textSize="16sp"
                     android:textColor="@color/textOnBackground"/>
             </LinearLayout>

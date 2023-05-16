@@ -56,6 +56,7 @@ public class MusicFragment extends Fragment {
         updateTrackInformationMainActivity();
 
         Boolean playing = mainActivity.getPlaying();
+        // Boolean playing = spotify.checkIfPlaying();
         updatePlaying(playing);
 
         playPauseButton.setOnClickListener(new View.OnClickListener() {
@@ -128,6 +129,7 @@ public class MusicFragment extends Fragment {
                 playPauseButton.setImageResource(R.drawable.btn_pause);
             }
             else {playPauseButton.setImageResource(R.drawable.btn_play); }
+            mainActivity.setPlaying(playing);
         }
     }
 

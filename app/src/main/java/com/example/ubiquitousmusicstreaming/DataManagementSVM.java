@@ -102,6 +102,8 @@ public class DataManagementSVM {
             int result = predict(newDataPoint);
             if (result == (int) arrayTestLabels[i]) {correct += 1;}
             System.out.println("Result: " + result + " Correct: " + (int) arrayTestLabels[i]);
+            System.out.println(newDataPoint[0]);
+            System.out.println("i: " + i);
             i++;
         }
 
@@ -178,6 +180,14 @@ public class DataManagementSVM {
             nSV[i] = nSVArray.getInt(i);
         }
 
+
+        JSONArray rhoArray = data.getJSONArray("rho");
+        double[] rho = new double[rhoArray.length()];
+        for (int i = 0; i < rhoArray.length(); i++) {
+            rho[i] = rhoArray.getDouble(i);
+        }
+
+
         // Create a new SVM model with the extracted parameters
         svm_parameter params = new svm_parameter();
         params.svm_type = svmType;
@@ -186,13 +196,23 @@ public class DataManagementSVM {
         params.coef0 = coef0;
         params.nu = nu;
         params.cache_size = cacheSize;
-        params.eps = Math.ulp(1.0);
+        params.eps = 0.1;
 
         svm_model model = new svm_model();
         model.param = params;
         model.nr_class = classIndex.length;
         model.label = classIndex;
         model.nSV = nSV;
+        model.rho = rho;
+        // model.rho = data.getDouble("rho");
+
+        /*
+        JSONObject jsonRho = data.getJSONObject("rho");
+        double value = jsonRho.getDouble("value");
+        double[] rho = new double[]{value};
+        model.rho = rho;
+
+         */
 
         // Set the support vectors and coefficients of the model
         // double[][] supportVectors = parseDoubleArray((String) data.get("support_vectors"));
@@ -299,7 +319,7 @@ public class DataManagementSVM {
             node.index = i + 1;
             node.value = newDataPoint[i];
             nodes[i] = node;
-            System.out.println("node " + i + ": " + nodes[i].value);
+            // System.out.println("node " + i + ": " + nodes[i].value);
         }
 
         // Predict the class using the svm_predict method of the libsvm library
@@ -307,20 +327,34 @@ public class DataManagementSVM {
         // double[] probEstimates = new double[]{0.3333, 0.3333, 0.3333};
         // int nrClasses = model.nr_class;
         // double[] probEstimates = new double[nrClasses];
+        /*
         System.out.println("model_nr_class: " + model.nr_class);
         System.out.println("nodes: " + nodes);
         System.out.println("probestimate: " + probEstimates.length);
         System.out.println("probestimate: " + probEstimates[0] + ", " + probEstimates[1] + ", " + probEstimates[2]);
 
-        try {
-            svm.svm_predict_probability(model, nodes, probEstimates);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+         */
 
-        System.out.println("probestimate: " + probEstimates[0] + ", " + probEstimates[1] + ", " + probEstimates[2]);
+        // try {
+        // double result = svm.svm_predict_probability(model, nodes, probEstimates);
+        // System.out.println("Result: " + result);
+        // System.out.println("probestimate efter: " + probEstimates[0] + ", " + probEstimates[1] + ", " + probEstimates[2]);
+        // } catch (Exception e) {
+        //     e.printStackTrace();
+        // }
+
+
+        // System.out.println("probestimate efter2: " + probEstimates[0] + ", " + probEstimates[1] + ", " + probEstimates[2]);
+        // Check if model and nodes are not null
+        // if (model != null && nodes != null) {
+            // Make the prediction
         int predictedClass = (int) svm.svm_predict(model, nodes);
-
+        System.out.println("predictedClass: " + predictedClass);
+        // } else {
+        //    System.out.println("Model or nodes is null. Cannot make prediction.");
+        //}
+        //int predictedClass = (int) svm.svm_predict(model, nodes);
+        //System.out.println("predictedClass: " + predictedClass);
         return predictedClass;
     }
 

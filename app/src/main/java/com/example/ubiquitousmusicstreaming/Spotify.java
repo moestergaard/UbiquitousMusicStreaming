@@ -51,6 +51,7 @@ public class Spotify {
     private String accessToken;
     private MusicFragment musicFragment;
     private Hashtable<String, String> speakerNameId = new Hashtable<String, String>();
+    private Boolean playing;
 
     public Spotify(Context context) {
         this.context = context;
@@ -68,6 +69,8 @@ public class Spotify {
                 spotifyAppRemote = _spotifyAppRemote;
                 subscribeToTrack();
                 retrieveAccessToken();
+                //playing = checkIfPlaying();
+                updateMusicFragmentPlaying();
             }
 
             @Override
@@ -96,7 +99,8 @@ public class Spotify {
             // Get the cover image URL
             ImageUri coverImage = track.imageUri;
 
-            Boolean playing = !playerState.isPaused;
+            playing = !playerState.isPaused;
+
             updateMusicFragment(trackName, artistName, coverImage, playing);
             //updateTrackInformation();
             // Do something with the updated track information
@@ -258,6 +262,21 @@ public class Spotify {
         return isPlaying[0];
     }
 
+    public Boolean checkIfPlaying() {
+        final Boolean[] isPlaying = {true};
+        spotifyAppRemote
+                .getPlayerApi()
+                .getPlayerState()
+                .setResultCallback(
+                        playerState -> {
+                            if (playerState.isPaused) {
+                                isPlaying[0] = false;
+                            } else {
+                            }
+                        });
+        return isPlaying[0];
+    }
+
     public void pause() {
         spotifyAppRemote
                 .getPlayerApi()
@@ -275,10 +294,12 @@ public class Spotify {
     public String getAccessToken() { return accessToken; }
     public SpotifyAppRemote getSpotifyAppRemote() { return spotifyAppRemote; }
     public Hashtable<String, String> getSpeakerNameId() { return speakerNameId; }
+    public Boolean getPlaying() {return playing;}
     public void attachMusicFragment(MusicFragment musicFragment) { this.musicFragment = musicFragment; }
     private void updateMusicFragment(String trackName, String artistName, ImageUri coverImage, Boolean playing)
     {
         musicFragment.updateTrackInformation(trackName, artistName, coverImage);
         musicFragment.updatePlaying(playing);
     }
+    private void updateMusicFragmentPlaying() {musicFragment.updatePlaying(playing);}
 }
