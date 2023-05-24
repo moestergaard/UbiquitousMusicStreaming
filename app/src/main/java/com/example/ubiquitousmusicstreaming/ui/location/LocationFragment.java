@@ -9,28 +9,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.collection.CircularArray;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.ubiquitousmusicstreaming.MainActivity;
-import com.example.ubiquitousmusicstreaming.Spotify;
+import com.example.ubiquitousmusicstreaming.SpotifyService;
 import com.example.ubiquitousmusicstreaming.databinding.FragmentLocationBinding;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.util.Enumeration;
 import java.util.Hashtable;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class LocationFragment extends Fragment {
 
@@ -41,7 +27,7 @@ public class LocationFragment extends Fragment {
     private static String playingLocation = "";
     private static Hashtable<String, String> locationSpeakerName = new Hashtable<>();
     private static MainActivity mainActivity;
-    private Spotify spotify;
+    private SpotifyService spotifyService;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -66,7 +52,7 @@ public class LocationFragment extends Fragment {
         inUse = mainActivity.getInUse();
         inUseTemp = mainActivity.getInUseTemp();
         locationSpeakerName = mainActivity.getLocationSpeakerName();
-        spotify = mainActivity.getSpotify();
+        spotifyService = mainActivity.getSpotify();
 
         updateTextView();
 
@@ -161,7 +147,7 @@ public class LocationFragment extends Fragment {
                 Toast.makeText(mainActivity, "Vælg hvilken højtaler, der hører til " + location, Toast.LENGTH_LONG).show();
                 return false;
             }
-            Hashtable<String, String> speakerNameId = spotify.getSpeakerNameId();
+            Hashtable<String, String> speakerNameId = spotifyService.getSpeakerNameId();
             System.out.println("Dette er speakerNameId: " + speakerNameId);
             System.out.println("Dette er speakerName: " + speakerName);
             String speakerId = speakerNameId.get(speakerName);
@@ -171,7 +157,7 @@ public class LocationFragment extends Fragment {
                 return false;
             }
             mainActivity.setPlayingSpeaker(speakerName);
-            spotify.changeSpeaker(speakerId);
+            spotifyService.changeSpeaker(speakerId);
             return true;
         }
         return true;

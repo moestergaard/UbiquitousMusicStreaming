@@ -14,7 +14,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.ubiquitousmusicstreaming.MainActivity;
 import com.example.ubiquitousmusicstreaming.R;
-import com.example.ubiquitousmusicstreaming.Spotify;
+import com.example.ubiquitousmusicstreaming.SpotifyService;
 import com.example.ubiquitousmusicstreaming.databinding.FragmentMusicBinding;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
 import com.spotify.protocol.types.Image;
@@ -26,7 +26,7 @@ public class MusicFragment extends Fragment {
     private FragmentMusicBinding binding;
     private MainActivity mainActivity;
     private SpotifyAppRemote spotifyAppRemote;
-    private Spotify spotify;
+    private SpotifyService spotifyService;
     private static Hashtable<String, String> locationSpeakerID = new Hashtable<>();
     ImageView coverImageView;
     TextView txtViewTrackName, txtViewArtistName, txtViewPlaying, txtViewPlayingOn;
@@ -40,9 +40,9 @@ public class MusicFragment extends Fragment {
 
         binding = FragmentMusicBinding.inflate(inflater, container, false);
         mainActivity = (MainActivity) getParentFragment().getActivity();
-        spotify = mainActivity.getSpotify();
-        spotifyAppRemote = spotify.getSpotifyAppRemote();
-        spotify.updatePlayingSpeaker();
+        spotifyService = mainActivity.getSpotify();
+        spotifyAppRemote = spotifyService.getSpotifyAppRemote();
+        spotifyService.updatePlayingSpeaker();
 
         View root = binding.getRoot();
 
@@ -55,7 +55,7 @@ public class MusicFragment extends Fragment {
         txtViewPlaying = binding.playing;
         txtViewPlayingOn = binding.playingOn;
 
-        spotify.attachMusicFragment(this);
+        spotifyService.attachMusicFragment(this);
 
         updateTrackInformationMainActivity();
 
@@ -104,7 +104,7 @@ public class MusicFragment extends Fragment {
 
     private void updateTxtViews(Boolean playing) {
         if (playing) {
-            spotify.updatePlayingSpeaker();
+            spotifyService.updatePlayingSpeaker();
             if (mainActivity.getPlayingSpeaker() != "") {
                 txtViewPlaying.setText("Afspiller på");
                 System.out.println("mainActivi playing speaker: " + mainActivity.getPlayingSpeaker());
@@ -119,7 +119,7 @@ public class MusicFragment extends Fragment {
 
 
     private void changePlayPause() {
-        spotifyAppRemote = spotify.getSpotifyAppRemote();
+        spotifyAppRemote = spotifyService.getSpotifyAppRemote();
         spotifyAppRemote
                 .getPlayerApi()
                 .getPlayerState()
@@ -173,7 +173,7 @@ public class MusicFragment extends Fragment {
         txtViewArtistName.setText(artistName);
         txtViewTrackName.setText(trackName);
 
-        spotifyAppRemote = spotify.getSpotifyAppRemote();
+        spotifyAppRemote = spotifyService.getSpotifyAppRemote();
         spotifyAppRemote
                 .getImagesApi()
                 .getImage(coverImage, Image.Dimension.LARGE)

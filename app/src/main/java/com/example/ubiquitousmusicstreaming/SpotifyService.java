@@ -18,9 +18,6 @@ import com.spotify.protocol.types.Track;
 import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
-import com.spotify.android.appremote.api.SpotifyAppRemote;
-import com.spotify.protocol.client.Subscription;
-import com.spotify.protocol.types.PlayerState;
 
 
 import org.json.JSONArray;
@@ -31,7 +28,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -41,7 +37,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class Spotify {
+public class SpotifyService implements IService {
 
     private Context context;
     private Call mCall;
@@ -58,7 +54,7 @@ public class Spotify {
     private Boolean playing;
     private String playingSpeaker = "";
 
-    public Spotify(Context context) {
+    public SpotifyService(Context context) {
         this.context = context;
         connect();
     }
@@ -85,6 +81,16 @@ public class Spotify {
             @Override
             public void onFailure(Throwable throwable) { }
         });
+    }
+
+    public void retrieveAccessToken() {
+        AuthorizationRequest.Builder builder =
+                new AuthorizationRequest.Builder(CLIENT_ID, AuthorizationResponse.Type.TOKEN, REDIRECT_URI);
+
+        builder.setScopes(new String[]{"streaming", "user-read-email", "user-read-currently-playing", "user-read-playback-state"});
+        AuthorizationRequest request = builder.build();
+
+        AuthorizationClient.openLoginActivity((Activity) context, REQUEST_CODE, request);
     }
 
     private void subscribeToTrack() {
@@ -133,15 +139,7 @@ public class Spotify {
 
      */
 
-    public void retrieveAccessToken() {
-        AuthorizationRequest.Builder builder =
-                new AuthorizationRequest.Builder(CLIENT_ID, AuthorizationResponse.Type.TOKEN, REDIRECT_URI);
 
-        builder.setScopes(new String[]{"streaming", "user-read-email", "user-read-currently-playing", "user-read-playback-state"});
-        AuthorizationRequest request = builder.build();
-
-        AuthorizationClient.openLoginActivity((Activity) context, REQUEST_CODE, request);
-    }
 
     public void handleAuthorizationResponse(int resultCode, Intent intent) {
         AuthorizationResponse response = AuthorizationClient.getResponse(resultCode, intent);

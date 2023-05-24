@@ -76,7 +76,7 @@ public class DataManagementSVM {
         trainingLabels = generateLabels(labelsString);
         // model = trainModel(trainingSamples, trainingLabels);
         try {
-            model = loadModel("svm_model.json");
+            model = loadModel("svm_model1.json");
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (ParseException e) {
@@ -290,6 +290,7 @@ public class DataManagementSVM {
         double[] newDataPoint = getNewDataPoint(scanResult);
 
         double prediction = predict(newDataPoint);
+        System.out.println("Prediction: " + prediction);
         int predictionIndex = (int) prediction;
 
         //double[] predictedLocation = (newDataPoint);
@@ -317,6 +318,7 @@ public class DataManagementSVM {
         for (int i = 0; i < newDataPoint.length; i++) {
             svm_node node = new svm_node();
             node.index = i + 1;
+            // node.index = i;
             node.value = newDataPoint[i];
             nodes[i] = node;
             // System.out.println("node " + i + ": " + nodes[i].value);

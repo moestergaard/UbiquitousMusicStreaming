@@ -23,7 +23,7 @@ import androidx.navigation.ui.NavigationUI;
 import com.example.ubiquitousmusicstreaming.databinding.ActivityMainBinding;
 import java.util.Hashtable;
 import java.util.List;
-import com.spotify.android.appremote.api.SpotifyAppRemote;
+
 import com.spotify.protocol.types.ImageUri;
 
 public class MainActivity extends AppCompatActivity {
@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private String[] locationsHardcodedForModelPurpose = new String[]{"Kontor", "Stue", "Køkken"};
     private String fileName = "";
     private static String lastLocationFragmentTextView = "";
-    private static Spotify spotify;
+    private static SpotifyService spotifyService;
     private static Hashtable<String, String> locationSpeakerName = new Hashtable<>();
     private String trackName;
     private String artistName;
@@ -87,9 +87,9 @@ public class MainActivity extends AppCompatActivity {
 
         loadSettings();
 
-        spotify = new Spotify(this);
+        spotifyService = new SpotifyService(this);
         //spotify.connect();
-        spotify.refreshSpeakers();
+        spotifyService.refreshSpeakers();
         // System.out.println("*** NEW GETPLAYING ***: " + playing);
         // playing = spotify.getPlaying();
         // System.out.println("*** NEW GETPLAYING ***: " + playing);
@@ -126,14 +126,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
         if (requestCode == REQUEST_CODE) {
-            spotify.handleAuthorizationResponse(resultCode, intent);
+            spotifyService.handleAuthorizationResponse(resultCode, intent);
         }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        spotify.disconnect();
+        spotifyService.disconnect();
     }
 
 
@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
         if(inUseTemp) {
             if (isOutsideArea && previousWasOutside) {
                 System.out.println("Den angiver tidligere og nuværende som udenfor.");
-                spotify.pause();
+                spotifyService.pause();
                 playing = false;
                 lastLocationFragmentTextView = "";
                 locationFragment.SetTextView(lastLocationFragmentTextView);
@@ -237,7 +237,7 @@ public class MainActivity extends AppCompatActivity {
         }
         if(inUseTemp) {
             if (predictedRoom != null && predictedRoom.equals("Intet Rum")) {
-                spotify.pause();
+                spotifyService.pause();
                 playing = false;
             }
             else if (quessedRoom.equals("")) {
@@ -361,10 +361,10 @@ public class MainActivity extends AppCompatActivity {
     public Boolean getInUse() { return inUse; }
     public Boolean getInUseTemp() { return inUseTemp; }
     public String getLastLocationFragmentTextView() { return lastLocationFragmentTextView; }
-    public Spotify getSpotify() { return spotify; }
+    public SpotifyService getSpotify() { return spotifyService; }
     public WifiReceiver getWifiReceiver() { return wifiReceiver; }
     public static WifiManager getWifiManager() { return wifiManager; }
-    public static String getAccessToken() { return spotify.getAccessToken(); }
+    public static String getAccessToken() { return spotifyService.getAccessToken(); }
     public static Hashtable<String, String> getLocationSpeakerName() { return locationSpeakerName; }
     public String getTrackName() { return trackName; }
     public String getArtistName() { return artistName; }

@@ -4,7 +4,6 @@ import static android.content.Context.MODE_APPEND;
 import static android.content.Context.MODE_PRIVATE;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.net.wifi.ScanResult;
 import android.os.Bundle;
@@ -26,17 +25,13 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.ubiquitousmusicstreaming.FileSystem;
 import com.example.ubiquitousmusicstreaming.MainActivity;
 import com.example.ubiquitousmusicstreaming.R;
-import com.example.ubiquitousmusicstreaming.Spotify;
+import com.example.ubiquitousmusicstreaming.SpotifyService;
 import com.example.ubiquitousmusicstreaming.WifiReceiver;
 import com.example.ubiquitousmusicstreaming.databinding.FragmentConfigurationBinding;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -80,7 +75,7 @@ public class ConfigurationFragment extends Fragment {
     Boolean scan = false;
     private Call mCall;
     private OkHttpClient mOkHttpClient = new OkHttpClient();
-    private Spotify spotify;
+    private SpotifyService spotifyService;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -98,7 +93,7 @@ public class ConfigurationFragment extends Fragment {
 
 
         wifiReceiver = mainActivity.getWifiReceiver();
-        spotify = mainActivity.getSpotify();
+        spotifyService = mainActivity.getSpotify();
 
         editTextRoom = binding.editTextRoom;
         buttonStartScanning = binding.btnStartScanning;
@@ -278,7 +273,7 @@ public class ConfigurationFragment extends Fragment {
     }
 
     private void setupSpeakerRoomSelection(Spinner spinSpeaker, Spinner spinRoom) {
-        devices = spotify.getAvailableSpeakers();
+        devices = spotifyService.getAvailableSpeakers();
         List<String> deviceNames = new ArrayList<>();
 
         if (!devices.isEmpty()) {
