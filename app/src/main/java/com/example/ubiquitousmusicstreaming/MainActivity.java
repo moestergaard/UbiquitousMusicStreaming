@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
 
         spotifyService = new SpotifyService(this);
         //spotify.connect();
-        spotifyService.refreshSpeakers();
+        //spotifyService.refreshSpeakers();
         // System.out.println("*** NEW GETPLAYING ***: " + playing);
         // playing = spotify.getPlaying();
         // System.out.println("*** NEW GETPLAYING ***: " + playing);
@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
         if(inUseTemp) {
             if (isOutsideArea && previousWasOutside) {
                 System.out.println("Den angiver tidligere og nuværende som udenfor.");
-                spotifyService.pause();
+                spotifyService.handleRequest("pause");
                 playing = false;
                 lastLocationFragmentTextView = "";
                 locationFragment.SetTextView(lastLocationFragmentTextView);
@@ -237,7 +237,7 @@ public class MainActivity extends AppCompatActivity {
         }
         if(inUseTemp) {
             if (predictedRoom != null && predictedRoom.equals("Intet Rum")) {
-                spotifyService.pause();
+                spotifyService.handleRequest("pause");
                 playing = false;
             }
             else if (quessedRoom.equals("")) {

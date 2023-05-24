@@ -273,7 +273,7 @@ public class ConfigurationFragment extends Fragment {
     }
 
     private void setupSpeakerRoomSelection(Spinner spinSpeaker, Spinner spinRoom) {
-        devices = spotifyService.getAvailableSpeakers();
+        devices = spotifyService.getAvailableDevices();
         List<String> deviceNames = new ArrayList<>();
 
         if (!devices.isEmpty()) {

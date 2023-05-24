@@ -42,7 +42,7 @@ public class MusicFragment extends Fragment {
         mainActivity = (MainActivity) getParentFragment().getActivity();
         spotifyService = mainActivity.getSpotify();
         spotifyAppRemote = spotifyService.getSpotifyAppRemote();
-        spotifyService.updatePlayingSpeaker();
+        spotifyService.updateActiveDevice();
 
         View root = binding.getRoot();
 
@@ -73,9 +73,13 @@ public class MusicFragment extends Fragment {
         skipNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                /*
                 spotifyAppRemote
                         .getPlayerApi()
                         .skipNext();
+
+                 */
+                spotifyService.handleRequest("next");
                 playPauseButton.setImageResource(R.drawable.btn_pause);
                 mainActivity.setPlaying(true);
                 updateTxtViews(true);
@@ -85,9 +89,13 @@ public class MusicFragment extends Fragment {
         skipPrevious.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                /*
                 spotifyAppRemote
                         .getPlayerApi()
                         .skipPrevious();
+
+                 */
+                spotifyService.handleRequest("prev");
                 playPauseButton.setImageResource(R.drawable.btn_pause);
                 mainActivity.setPlaying(true);
                 updateTxtViews(true);
@@ -104,7 +112,7 @@ public class MusicFragment extends Fragment {
 
     private void updateTxtViews(Boolean playing) {
         if (playing) {
-            spotifyService.updatePlayingSpeaker();
+            spotifyService.updateActiveDevice();
             if (mainActivity.getPlayingSpeaker() != "") {
                 txtViewPlaying.setText("Afspiller på");
                 System.out.println("mainActivi playing speaker: " + mainActivity.getPlayingSpeaker());

@@ -147,7 +147,7 @@ public class LocationFragment extends Fragment {
                 Toast.makeText(mainActivity, "Vælg hvilken højtaler, der hører til " + location, Toast.LENGTH_LONG).show();
                 return false;
             }
-            Hashtable<String, String> speakerNameId = spotifyService.getSpeakerNameId();
+            Hashtable<String, String> speakerNameId = spotifyService.getDeviceNameId();
             System.out.println("Dette er speakerNameId: " + speakerNameId);
             System.out.println("Dette er speakerName: " + speakerName);
             String speakerId = speakerNameId.get(speakerName);
@@ -157,7 +157,7 @@ public class LocationFragment extends Fragment {
                 return false;
             }
             mainActivity.setPlayingSpeaker(speakerName);
-            spotifyService.changeSpeaker(speakerId);
+            spotifyService.changeDevice(speakerId);
             return true;
         }
         return true;
