@@ -3,6 +3,7 @@ package com.example.ubiquitousmusicstreaming;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 
 import com.example.ubiquitousmusicstreaming.ui.configuration.Device;
 import com.example.ubiquitousmusicstreaming.ui.music.MusicFragment;
@@ -13,6 +14,7 @@ import com.google.gson.JsonObject;
 import com.spotify.android.appremote.api.ConnectionParams;
 import com.spotify.android.appremote.api.Connector;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
+import com.spotify.protocol.types.Image;
 import com.spotify.protocol.types.ImageUri;
 import com.spotify.protocol.types.Track;
 import com.spotify.sdk.android.auth.AuthorizationClient;
@@ -76,6 +78,8 @@ public class SpotifyService implements IService {
             String artistName = track.artist.name;
             ImageUri coverImage = track.imageUri;
             playing = !playerState.isPaused;
+
+            System.out.println("It gets an event from the track");
             updateMusicFragment(trackName, artistName, coverImage, playing);
         });
     }
@@ -145,7 +149,19 @@ public class SpotifyService implements IService {
 
     private void updateMusicFragment(String trackName, String artistName, ImageUri coverImage, Boolean playing)
     {
-        musicFragment.updateTrackInformation(trackName, artistName, coverImage);
+        final Bitmap[] image = new Bitmap[1];
+        System.out.println("her er image: " + image[0]);
+        spotifyAppRemote
+                .getImagesApi()
+                .getImage(coverImage, Image.Dimension.LARGE)
+                .setResultCallback(
+                        bitmap -> {
+                            image[0] = bitmap;
+                            // coverImageView.setImageBitmap(bitmap);
+                        });
+
+        System.out.println("dernæst er image: " + image[0]);
+        musicFragment.updateTrackInformation(trackName, artistName, coverImage, image[0]);
         musicFragment.updatePlaying(playing);
     }
     private void updateMusicFragmentPlaying() {musicFragment.updatePlaying(playing);}
@@ -323,6 +339,21 @@ public class SpotifyService implements IService {
                     .pause();
         }
     }
+
+    /*
+    public void getInformation(String request) {
+        if (request.equals("image")) {
+            spotifyAppRemote
+                    .getImagesApi()
+                    .getImage(coverImage, Image.Dimension.LARGE)
+                    .setResultCallback(
+                            bitmap -> {
+                                coverImageView.setImageBitmap(bitmap);
+                            });
+        }
+    }
+
+     */
 
     public List<Device> getAvailableDevices() { return devices; }
     public String getAccessToken() { return accessToken; }

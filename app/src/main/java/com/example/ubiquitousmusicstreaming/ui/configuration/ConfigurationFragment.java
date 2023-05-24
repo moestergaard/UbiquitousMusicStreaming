@@ -23,6 +23,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.ubiquitousmusicstreaming.FileSystem;
+import com.example.ubiquitousmusicstreaming.IService;
 import com.example.ubiquitousmusicstreaming.MainActivity;
 import com.example.ubiquitousmusicstreaming.R;
 import com.example.ubiquitousmusicstreaming.SpotifyService;
@@ -75,7 +76,7 @@ public class ConfigurationFragment extends Fragment {
     Boolean scan = false;
     private Call mCall;
     private OkHttpClient mOkHttpClient = new OkHttpClient();
-    private SpotifyService spotifyService;
+    private IService spotifyService;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -93,7 +94,7 @@ public class ConfigurationFragment extends Fragment {
 
 
         wifiReceiver = mainActivity.getWifiReceiver();
-        spotifyService = mainActivity.getSpotify();
+        spotifyService = mainActivity.getService();
 
         editTextRoom = binding.editTextRoom;
         buttonStartScanning = binding.btnStartScanning;

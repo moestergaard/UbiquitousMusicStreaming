@@ -1,5 +1,6 @@
 package com.example.ubiquitousmusicstreaming.ui.music;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.ubiquitousmusicstreaming.IService;
 import com.example.ubiquitousmusicstreaming.MainActivity;
 import com.example.ubiquitousmusicstreaming.R;
 import com.example.ubiquitousmusicstreaming.SpotifyService;
@@ -26,7 +28,7 @@ public class MusicFragment extends Fragment {
     private FragmentMusicBinding binding;
     private MainActivity mainActivity;
     private SpotifyAppRemote spotifyAppRemote;
-    private SpotifyService spotifyService;
+    private IService service;
     private static Hashtable<String, String> locationSpeakerID = new Hashtable<>();
     ImageView coverImageView;
     TextView txtViewTrackName, txtViewArtistName, txtViewPlaying, txtViewPlayingOn;
@@ -40,9 +42,9 @@ public class MusicFragment extends Fragment {
 
         binding = FragmentMusicBinding.inflate(inflater, container, false);
         mainActivity = (MainActivity) getParentFragment().getActivity();
-        spotifyService = mainActivity.getSpotify();
-        spotifyAppRemote = spotifyService.getSpotifyAppRemote();
-        spotifyService.updateActiveDevice();
+        service = mainActivity.getService();
+        service.attachMusicFragment(this);
+        service.updateActiveDevice();
 
         View root = binding.getRoot();
 
@@ -55,12 +57,9 @@ public class MusicFragment extends Fragment {
         txtViewPlaying = binding.playing;
         txtViewPlayingOn = binding.playingOn;
 
-        spotifyService.attachMusicFragment(this);
-
         updateTrackInformationMainActivity();
 
         Boolean playing = mainActivity.getPlaying();
-        // Boolean playing = spotify.checkIfPlaying();
         updatePlaying(playing);
 
         playPauseButton.setOnClickListener(new View.OnClickListener() {
@@ -73,13 +72,7 @@ public class MusicFragment extends Fragment {
         skipNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*
-                spotifyAppRemote
-                        .getPlayerApi()
-                        .skipNext();
-
-                 */
-                spotifyService.handleRequest("next");
+                service.handleRequest("next");
                 playPauseButton.setImageResource(R.drawable.btn_pause);
                 mainActivity.setPlaying(true);
                 updateTxtViews(true);
@@ -89,19 +82,12 @@ public class MusicFragment extends Fragment {
         skipPrevious.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*
-                spotifyAppRemote
-                        .getPlayerApi()
-                        .skipPrevious();
-
-                 */
-                spotifyService.handleRequest("prev");
+                service.handleRequest("prev");
                 playPauseButton.setImageResource(R.drawable.btn_pause);
                 mainActivity.setPlaying(true);
                 updateTxtViews(true);
             }
         });
-
         return root;
     }
     @Override
@@ -112,22 +98,19 @@ public class MusicFragment extends Fragment {
 
     private void updateTxtViews(Boolean playing) {
         if (playing) {
-            spotifyService.updateActiveDevice();
+            service.updateActiveDevice();
             if (mainActivity.getPlayingSpeaker() != "") {
                 txtViewPlaying.setText("Afspiller på");
-                System.out.println("mainActivi playing speaker: " + mainActivity.getPlayingSpeaker());
                 txtViewPlayingOn.setText(mainActivity.getPlayingSpeaker());
             }
         } else {
             txtViewPlaying.setText("");
             txtViewPlayingOn.setText("");
-            // mainActivity.setPlayingSpeaker("");
         }
     }
 
-
     private void changePlayPause() {
-        spotifyAppRemote = spotifyService.getSpotifyAppRemote();
+        spotifyAppRemote = service.getSpotifyAppRemote();
         spotifyAppRemote
                 .getPlayerApi()
                 .getPlayerState()
@@ -173,15 +156,19 @@ public class MusicFragment extends Fragment {
         ImageUri coverImage = mainActivity.getCoverImage();
         if (trackName != null && artistName != null && coverImage != null)
         {
-            updateTrackInformation(trackName, artistName, coverImage);
+            //updateTrackInformation(trackName, artistName, coverImage);
         }
     }
 
-    public void updateTrackInformation(String trackName, String artistName, ImageUri coverImage) {
+    public void updateTrackInformation(String trackName, String artistName, ImageUri coverImage, Bitmap image) {
         txtViewArtistName.setText(artistName);
         txtViewTrackName.setText(trackName);
+        coverImageView.setImageBitmap(image);
 
-        spotifyAppRemote = spotifyService.getSpotifyAppRemote();
+        // service.getInformation("image");
+
+        /*
+        spotifyAppRemote = service.getSpotifyAppRemote();
         spotifyAppRemote
                 .getImagesApi()
                 .getImage(coverImage, Image.Dimension.LARGE)
@@ -190,28 +177,22 @@ public class MusicFragment extends Fragment {
                             coverImageView.setImageBitmap(bitmap);
                         });
 
+         */
+
         mainActivity.setTrackName(trackName);
         mainActivity.setArtistName(artistName);
         mainActivity.setCoverImage(coverImage);
     }
 
     public void updatePlayingSpeaker(String speakerName) {
-        System.out.println("Playing Speaker: " + playingSpeaker);
         playingSpeaker = speakerName;
-        System.out.println("Playing Speaker: " + playingSpeaker);
         mainActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 txtViewPlaying.setText("Afspiller på");
-                txtViewPlayingOn.setText(playingSpeaker); // DENNE ER TOM!!!
+                txtViewPlayingOn.setText(playingSpeaker);
             }
         });
         mainActivity.setPlayingSpeaker(playingSpeaker);
-    }
-
-    private void initializeLocationSpeakerID() {
-        locationSpeakerID.put("Stue", "1af54257b625e17733f383612d7e027ad658bee2");
-        locationSpeakerID.put("Kontor", "9421d826c2f75f49a95085a1063b9f74c8581cbb");
-        locationSpeakerID.put("Køkken", "55ee551079c70a6e720fb7af7ed1455b050f0c37");
     }
 }

@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.ubiquitousmusicstreaming.IService;
 import com.example.ubiquitousmusicstreaming.MainActivity;
 import com.example.ubiquitousmusicstreaming.SpotifyService;
 import com.example.ubiquitousmusicstreaming.databinding.FragmentLocationBinding;
@@ -27,7 +28,7 @@ public class LocationFragment extends Fragment {
     private static String playingLocation = "";
     private static Hashtable<String, String> locationSpeakerName = new Hashtable<>();
     private static MainActivity mainActivity;
-    private SpotifyService spotifyService;
+    private IService spotifyService;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -52,7 +53,7 @@ public class LocationFragment extends Fragment {
         inUse = mainActivity.getInUse();
         inUseTemp = mainActivity.getInUseTemp();
         locationSpeakerName = mainActivity.getLocationSpeakerName();
-        spotifyService = mainActivity.getSpotify();
+        spotifyService = mainActivity.getService();
 
         updateTextView();
 
