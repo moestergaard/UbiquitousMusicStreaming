@@ -184,13 +184,14 @@ public class ConfigurationFragment extends Fragment {
         mainActivity = (MainActivity) getParentFragment().getActivity();
         mainActivity.attachConfigurationFragment(this);
 
-        fileName = mainActivity.getFileName();
         locations = mainActivity.getLocation();
         room = mainActivity.getRoomCurrentlyScanning();
         wifiReceiver = mainActivity.getWifiReceiver();
         service = mainActivity.getService();
         locationDeviceName = mainActivity.getLocationSpeakerName();
         fileSystem = mainActivity.getFileSystem();
+        fileName = mainActivity.getFileName();
+        if(fileName.equals("")) { fileName = LocalDateTime.now().toString() + ".txt"; }
 
         if (mainActivity.getInUseDataCollection()) { scan = true; mainActivity.startScan(); }
     }

@@ -11,7 +11,7 @@ import android.os.Bundle;
 import android.Manifest;
 import android.view.Window;
 import android.widget.Toast;
-import com.example.ubiquitousmusicstreaming.DataManagement.DataManagement;
+import com.example.ubiquitousmusicstreaming.DataManagement.DataManagementNN;
 import com.example.ubiquitousmusicstreaming.DataManagement.DataManagementSVM;
 import com.example.ubiquitousmusicstreaming.FileSystem.FileSystem;
 import com.example.ubiquitousmusicstreaming.FileSystem.IFileSystem;
@@ -44,10 +44,10 @@ public class MainActivity extends AppCompatActivity {
     private static LocationFragment locationFragment;
     private static MusicFragment musicFragment;
     private static Boolean inUse = false, inUseTemp, inUseDataCollection = false;
-    private static DataManagement dm;
+    private static DataManagementNN dmNN;
     private static DataManagementSVM dmSVM;
     private static String predictedRoom, previousLocation = "";
-    private String[] locations; // = /* new String[]{}; = */ new String[]{"Kontor", "Stue", "Køkken"};
+    private String[] locations;
     private final String[] locationsHardcodedForModelPurpose = new String[]{"Kontor", "Stue", "Køkken"};
     private String fileName = "";
     private static String lastLocationFragmentTextView = "";
@@ -64,21 +64,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-
-        /*
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
         }
-
-         */
-
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, REQUEST_CODE);
-            Toast.makeText(this, "Giv gerne adgang til baggrundsplacering. Derved virker servicen også i baggrunden.", Toast.LENGTH_LONG).show();
-        }
-
-
 
         super.onCreate(savedInstanceState);
 
@@ -86,14 +74,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().hide();
 
         fileSystem = new FileSystem(this);
-        System.out.println("Inden loadsettings");
-
-        fileSystem.createSettingFile();
-        Settings settings = new Settings();
-        fileSystem.storeSettings(settings);
-
         loadSettings();
-        System.out.println("På den anden side af loadsettings");
         service = new SpotifyService(this);
         service.connect();
         binding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -110,10 +91,9 @@ public class MainActivity extends AppCompatActivity {
         wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         wifiReceiver = new WifiReceiver();
         registerReceiver(wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
-        wifiReceiver.attach(this); // Adding this mainActivity as an observer.
-        dm = new DataManagement();
+        wifiReceiver.attach(this);
+        dmNN = new DataManagementNN();
         dmSVM = new DataManagementSVM(this);
-        // playingSpeaker = spotify.getPlayingSpeaker();
     }
 
     @Override
@@ -130,9 +110,6 @@ public class MainActivity extends AppCompatActivity {
         service.disconnect();
     }
 
-
-
-    /*
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -149,77 +126,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-
-     */
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            } else {
-                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
-                    Toast.makeText(this, "Det er nødvendigt at give adgang til placering for at bruge denne service, da det giver adgang til nødvendige Wi-Fi informationer.", Toast.LENGTH_LONG).show();
-                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, REQUEST_CODE);
-                } else {
-                    Toast.makeText(this, "Det er nødvendigt at give adgang til placering for at bruge denne service, da det giver adgang til nødvendige Wi-Fi informationer.", Toast.LENGTH_LONG).show();
-                }
-            }
-        }
-    }
-
-
-     /*
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission to location granted
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    // Check if background location is necessary
-                    if (!(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
-                        // Ask for permission to background location
-                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, REQUEST_CODE);
-                        Toast.makeText(this, "For at appen kan fungere korrekt i baggrunden, er det nødvendigt at give adgang til baggrundsplacering.", Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(this, "Appen fungerer i baggrunden.", Toast.LENGTH_LONG).show();
-                    }
-                }
-            } else {
-                // Permission to location is not granted
-                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    // Ask for permission again
-                    Toast.makeText(this, "Det er nødvendigt at give adgang til placering for at bruge denne service, da det giver adgang til nødvendige Wi-Fi informationer.", Toast.LENGTH_LONG).show();
-                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
-                } else {
-                    // Brugeren har afvist tilladelse permanent
-                    Toast.makeText(this, "Det er nødvendigt at give adgang til placering for at bruge denne service, da det giver adgang til nødvendige Wi-Fi informationer. Appen fungerer kun, når den er åben.", Toast.LENGTH_LONG).show();
-                }
-            }
-        }
-    }
-
-      */
-
-
-
-
-
-    /**
-     * Will later be used to determine in which room the music are supposed to play.
-     * @param scanResults
-     */
-
     private void determineLocation(List<ScanResult> scanResults) {
-        int locationIndex = dmSVM.getPredictionSVM(scanResults);
-        System.out.println("Room: " + locationsHardcodedForModelPurpose[locationIndex]);
+        double[] location = dmSVM.getPrediction(scanResults);
+        int locationIndex = (int) location[0];
         predictedRoom = locationsHardcodedForModelPurpose[locationIndex];
         boolean isOutsideArea = checkIfOutsideArea(scanResults);
 
         if(inUseTemp) {
             if (isOutsideArea && previousWasOutside) {
-                System.out.println("Den angiver tidligere og nuværende som udenfor.");
                 service.handleRequest("pause");
                 playing = false;
                 lastLocationFragmentTextView = "";
@@ -235,14 +149,13 @@ public class MainActivity extends AppCompatActivity {
                 } else previousLocation = predictedRoom;
                 previousWasOutside = isOutsideArea;
                 wifiManager.startScan();
-
             }
         }
         else { inUse = false; }
     }
 
     private Boolean checkIfOutsideArea(List<ScanResult> scanResults) {
-        double[] location = dm.getPredictionNN(scanResults);
+        double[] location = dmNN.getPrediction(scanResults);
 
         boolean outside = true;
 
@@ -254,137 +167,11 @@ public class MainActivity extends AppCompatActivity {
                 outside = false;
             }
         }
-
-        System.out.println("Den prædikterer udenfor: " + outside);
         return outside;
     }
 
-
-    private void determineLocation2(List<ScanResult> scanResults) {
-        double[] location = dm.getPredictionNN(scanResults);
-        int locationIndex = dmSVM.getPredictionSVM(scanResults);
-        System.out.println("Room: " + locationsHardcodedForModelPurpose[locationIndex]);
-
-        String quessedRoom = "";
-
-        double temp = 0;
-        int index = 0;
-        for (int i = 0; i < location.length; i++) {
-            if(location[i] > temp) {
-                temp = location[i];
-                index = i;
-            }
-        }
-        if (location[index] < 0.70) {
-            if (previousLocation.equals("Intet Rum")) {
-                predictedRoom = "Intet Rum";
-            }
-            else {
-                quessedRoom = "Intet Rum";
-                previousLocation = "Intet Rum";
-            }
-        }
-        else {
-            if(locationsHardcodedForModelPurpose[index].equals(previousLocation)) {
-                predictedRoom = locationsHardcodedForModelPurpose[index];
-            }
-            else {
-                quessedRoom = locationsHardcodedForModelPurpose[index];
-
-                /*
-                if(inUseTemp) {
-                    //lastLocationFragmentTextView = "Gætter på: " + quessedRoom + ", men er stadigvæk: " + predictedRoom;
-                    lastLocationFragmentTextView = "Gætter på: " + quessedRoom + ", men er stadigvæk: " + predictedRoom;
-                    locationFragment.SetTextView(lastLocationFragmentTextView);
-                }
-                 */
-                previousLocation = locationsHardcodedForModelPurpose[index];
-
-            }
-        }
-        if(inUseTemp) {
-            if (predictedRoom != null && predictedRoom.equals("Intet Rum")) {
-                service.handleRequest("pause");
-                playing = false;
-            }
-            else if (quessedRoom.equals("")) {
-                Boolean result = locationFragment.updateSpeaker(predictedRoom);
-                playing = result;
-                // lastLocationFragmentTextView = "Lokation: " + predictedRoom;
-                if (result) {
-                    lastLocationFragmentTextView = predictedRoom;
-                    locationFragment.SetTextView(lastLocationFragmentTextView);
-                }
-            }
-            wifiManager.startScan();
-        }
-        else { inUse = false; }
-    }
-
-    /*
-    private static void printLocation(List<ScanResult> scanResults) {
-        double[] location = dm.getPredictionNN(scanResults);
-
-        int index = getMaxIndex(location);
-        String predictedRoom = getPredictedRoom(index, location);
-        String guessedRoom = getGuessedRoom(index, location, predictedRoom);
-
-        if (inUseTemp) {
-            if (!guessedRoom.isEmpty()) {
-                String lastLocation = "Gætter på: " + guessedRoom + ", men er stadigvæk: " + predictedRoom;
-                locationFragment.SetTextView(lastLocation);
-                previousLocation = guessedRoom;
-            } else {
-                String currentLocation = "Lokation: " + predictedRoom;
-                locationFragment.updateSpeaker(predictedRoom);
-                locationFragment.SetTextView(currentLocation);
-                previousLocation = predictedRoom;
-            }
-            wifiManager.startScan();
-        } else {
-            inUse = false;
-        }
-    }
-
-    private static int getMaxIndex(double[] array) {
-        int maxIndex = 0;
-        for (int i = 1; i < array.length; i++) {
-            if (array[i] > array[maxIndex]) {
-                maxIndex = i;
-            }
-        }
-        return maxIndex;
-    }
-
-    private static String getPredictedRoom(int index, double[] location) {
-        if (location[index] < 0.70) {
-            return "Intet Rum";
-        } else {
-            return locations[index];
-        }
-    }
-
-    private static String getGuessedRoom(int index, double[] location, String predictedRoom) {
-        String guessedRoom = "";
-        if (location[index] < 0.70) {
-            if (!previousLocation.equals("Intet Rum")) {
-                guessedRoom = "Intet Rum";
-            }
-        } else {
-            if (!locations[index].equals(previousLocation)) {
-                guessedRoom = locations[index];
-            }
-        }
-        return guessedRoom;
-    }
-
-     */
-
-
     public void updateLocationSpeakerName(Hashtable<String, String> _locationSpeakerName) {
-        System.out.println("Hashtable mainactivity old: " + locationSpeakerName);
         locationSpeakerName = _locationSpeakerName;
-        System.out.println("Hashtable mainactivity updated: " + locationSpeakerName);
     }
 
     public void loadSettings(){
