@@ -1,18 +1,24 @@
-package com.example.ubiquitousmusicstreaming;
+package com.example.ubiquitousmusicstreaming.FileSystem;
 
 import android.content.Context;
+
+import com.example.ubiquitousmusicstreaming.Settings;
 
 import java.io.File;
 
 public class FileSystemTest {
     private Context context;
+    IFileSystem fileSystem;
 
     public FileSystemTest(Context _context) {
         context = _context;
+        fileSystem = new FileSystem(context);
     }
 
+
     public void overAllTestMethod() {
-        Settings settings = FileSystem.readObjectFromFile(context);
+
+        Settings settings = fileSystem.loadSettings();
         String fileName = settings.getFileName();
         System.out.println();
         System.out.println("****");
@@ -32,16 +38,19 @@ public class FileSystemTest {
         System.out.println("Correct set file name: " + setFileName);
     }
 
+
     public boolean TestCreate() {
         File settingFile = new File(context.getFilesDir(), "Setting");
-        FileSystem.createSettingFile(context);
+        fileSystem.createSettingFile();
         return settingFile.exists();
     }
 
+
+
     public boolean TestWriteAndRead() {
         Settings settings = new Settings();
-        FileSystem.writeObjectToFile(context, settings);
-        Settings settingsRead = FileSystem.readObjectFromFile(context);
+        fileSystem.storeSettings(settings);
+        Settings settingsRead = fileSystem.loadSettings();
 
         boolean settingsAreEqual = true;
         String settingFileName = settings.getFileName();
@@ -58,8 +67,8 @@ public class FileSystemTest {
     public boolean TestSetFileName() {
         Settings settings = new Settings();
         settings.setFileName("TestFileName");
-        FileSystem.writeObjectToFile(context, settings);
-        Settings settingsRead = FileSystem.readObjectFromFile(context);
+        fileSystem.storeSettings(settings);
+        Settings settingsRead = fileSystem.loadSettings();
         boolean correctFileName = (settingsRead.getFileName().equals("TestFileName"));
 
         return correctFileName;

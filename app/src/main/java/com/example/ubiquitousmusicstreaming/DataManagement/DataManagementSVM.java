@@ -1,16 +1,12 @@
-package com.example.ubiquitousmusicstreaming;
+package com.example.ubiquitousmusicstreaming.DataManagement;
 import android.content.Context;
-import android.content.res.AssetManager;
 
-import com.google.firebase.crashlytics.buildtools.reloc.org.apache.commons.io.IOUtils;
+import com.example.ubiquitousmusicstreaming.Models.LongStrings;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
-import java.io.InputStream;
 
 import android.net.wifi.ScanResult;
-import android.os.Bundle;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,18 +16,9 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 import libsvm.*;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Scanner;
 
 //import libsvm.svm_model;
 //import libsvm.svm;
@@ -41,15 +28,8 @@ import java.util.Scanner;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
-import org.json.simple.parser.JSONParser;
+
 import org.json.simple.parser.ParseException;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-import libsvm.*;
 
 public class DataManagementSVM {
     private static svm_model model;

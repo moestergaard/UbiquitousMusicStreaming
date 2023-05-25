@@ -20,13 +20,13 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 
-import com.example.ubiquitousmusicstreaming.FileSystem;
-import com.example.ubiquitousmusicstreaming.IService;
+import com.example.ubiquitousmusicstreaming.FileSystem.FileSystem;
+import com.example.ubiquitousmusicstreaming.FileSystem.IFileSystem;
+import com.example.ubiquitousmusicstreaming.Models.Device;
+import com.example.ubiquitousmusicstreaming.Services.IService;
 import com.example.ubiquitousmusicstreaming.MainActivity;
 import com.example.ubiquitousmusicstreaming.R;
-import com.example.ubiquitousmusicstreaming.SpotifyService;
 import com.example.ubiquitousmusicstreaming.WifiReceiver;
 import com.example.ubiquitousmusicstreaming.databinding.FragmentConfigurationBinding;
 
@@ -40,23 +40,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.time.LocalDateTime;
 
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-
 import com.example.ubiquitousmusicstreaming.Settings;
-import com.example.ubiquitousmusicstreaming.databinding.FragmentMusicBinding;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 
 public class ConfigurationFragment extends Fragment {
 
     private FragmentConfigurationBinding binding;
+    private IFileSystem fileSystem;
     private MainActivity mainActivity;
     private WifiReceiver wifiReceiver;
     private EditText editTextRoom;
@@ -145,10 +135,10 @@ public class ConfigurationFragment extends Fragment {
                         FILE_NAME = LocalDateTime.now().toString() + ".txt";
                         makeFile(new View(mainActivity), FILE_NAME);
                         updateTextViewDataFile();
-                        FileSystem.createSettingFile(mainActivity);
+                        fileSystem.createSettingFile();
                         Settings settings = new Settings();
                         settings.setFileName(FILE_NAME);
-                        FileSystem.writeObjectToFile(mainActivity, settings);
+                        fileSystem.storeSettings(settings);
 
                         mainActivity.loadSettings();
                         locations = new String[]{};
@@ -216,12 +206,13 @@ public class ConfigurationFragment extends Fragment {
         wifiReceiver = mainActivity.getWifiReceiver();
         service = mainActivity.getService();
         locationDeviceName = mainActivity.getLocationSpeakerName();
+        fileSystem = mainActivity.getFileSystem();
 
         if (mainActivity.getInUseDataCollection()) { scan = true; startScanning(); }
     }
 
     private void addLocationToSettings(String room) {
-        Settings settings = FileSystem.readObjectFromFile(mainActivity);
+        Settings settings = fileSystem.loadSettings();
 
         if (settings != null) {
             String[] locations = settings.getLocations();
@@ -235,15 +226,15 @@ public class ConfigurationFragment extends Fragment {
             newLocations[newLocations.length - 1] = room;
             settings.setLocations(newLocations);
         }
-        FileSystem.writeObjectToFile(mainActivity, settings);
+        fileSystem.storeSettings(settings);
     }
 
     private void addLocationSpeakerNameToSettings() {
-        Settings settings = FileSystem.readObjectFromFile(mainActivity);
+        Settings settings = fileSystem.loadSettings();
         if (settings != null) {
             settings.setLocationSpeakerName(locationDeviceName);
         }
-        FileSystem.writeObjectToFile(mainActivity, settings);
+        fileSystem.storeSettings(settings);
     }
 
 

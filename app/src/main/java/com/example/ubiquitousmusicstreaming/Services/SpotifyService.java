@@ -1,10 +1,11 @@
-package com.example.ubiquitousmusicstreaming;
+package com.example.ubiquitousmusicstreaming.Services;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import androidx.fragment.app.Fragment;
-import com.example.ubiquitousmusicstreaming.ui.configuration.Device;
+
+import com.example.ubiquitousmusicstreaming.Models.Device;
 import com.example.ubiquitousmusicstreaming.ui.music.MusicFragment;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;

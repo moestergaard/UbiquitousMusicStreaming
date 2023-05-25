@@ -1,10 +1,12 @@
-package com.example.ubiquitousmusicstreaming;
+package com.example.ubiquitousmusicstreaming.FileSystem;
 
 import static android.content.ContentValues.TAG;
 
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
+
+import com.example.ubiquitousmusicstreaming.Settings;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,9 +15,14 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-public class FileSystem {
+public class FileSystem implements IFileSystem {
+    Context context;
 
-    public static File createSettingFile(Context context) {
+    public FileSystem(Context context) {
+        this.context = context;
+    }
+
+    public File createSettingFile() {
         File settingFile = new File(context.getFilesDir(), "Setting");
 
         if (settingFile.exists()) {
@@ -38,7 +45,7 @@ public class FileSystem {
         return settingFile;
     }
 
-    public static Settings readObjectFromFile(Context context) {
+    public Settings loadSettings() {
         try {
             FileInputStream fileInputStream = context.openFileInput("Setting");
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
@@ -53,7 +60,7 @@ public class FileSystem {
         }
     }
 
-    public static void writeObjectToFile(Context context, Settings settings) {
+    public void storeSettings(Settings settings) {
         try {
             FileOutputStream fileOutputStream = context.openFileOutput("Setting", Context.MODE_PRIVATE);
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
@@ -66,6 +73,7 @@ public class FileSystem {
         }
     }
 
+    /*
     public static Settings loadSettings(View v) {
         Settings settings = null;
         try {
@@ -79,6 +87,8 @@ public class FileSystem {
             e.printStackTrace();
         }
         return settings;
+
+     */
         /*
         if (settings == null) {
             // Failed to load settings from file
@@ -115,5 +125,5 @@ public class FileSystem {
         }
 
          */
-    }
+
 }

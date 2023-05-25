@@ -1,4 +1,4 @@
-package com.example.ubiquitousmusicstreaming;
+package com.example.ubiquitousmusicstreaming.DataManagement;
 
 
 import android.net.wifi.ScanResult;

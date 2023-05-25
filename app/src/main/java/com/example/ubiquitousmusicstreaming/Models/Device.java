@@ -1,4 +1,4 @@
-package com.example.ubiquitousmusicstreaming.ui.configuration;
+package com.example.ubiquitousmusicstreaming.Models;
 
 public class Device {
     private String id;

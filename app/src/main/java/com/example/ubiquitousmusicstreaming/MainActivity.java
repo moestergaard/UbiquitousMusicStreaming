@@ -10,6 +10,13 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.Manifest;
 import android.view.Window;
+
+import com.example.ubiquitousmusicstreaming.DataManagement.DataManagement;
+import com.example.ubiquitousmusicstreaming.DataManagement.DataManagementSVM;
+import com.example.ubiquitousmusicstreaming.FileSystem.FileSystem;
+import com.example.ubiquitousmusicstreaming.FileSystem.IFileSystem;
+import com.example.ubiquitousmusicstreaming.Services.IService;
+import com.example.ubiquitousmusicstreaming.Services.SpotifyService;
 import com.example.ubiquitousmusicstreaming.ui.configuration.ConfigurationFragment;
 import com.example.ubiquitousmusicstreaming.ui.location.LocationFragment;
 import com.example.ubiquitousmusicstreaming.ui.music.MusicFragment;
@@ -25,13 +32,12 @@ import com.example.ubiquitousmusicstreaming.databinding.ActivityMainBinding;
 import java.util.Hashtable;
 import java.util.List;
 
-import com.spotify.protocol.types.ImageUri;
-
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
     private Integer REQUEST_CODE = 42;
     private static WifiReceiver wifiReceiver;
+    private IFileSystem fileSystem;
     private static WifiManager wifiManager;
     private static ConfigurationFragment configurationFragment;
     private static LocationFragment locationFragment;
@@ -84,6 +90,8 @@ public class MainActivity extends AppCompatActivity {
         // Request window feature
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getSupportActionBar().hide();
+
+        fileSystem = new FileSystem(this);
 
 
         loadSettings();
@@ -322,7 +330,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void loadSettings(){
-        Settings settings = FileSystem.readObjectFromFile(this);
+        Settings settings = fileSystem.loadSettings();
 
         if (settings != null) {
             String fileName = settings.getFileName();
@@ -373,6 +381,7 @@ public class MainActivity extends AppCompatActivity {
     public String getRoomCurrentlyScanning() { return roomCurrentlyScanning; }
     public Boolean getInUseDataCollection() { return inUseDataCollection; }
     public String getPlayingSpeaker() { return playingSpeaker; }
+    public IFileSystem getFileSystem() { return fileSystem; }
     public void attachMusicFragment(MusicFragment musicFragment) { this.musicFragment = musicFragment; }
     public void attachConfigurationFragment(ConfigurationFragment configurationFragment) { this.configurationFragment = configurationFragment; }
     public void attachLocationFragment(LocationFragment locationFragment) { this.locationFragment = locationFragment; }

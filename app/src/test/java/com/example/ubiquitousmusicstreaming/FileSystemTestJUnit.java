@@ -2,6 +2,10 @@ package com.example.ubiquitousmusicstreaming;
 
 import android.content.Context;
 import androidx.test.core.app.ApplicationProvider;
+
+import com.example.ubiquitousmusicstreaming.FileSystem.FileSystem;
+import com.example.ubiquitousmusicstreaming.FileSystem.IFileSystem;
+
 import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +24,8 @@ public class FileSystemTestJUnit extends TestCase {
     @Test
     public void testCreateSettingFile() {
         File settingFile = new File(context.getFilesDir(), "Setting");
-        FileSystem.createSettingFile(context);
+        IFileSystem fileSystem = new FileSystem(context);
+        fileSystem.createSettingFile();
         assertTrue(settingFile.exists());
     }
 
