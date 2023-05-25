@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -47,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private static Hashtable<String, String> locationSpeakerName = new Hashtable<>();
     private String trackName;
     private String artistName;
-    private ImageUri coverImage;
+    private Bitmap coverImage;
     private static Boolean playing;
     private String roomCurrentlyScanning;
     private Boolean previousWasOutside = false;
@@ -368,7 +369,7 @@ public class MainActivity extends AppCompatActivity {
     public static Hashtable<String, String> getLocationSpeakerName() { return locationSpeakerName; }
     public String getTrackName() { return trackName; }
     public String getArtistName() { return artistName; }
-    public ImageUri getCoverImage() { return coverImage; }
+    public Bitmap getCoverImage() { return coverImage; }
     public Boolean getPlaying() { return playing; }
     public String getRoomCurrentlyScanning() { return roomCurrentlyScanning; }
     public Boolean getInUseDataCollection() { return inUseDataCollection; }
@@ -380,7 +381,7 @@ public class MainActivity extends AppCompatActivity {
     public void setInUseDataCollection(Boolean bool) { inUseDataCollection = bool; }
     public void setTrackName(String trackName) { this.trackName = trackName; }
     public void setArtistName(String artistName) { this.artistName = artistName; }
-    public void setCoverImage(ImageUri coverImage) { this.coverImage = coverImage; }
+    public void setCoverImage(Bitmap coverImage) { this.coverImage = coverImage; }
     public void setPlayingSpeaker(String speakerName) { playingSpeaker = speakerName; }
     public void setPlaying(Boolean playing) {this.playing = playing; }
     public void setRoomCurrentlyScanning(String roomCurrentlyScanning) { this.roomCurrentlyScanning = roomCurrentlyScanning; }

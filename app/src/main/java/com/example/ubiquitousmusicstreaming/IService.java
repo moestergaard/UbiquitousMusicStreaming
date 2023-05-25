@@ -20,6 +20,7 @@ public interface IService {
     Hashtable<String, String> getDeviceNameId();
     // void getInformation(String request);
 
+    void changeActivationOfDevice();
 
 
 

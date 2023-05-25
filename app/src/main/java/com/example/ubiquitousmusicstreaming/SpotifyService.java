@@ -81,7 +81,6 @@ public class SpotifyService implements IService {
             ImageUri coverImage = track.imageUri;
             playing = !playerState.isPaused;
 
-            System.out.println("It gets an event from the track");
             updateMusicFragment(trackName, artistName, coverImage, playing);
         });
     }
@@ -151,62 +150,20 @@ public class SpotifyService implements IService {
 
     private void updateMusicFragment(String trackName, String artistName, ImageUri coverImage, Boolean playing)
     {
-        // final Bitmap[] image = new Bitmap[1];
-        /*
-        getCoverImage(coverImage, new Callback() {
-            @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-
-            }
-
-            @Override
-            public void onFailure(@NonNull Call call, @NonNull IOException e) {
-
-            }
-
-            @Override
-            public void onSuccess(Bitmap bitmap) {
-                // Use the bitmap here
-            }
-        });
-
-         */
-
-        getCoverImage(coverImage);
-
+        updateCoverImage(coverImage);
         musicFragment.updateTrackInformation(trackName, artistName);
         musicFragment.updatePlaying(playing);
     }
 
-    private void getCoverImage(ImageUri coverImage) {
-        // System.out.println("her er image 1: " + image[0]);
+    private void updateCoverImage(ImageUri coverImage) {
         spotifyAppRemote
                 .getImagesApi()
                 .getImage(coverImage, Image.Dimension.LARGE)
                 .setResultCallback(
                         bitmap -> {
                             musicFragment.updateCoverImage(bitmap);
-                            //image[0] = bitmap;
-                            // System.out.println("her er image 2: " + bitmap);
-                            // coverImageView.setImageBitmap(bitmap);
-                        });
-
-        // System.out.println("dernæst er image: " + image[0]);
-    }
-
-    /*
-    private void getCoverImage(ImageUri coverImage, final Callback callback) {
-        spotifyAppRemote
-                .getImagesApi()
-                .getImage(coverImage, Image.Dimension.LARGE)
-                .setResultCallback(
-                        bitmap -> {
-                            callback.onResponse(bitmap);
                         });
     }
-
-     */
-
 
     private void updateMusicFragmentPlaying() {musicFragment.updatePlaying(playing);}
     private void updateMusicFragmentSpeaker() { musicFragment.updatePlayingSpeaker(playingSpeaker); }
@@ -285,8 +242,8 @@ public class SpotifyService implements IService {
         });
     }
 
-    /*
-    public Boolean changePlayPause() {
+
+    public void changeActivationOfDevice() {
         final Boolean[] isPlaying = {true};
         spotifyAppRemote
                 .getPlayerApi()
@@ -297,20 +254,23 @@ public class SpotifyService implements IService {
                                 spotifyAppRemote
                                         .getPlayerApi()
                                         .resume();
-                                isPlaying[0] = false;
-                                System.out.println("I spotify:" + isPlaying[0]);
+                                playing = true;
+                                //isPlaying[0] = false;
+                                //System.out.println("I spotify:" + isPlaying[0]);
                             } else {
                                 spotifyAppRemote
                                         .getPlayerApi()
                                         .pause();
+                                playing = false;
                             }
+                            updateMusicFragmentPlaying();
                         });
-        System.out.println("end of method: " + isPlaying[0]);
-        return isPlaying[0];
+        // System.out.println("end of method: " + isPlaying[0]);
+        // return isPlaying[0];
     }
 
 
-
+/*
     public Boolean checkIfPlaying() {
         final Boolean[] isPlaying = {true};
         spotifyAppRemote
@@ -383,21 +343,6 @@ public class SpotifyService implements IService {
                     .pause();
         }
     }
-
-    /*
-    public void getInformation(String request) {
-        if (request.equals("image")) {
-            spotifyAppRemote
-                    .getImagesApi()
-                    .getImage(coverImage, Image.Dimension.LARGE)
-                    .setResultCallback(
-                            bitmap -> {
-                                coverImageView.setImageBitmap(bitmap);
-                            });
-        }
-    }
-
-     */
 
     public List<Device> getAvailableDevices() { return devices; }
     public String getAccessToken() { return accessToken; }

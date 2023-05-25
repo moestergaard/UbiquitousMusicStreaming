@@ -65,7 +65,7 @@ public class MusicFragment extends Fragment {
         playPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                changePlayPause();
+                service.changeActivationOfDevice();
             }
         });
 
@@ -153,35 +153,20 @@ public class MusicFragment extends Fragment {
     private void updateTrackInformationMainActivity() {
         String trackName = mainActivity.getTrackName();
         String artistName = mainActivity.getArtistName();
-        ImageUri coverImage = mainActivity.getCoverImage();
+        Bitmap coverImage = mainActivity.getCoverImage();
         if (trackName != null && artistName != null && coverImage != null)
         {
-            //updateTrackInformation(trackName, artistName, coverImage);
+            updateTrackInformation(trackName, artistName);
+            updateCoverImage(coverImage);
         }
     }
 
     public void updateTrackInformation(String trackName, String artistName) {
         txtViewArtistName.setText(artistName);
         txtViewTrackName.setText(trackName);
-        // coverImageView.setImageBitmap(image);
-
-        // service.getInformation("image");
-
-        /*
-        spotifyAppRemote = service.getSpotifyAppRemote();
-        spotifyAppRemote
-                .getImagesApi()
-                .getImage(coverImage, Image.Dimension.LARGE)
-                .setResultCallback(
-                        bitmap -> {
-                            coverImageView.setImageBitmap(bitmap);
-                        });
-
-         */
 
         mainActivity.setTrackName(trackName);
         mainActivity.setArtistName(artistName);
-        // mainActivity.setCoverImage(coverImage);
     }
 
     public void updatePlayingSpeaker(String speakerName) {
@@ -198,5 +183,6 @@ public class MusicFragment extends Fragment {
 
     public void updateCoverImage(Bitmap coverImage) {
         coverImageView.setImageBitmap(coverImage);
+        mainActivity.setCoverImage(coverImage);
     }
 }
