@@ -16,20 +16,14 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.ubiquitousmusicstreaming.IService;
 import com.example.ubiquitousmusicstreaming.MainActivity;
 import com.example.ubiquitousmusicstreaming.R;
-import com.example.ubiquitousmusicstreaming.SpotifyService;
 import com.example.ubiquitousmusicstreaming.databinding.FragmentMusicBinding;
-import com.spotify.android.appremote.api.SpotifyAppRemote;
-import com.spotify.protocol.types.Image;
-import com.spotify.protocol.types.ImageUri;
-import java.util.Hashtable;
 
 public class MusicFragment extends Fragment {
 
     private FragmentMusicBinding binding;
     private MainActivity mainActivity;
-    private SpotifyAppRemote spotifyAppRemote;
     private IService service;
-    private static Hashtable<String, String> locationSpeakerID = new Hashtable<>();
+    private View root;
     ImageView coverImageView;
     TextView txtViewTrackName, txtViewArtistName, txtViewPlaying, txtViewPlayingOn;
     AppCompatImageButton playPauseButton, skipNext, skipPrevious;
@@ -37,26 +31,11 @@ public class MusicFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        MusicViewModel musicViewModel =
-                new ViewModelProvider(this).get(MusicViewModel.class);
 
-        binding = FragmentMusicBinding.inflate(inflater, container, false);
         mainActivity = (MainActivity) getParentFragment().getActivity();
-        service = mainActivity.getService();
-        service.attachMusicFragment(this);
-        service.updateActiveDevice();
 
-        View root = binding.getRoot();
-
-        coverImageView = binding.image;
-        playPauseButton = binding.playPauseButton;
-        skipNext = binding.skipNextButton;
-        skipPrevious = binding.skipPrevButton;
-        txtViewArtistName = binding.currentArtist;
-        txtViewTrackName = binding.currentTrack;
-        txtViewPlaying = binding.playing;
-        txtViewPlayingOn = binding.playingOn;
-
+        setupService();
+        setupBindings(inflater, container);
         updateTrackInformationMainActivity();
 
         Boolean playing = mainActivity.getPlaying();
@@ -96,6 +75,26 @@ public class MusicFragment extends Fragment {
         binding = null;
     }
 
+    private void setupService() {
+        service = mainActivity.getService();
+        service.attachMusicFragment(this);
+        service.updateActiveDevice();
+    }
+
+    private void setupBindings(LayoutInflater inflater, ViewGroup container) {
+        binding = FragmentMusicBinding.inflate(inflater, container, false);
+        root = binding.getRoot();
+
+        coverImageView = binding.image;
+        playPauseButton = binding.playPauseButton;
+        skipNext = binding.skipNextButton;
+        skipPrevious = binding.skipPrevButton;
+        txtViewArtistName = binding.currentArtist;
+        txtViewTrackName = binding.currentTrack;
+        txtViewPlaying = binding.playing;
+        txtViewPlayingOn = binding.playingOn;
+    }
+
     private void updateTxtViews(Boolean playing) {
         if (playing) {
             service.updateActiveDevice();
@@ -107,32 +106,6 @@ public class MusicFragment extends Fragment {
             txtViewPlaying.setText("");
             txtViewPlayingOn.setText("");
         }
-    }
-
-    private void changePlayPause() {
-        spotifyAppRemote = service.getSpotifyAppRemote();
-        spotifyAppRemote
-                .getPlayerApi()
-                .getPlayerState()
-                .setResultCallback(
-                        playerState -> {
-                            if (playerState.isPaused) {
-                                spotifyAppRemote
-                                        .getPlayerApi()
-                                        .resume();
-                                playPauseButton.setImageResource(R.drawable.btn_pause);
-                                mainActivity.setPlaying(true);
-                                updateTxtViews(true);
-                            } else {
-                                spotifyAppRemote
-                                        .getPlayerApi()
-                                        .pause();
-                                playPauseButton.setImageResource(R.drawable.btn_play);
-                                mainActivity.setPlaying(false);
-                                updateTxtViews(false);
-                            }
-                        });
-
     }
 
     public void updatePlaying(Boolean playing) {
