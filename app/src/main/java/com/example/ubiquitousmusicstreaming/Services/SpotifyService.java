@@ -37,13 +37,12 @@ import okhttp3.Response;
 
 public class SpotifyService implements IService {
 
-    private Context context;
+    private final Context context;
     private Call mCall;
-    private OkHttpClient mOkHttpClient = new OkHttpClient();
+    private final OkHttpClient mOkHttpClient = new OkHttpClient();
     private static List<Device> devices = new ArrayList<>();
     private static final String CLIENT_ID = "6e101d8a913048819b5af5e6ee372b59";
     private static final String REDIRECT_URI = "ubiquitousmusicstreaming-login://callback";
-    private Integer REQUEST_CODE = 42;
     private static SpotifyAppRemote spotifyAppRemote;
     private String accessToken;
     private MusicFragment musicFragment;
@@ -63,6 +62,7 @@ public class SpotifyService implements IService {
         builder.setScopes(new String[]{"streaming", "user-read-email", "user-read-currently-playing", "user-read-playback-state"});
         AuthorizationRequest request = builder.build();
 
+        Integer REQUEST_CODE = 42;
         AuthorizationClient.openLoginActivity((Activity) context, REQUEST_CODE, request);
     }
 
@@ -234,7 +234,6 @@ public class SpotifyService implements IService {
     }
 
     public void changeActivationOfDevice() {
-        final Boolean[] isPlaying = {true};
         spotifyAppRemote
                 .getPlayerApi()
                 .getPlayerState()
@@ -292,22 +291,27 @@ public class SpotifyService implements IService {
     }
 
     public void handleRequest(String request) {
-        if (request.equals("next")) {
-            spotifyAppRemote
-                    .getPlayerApi()
-                    .skipNext();
-        } else if (request.equals("prev")) {
-            spotifyAppRemote
-                    .getPlayerApi()
-                    .skipPrevious();
-        } else if (request.equals("play")) {
-            spotifyAppRemote
-                    .getPlayerApi()
-                    .resume();
-        } else if (request.equals("pause")) {
-            spotifyAppRemote
-                    .getPlayerApi()
-                    .pause();
+        switch (request) {
+            case "next":
+                spotifyAppRemote
+                        .getPlayerApi()
+                        .skipNext();
+                break;
+            case "prev":
+                spotifyAppRemote
+                        .getPlayerApi()
+                        .skipPrevious();
+                break;
+            case "play":
+                spotifyAppRemote
+                        .getPlayerApi()
+                        .resume();
+                break;
+            case "pause":
+                spotifyAppRemote
+                        .getPlayerApi()
+                        .pause();
+                break;
         }
     }
     public void attachFragment(Fragment musicFragment) { this.musicFragment = (MusicFragment) musicFragment; }

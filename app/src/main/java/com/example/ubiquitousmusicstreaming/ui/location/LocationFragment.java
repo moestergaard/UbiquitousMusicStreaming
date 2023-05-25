@@ -19,12 +19,12 @@ import java.util.Objects;
 public class LocationFragment extends Fragment {
 
     private FragmentLocationBinding binding;
-    private static TextView txtViewInUse, txtViewLocation, txtViewRoom, txtViewSpeaker;
-    private static Button buttonInUse, buttonStop;
-    private Boolean inUse = false, inUseTemp;
-    private static String playingLocation = "";
-    private static Hashtable<String, String> locationSpeakerName = new Hashtable<>();
-    private static MainActivity mainActivity;
+    private TextView txtViewInUse, txtViewLocation, txtViewRoom, txtViewSpeaker;
+    private Button buttonInUse, buttonStop;
+    private Boolean inUse = false;
+    private String playingLocation = "";
+    private Hashtable<String, String> locationSpeakerName = new Hashtable<>();
+    private MainActivity mainActivity;
     private IService service;
     private View root;
 
@@ -42,7 +42,6 @@ public class LocationFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 inUse = true;
-                inUseTemp = true;
 
                 mainActivity.attachLocationFragment(LocationFragment.this);
                 mainActivity.setInUse(true);
@@ -56,7 +55,7 @@ public class LocationFragment extends Fragment {
         buttonStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                inUse = inUseTemp = false;
+                inUse = false;
 
                 mainActivity.removeLocationFragment();
                 mainActivity.setInUse(false);
@@ -92,7 +91,6 @@ public class LocationFragment extends Fragment {
     private void setupFromMainActivity() {
         mainActivity = (MainActivity) getParentFragment().getActivity();
         inUse = mainActivity.getInUse();
-        inUseTemp = mainActivity.getInUseTemp();
         locationSpeakerName = mainActivity.getLocationSpeakerName();
         service = mainActivity.getService();
     }
@@ -129,7 +127,7 @@ public class LocationFragment extends Fragment {
         txtViewSpeaker.setText(speakerTextView);
     }
 
-    public static void SetTextView(String text) { txtViewLocation.setText(text); }
+    public void SetTextView(String text) { txtViewLocation.setText(text); }
 
     public boolean updateSpeaker(String location) {
         if (!playingLocation.equals(location)) {
