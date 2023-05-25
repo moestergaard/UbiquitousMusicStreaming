@@ -7,16 +7,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.example.ubiquitousmusicstreaming.Services.IService;
 import com.example.ubiquitousmusicstreaming.MainActivity;
 import com.example.ubiquitousmusicstreaming.databinding.FragmentLocationBinding;
-
 import java.util.Hashtable;
+import java.util.Objects;
 
 public class LocationFragment extends Fragment {
 
@@ -27,38 +25,18 @@ public class LocationFragment extends Fragment {
     private static String playingLocation = "";
     private static Hashtable<String, String> locationSpeakerName = new Hashtable<>();
     private static MainActivity mainActivity;
-    private IService spotifyService;
+    private IService service;
+    private View root;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        LocationViewModel locationViewModel =
-                new ViewModelProvider(this).get(LocationViewModel.class);
 
-        binding = FragmentLocationBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
-
-        setHasOptionsMenu(false);
-
-        mainActivity = (MainActivity) getParentFragment().getActivity();
-
-        txtViewInUse = binding.textInUse;
-        txtViewLocation = binding.textLocation;
-        buttonInUse = binding.btnUseSystem;
-        buttonStop = binding.btnStopSystem;
-        txtViewRoom = binding.textRoom;
-        txtViewSpeaker = binding.textSpeaker;
-
-        inUse = mainActivity.getInUse();
-        inUseTemp = mainActivity.getInUseTemp();
-        locationSpeakerName = mainActivity.getLocationSpeakerName();
-        spotifyService = mainActivity.getService();
-
+        setupBindings(inflater, container);
+        setupFromMainActivity();
         updateTextView();
-
         updateLocationSpeakerTextView();
-
-        SetTextView(mainActivity.getLastLocationFragmentTextView());
+        txtViewLocation.setText(mainActivity.getLastLocationFragmentTextView());
 
         buttonInUse.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,10 +46,10 @@ public class LocationFragment extends Fragment {
 
                 mainActivity.attachLocationFragment(LocationFragment.this);
                 mainActivity.setInUse(true);
+                mainActivity.startScan();
 
-                mainActivity.getWifiManager().startScan();
                 updateTextView();
-                updateButtons(true);
+                updateButtonsTrackingActive(true);
             }
         });
 
@@ -87,24 +65,50 @@ public class LocationFragment extends Fragment {
 
                 txtViewLocation.setText("");
                 updateTextView();
-                updateButtons(false);
+                updateButtonsTrackingActive(false);
             }
         });
         return root;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
+
+    private void setupBindings(LayoutInflater inflater, ViewGroup container) {
+        binding = FragmentLocationBinding.inflate(inflater, container, false);
+        root = binding.getRoot();
+
+        txtViewInUse = binding.textInUse;
+        txtViewLocation = binding.textLocation;
+        buttonInUse = binding.btnUseSystem;
+        buttonStop = binding.btnStopSystem;
+        txtViewRoom = binding.textRoom;
+        txtViewSpeaker = binding.textSpeaker;
+    }
+
+    private void setupFromMainActivity() {
+        mainActivity = (MainActivity) getParentFragment().getActivity();
+        inUse = mainActivity.getInUse();
+        inUseTemp = mainActivity.getInUseTemp();
+        locationSpeakerName = mainActivity.getLocationSpeakerName();
+        service = mainActivity.getService();
+    }
+
     private void updateTextView() {
         if(inUse) {
             txtViewInUse.setText("Sporing er aktiveret");
-            updateButtons(true);
+            updateButtonsTrackingActive(true);
         }
         else {
             txtViewInUse.setText("Sporing er deaktiveret");
-            updateButtons(false);
+            updateButtonsTrackingActive(false);
         }
     }
 
-    private void updateButtons(Boolean activated) {
+    private void updateButtonsTrackingActive(Boolean activated) {
         buttonInUse.setEnabled(!activated);
         buttonStop.setEnabled(activated);
     }
@@ -125,31 +129,18 @@ public class LocationFragment extends Fragment {
         txtViewSpeaker.setText(speakerTextView);
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
-    }
-
-    public static void SetTextView(String text) {
-        txtViewLocation.setText(text);
-    }
+    public static void SetTextView(String text) { txtViewLocation.setText(text); }
 
     public boolean updateSpeaker(String location) {
-        if (playingLocation != location) {
+        if (!playingLocation.equals(location)) {
             playingLocation = location;
-
-            System.out.println(location);
-            System.out.println(locationSpeakerName);
 
             String speakerName = locationSpeakerName.get(location);
             if(speakerName == null) {
                 Toast.makeText(mainActivity, "Vælg hvilken højtaler, der hører til " + location, Toast.LENGTH_LONG).show();
                 return false;
             }
-            Hashtable<String, String> speakerNameId = spotifyService.getDeviceNameId();
-            System.out.println("Dette er speakerNameId: " + speakerNameId);
-            System.out.println("Dette er speakerName: " + speakerName);
+            Hashtable<String, String> speakerNameId = service.getDeviceNameId();
             String speakerId = speakerNameId.get(speakerName);
 
             if (speakerId == null) {
@@ -157,11 +148,9 @@ public class LocationFragment extends Fragment {
                 return false;
             }
             mainActivity.setPlayingSpeaker(speakerName);
-            spotifyService.changeDevice(speakerId);
+            service.changeDevice(speakerId);
             return true;
         }
         return true;
     }
-
-
 }
