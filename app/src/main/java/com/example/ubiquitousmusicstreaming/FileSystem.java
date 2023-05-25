@@ -1,6 +1,9 @@
 package com.example.ubiquitousmusicstreaming;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 
 import java.io.File;
@@ -17,25 +20,21 @@ public class FileSystem {
 
         if (settingFile.exists()) {
             if (!settingFile.delete()) {
-                System.out.println("Problem with deleting the old Setting file.");
-                //Log.e(TAG, "Error deleting existing setting file");
+                Log.e(TAG, "Error deleting existing setting file");
                 return null;
             }
         }
 
         try {
             if (settingFile.createNewFile()) {
-                System.out.println("Setting file created.");
-                // Log.d(TAG, "Setting file created");
+                Log.d(TAG, "Setting file created");
             } else {
-                System.out.println("Setting file NOT created.");
-                // Log.d(TAG, "Setting file already exists");
+                Log.d(TAG, "Setting file already exists");
             }
         } catch (IOException e) {
             e.printStackTrace();
-            // Log.e(TAG, "Error creating setting file", e);
+            Log.e(TAG, "Error creating setting file", e);
         }
-
         return settingFile;
     }
 
@@ -46,12 +45,10 @@ public class FileSystem {
             Settings settings = (Settings) objectInputStream.readObject();
             objectInputStream.close();
             fileInputStream.close();
-            System.out.println("Object read from file.");
-            //Log.d(TAG, "Object read from file");
+            Log.d(TAG, "Object read from file");
             return settings;
         } catch (IOException | ClassNotFoundException e) {
-            System.out.println("Error reading object from file.");
-            //Log.e(TAG, "Error reading object from file", e);
+            Log.e(TAG, "Error reading object from file", e);
             return null;
         }
     }
@@ -63,11 +60,9 @@ public class FileSystem {
             objectOutputStream.writeObject(settings);
             objectOutputStream.close();
             fileOutputStream.close();
-            System.out.println("Object written to file.");
-            //Log.d(TAG, "Object written to file");
+            Log.d(TAG, "Object written to file");
         } catch (IOException e) {
-            System.out.println("Error writing object to file.");
-            //Log.e(TAG, "Error writing object to file", e);
+            Log.e(TAG, "Error writing object to file", e);
         }
     }
 

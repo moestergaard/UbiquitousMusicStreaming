@@ -61,21 +61,20 @@ public class ConfigurationFragment extends Fragment {
     private WifiReceiver wifiReceiver;
     private EditText editTextRoom;
     private View root;
-    private Button buttonStartScanning, buttonStopScanning, buttonNewDataFile, buttonStoreSpeakerRoom;
+    private Button buttonStartScanning, buttonStopScanning, buttonNewDataFile, buttonStoreDeviceRoom;
     private TextView textViewRoom, textViewDataFile;
     private Spinner spinSpeaker, spinRoom;
-    private ArrayAdapter<String> adapterSpeakers, adapterRoom;
+    private ArrayAdapter<String> adapterDevices, adapterRoom;
     private String room, lastScanResults = "";
     private String FILE_NAME = "";
     private String[] locations = new String[]{};
     private List<Device> devices = new ArrayList<>();
-    private String chosenSpeakerUniqueName = "", chosenSpeakerReadableName = "", chosenRoom = "";
-    private Hashtable<String, String> locationSpeakerName = new Hashtable<>();
-    private Hashtable<String, String> speakersNameID = new Hashtable<>();
+    private String chosenDeviceUniqueName = "", chosenDeviceReadableName = "", chosenRoom = "";
+    private Hashtable<String, String> locationDeviceName = new Hashtable<>();
+    private Hashtable<String, String> devicesNameID = new Hashtable<>();
     private List<ScanResult> scanResults;
     private Boolean scan = false;
-    private OkHttpClient mOkHttpClient = new OkHttpClient();
-    private IService spotifyService;
+    private IService service;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -94,15 +93,13 @@ public class ConfigurationFragment extends Fragment {
                 if (FILE_NAME != null) {
                     room = editTextRoom.getText().toString();
                     if (!room.isEmpty()) {
-                        List<String> l;
-                        if (locations != null) {
-                            l = new ArrayList<String>(Arrays.asList(locations));
-                        } else { l = new ArrayList<>(); }
+                        List<String> l = locations != null ? new ArrayList<>(Arrays.asList(locations)) : new ArrayList<>();
 
                         if (!l.contains(room)) {
                             l.add(room);
                             addLocationToSettings(room);
                         }
+
                         if (locations != null) {
                             locations = l.toArray(locations);
                         } else { locations = l.toArray(new String[]{}); }
@@ -155,8 +152,8 @@ public class ConfigurationFragment extends Fragment {
 
                         mainActivity.loadSettings();
                         locations = new String[]{};
-                        locationSpeakerName = new Hashtable<>();
-                        speakersNameID = new Hashtable<>();
+                        locationDeviceName = new Hashtable<>();
+                        devicesNameID = new Hashtable<>();
                         setupSpeakerRoomSelection(spinSpeaker, spinRoom);
                     }
                 });
@@ -167,20 +164,19 @@ public class ConfigurationFragment extends Fragment {
                         dialog.dismiss();
                     }
                 });
-
                 AlertDialog dialog = builder.create();
                 dialog.show();
             }
         });
 
-        buttonStoreSpeakerRoom.setOnClickListener(new View.OnClickListener() {
+        buttonStoreDeviceRoom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!chosenSpeakerUniqueName.equals("") && !chosenRoom.equals("")) {
+                if(!chosenDeviceUniqueName.equals("") && !chosenRoom.equals("")) {
                     changeLocationSpeakerName();
                     addLocationSpeakerNameToSettings();
-                    mainActivity.updateLocationSpeakerName(locationSpeakerName);
-                    Toast.makeText(mainActivity, "Rum: " + chosenRoom + "\nHøjtaler: " + chosenSpeakerReadableName, Toast.LENGTH_LONG).show();
+                    mainActivity.updateLocationSpeakerName(locationDeviceName);
+                    Toast.makeText(mainActivity, "Rum: " + chosenRoom + "\nHøjtaler: " + chosenDeviceReadableName, Toast.LENGTH_LONG).show();
                 }
                 else {
                     Toast.makeText(mainActivity, "Vælg både en højtaler og et rum.", Toast.LENGTH_LONG).show();
@@ -188,6 +184,11 @@ public class ConfigurationFragment extends Fragment {
             }
         });
         return root;
+    }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 
     private void setupBindings(LayoutInflater inflater, ViewGroup container) {
@@ -198,10 +199,10 @@ public class ConfigurationFragment extends Fragment {
         buttonStartScanning = binding.btnStartScanning;
         buttonStopScanning = binding.btnStopScanning;
         buttonNewDataFile = binding.btnNewFile;
-        buttonStoreSpeakerRoom = binding.btnStoreSpeakerRoom;
+        buttonStoreDeviceRoom = binding.btnStoreDeviceRoom;
         textViewRoom = binding.textRoom;
         textViewDataFile = binding.textFileName;
-        spinSpeaker = binding.spinnerSpeaker;
+        spinSpeaker = binding.spinnerDevice;
         spinRoom = binding.spinnerRoom;
     }
 
@@ -213,8 +214,8 @@ public class ConfigurationFragment extends Fragment {
         locations = mainActivity.getLocation();
         room = mainActivity.getRoomCurrentlyScanning();
         wifiReceiver = mainActivity.getWifiReceiver();
-        spotifyService = mainActivity.getService();
-        locationSpeakerName = mainActivity.getLocationSpeakerName();
+        service = mainActivity.getService();
+        locationDeviceName = mainActivity.getLocationSpeakerName();
 
         if (mainActivity.getInUseDataCollection()) { scan = true; startScanning(); }
     }
@@ -240,16 +241,12 @@ public class ConfigurationFragment extends Fragment {
     private void addLocationSpeakerNameToSettings() {
         Settings settings = FileSystem.readObjectFromFile(mainActivity);
         if (settings != null) {
-            settings.setLocationSpeakerName(locationSpeakerName);
+            settings.setLocationSpeakerName(locationDeviceName);
         }
         FileSystem.writeObjectToFile(mainActivity, settings);
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
-    }
+
 
     private void updateTextViewDataFile() {
         if (!FILE_NAME.equals("")) {
@@ -269,13 +266,13 @@ public class ConfigurationFragment extends Fragment {
     }
 
     private void setupSpeakerRoomSelection(Spinner spinSpeaker, Spinner spinRoom) {
-        devices = spotifyService.getAvailableDevices();
+        devices = service.getAvailableDevices();
         List<String> deviceNames = new ArrayList<>();
 
         if (!devices.isEmpty()) {
             for (Device d : devices) {
                 deviceNames.add(d.getName());
-                speakersNameID.put(d.getName(), d.getId());
+                devicesNameID.put(d.getName(), d.getId());
             }
         }
 
@@ -283,9 +280,9 @@ public class ConfigurationFragment extends Fragment {
         deviceNames.toArray(deviceNamesArray);
 
         if (deviceNamesArray != null) {
-            adapterSpeakers = new ArrayAdapter<String>(mainActivity, R.layout.list_item, deviceNamesArray);
-            adapterSpeakers.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinSpeaker.setAdapter(adapterSpeakers);
+            adapterDevices = new ArrayAdapter<String>(mainActivity, R.layout.list_item, deviceNamesArray);
+            adapterDevices.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinSpeaker.setAdapter(adapterDevices);
         }
 
         if (locations != null) {
@@ -297,12 +294,9 @@ public class ConfigurationFragment extends Fragment {
         spinSpeaker.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                chosenSpeakerReadableName = adapterView.getItemAtPosition(i).toString();
-                chosenSpeakerUniqueName = speakersNameID.get(chosenSpeakerReadableName);
-                System.out.println("readable name: " + chosenSpeakerReadableName);
-                System.out.println("unique name: " + chosenSpeakerUniqueName);
+                chosenDeviceReadableName = adapterView.getItemAtPosition(i).toString();
+                chosenDeviceUniqueName = devicesNameID.get(chosenDeviceReadableName);
             }
-
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {}
         });
@@ -312,25 +306,24 @@ public class ConfigurationFragment extends Fragment {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 chosenRoom = adapterView.getItemAtPosition(i).toString();
             }
-
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {}
         });
     }
 
     private void changeLocationSpeakerName() {
-        Boolean containsChosenSpeaker = locationSpeakerName.containsValue(chosenSpeakerReadableName);
+        Boolean containsChosenSpeaker = locationDeviceName.containsValue(chosenDeviceReadableName);
         while (containsChosenSpeaker) {
-            Iterator<String> iterator = locationSpeakerName.keySet().iterator();
+            Iterator<String> iterator = locationDeviceName.keySet().iterator();
             while (iterator.hasNext()) {
                 String key = iterator.next();
-                if (locationSpeakerName.get(key).equals(chosenSpeakerReadableName)) {
+                if (locationDeviceName.get(key).equals(chosenDeviceReadableName)) {
                     iterator.remove();
                 }
             }
-            containsChosenSpeaker = locationSpeakerName.containsValue(chosenSpeakerReadableName);
+            containsChosenSpeaker = locationDeviceName.containsValue(chosenDeviceReadableName);
         }
-        locationSpeakerName.put(chosenRoom, chosenSpeakerReadableName);
+        locationDeviceName.put(chosenRoom, chosenDeviceReadableName);
     }
 
     public void update() {

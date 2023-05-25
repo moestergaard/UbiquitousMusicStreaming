@@ -79,26 +79,6 @@
                     android:layout_weight="1"
                     android:text="Start Wifi Scanning" />
 
-                <!-- android:backgroundTint="@color/button"
-                android:layout_width="wrap_content"
-                android:layout_height="60sp"
-                    android:layout_marginTop="4dp"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:textColor="@color/textOnButton" -->
-
-
-                <!--Button
-                    android:id="@+id/btnUseSystem"
-                    style="@style/Widget.Cat.Button.Small"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:filterTouchesWhenObscured="false"
-                    android:state_focused="true"
-                    android:layout_weight="1"
-                    android:text="Aktiver sporing" /-->
-
                 <Button
                     android:id="@+id/btnStopScanning"
                     android:layout_width="1in"
@@ -108,14 +88,6 @@
                     style="@style/Widget.Cat.Button.Small"
                     android:text="Stop Wifi Scanning"
                     />
-                <!--
-                android:backgroundTint="@color/button"
-                    android:textColor="@color/textOnButton"
-                    android:layout_marginTop="4dp"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_marginLeft="8dp"
-                -->
 
             </LinearLayout>
 
@@ -153,14 +125,6 @@
                 android:layout_marginLeft="0dp"
                 android:layout_marginRight="0dp"
                 android:text="Lav ny datafil" />
-
-            <!-- android:layout_height="60sp"
-                android:layout_marginTop="4dp"
-                android:layout_marginLeft="105dp"
-                android:layout_marginRight="105dp"
-                android:layout_marginBottom="16dp"
-                 android:backgroundTint="@color/button"
-                android:textColor="@color/textOnButton"-->
 
             <TextView
                 android:id="@+id/speakerHeader"
@@ -228,7 +192,7 @@
                         android:textColor="@color/textOnBackground"/>
 
                     <Spinner
-                        android:id="@+id/spinnerSpeaker"
+                        android:id="@+id/spinnerDevice"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="8dp"
@@ -238,7 +202,7 @@
             </LinearLayout>
 
             <Button
-                android:id="@+id/btnStoreSpeakerRoom"
+                android:id="@+id/btnStoreDeviceRoom"
                 style="@style/Widget.Cat.Button.Small"
                 android:layout_width="1in"
                 android:layout_height="wrap_content"
@@ -248,11 +212,6 @@
                 android:layout_marginBottom="8dp"
                 android:text="Gem"
                 />
-            <!-- android:backgroundTint="@color/button"
-                android:textColor="@color/textOnButton"-->
-
-
         </LinearLayout>
     </ScrollView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>
