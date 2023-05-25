@@ -328,13 +328,6 @@ public class ConfigurationFragment extends Fragment {
             String resultElse = makeScanResultString(scanResults);
             Boolean newAndLastScanAreEqual = !lastScanResults.equals(resultElse);
             if(newAndLastScanAreEqual) {
-                System.out.println("***************");
-                System.out.println("lastscanresults: " + lastScanResults);
-                System.out.println("elseResult: " + resultElse);
-                System.out.println("--------------");
-                System.out.println(lastScanResults.equals(resultElse));
-                System.out.println("--------------");
-                System.out.println("***************");
                 fileSystem.writeToFile(resultElse, fileName);
             }
             lastScanResults = resultElse;
