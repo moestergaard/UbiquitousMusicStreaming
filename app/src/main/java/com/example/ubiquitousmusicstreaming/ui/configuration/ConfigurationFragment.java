@@ -47,6 +47,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 import com.example.ubiquitousmusicstreaming.Settings;
+import com.example.ubiquitousmusicstreaming.databinding.FragmentMusicBinding;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -56,67 +57,36 @@ import com.google.gson.JsonObject;
 public class ConfigurationFragment extends Fragment {
 
     private FragmentConfigurationBinding binding;
-
-    MainActivity mainActivity;
-    WifiReceiver wifiReceiver;
-    EditText editTextRoom;
-    Button buttonStartScanning, buttonStopScanning, buttonNewDataFile, buttonStoreSpeakerRoom;
-    TextView textViewRoom, textViewDataFile;
-    Spinner spinSpeaker, spinRoom;
-    ArrayAdapter<String> adapterSpeakers, adapterRoom;
-    String room, lastScanResults = "";
-    String FILE_NAME = "";
-    String[] locations = new String[]{};
-    List<Device> devices = new ArrayList<>();
-    String chosenSpeakerUniqueName = "", chosenSpeakerReadableName = "", chosenRoom = "";
-    Hashtable<String, String> locationSpeakerName = new Hashtable<>();
-    Hashtable<String, String> speakersNameID = new Hashtable<>();
-
-    List<ScanResult> scanResults;
-    Boolean scan = false;
-    private Call mCall;
+    private MainActivity mainActivity;
+    private WifiReceiver wifiReceiver;
+    private EditText editTextRoom;
+    private View root;
+    private Button buttonStartScanning, buttonStopScanning, buttonNewDataFile, buttonStoreSpeakerRoom;
+    private TextView textViewRoom, textViewDataFile;
+    private Spinner spinSpeaker, spinRoom;
+    private ArrayAdapter<String> adapterSpeakers, adapterRoom;
+    private String room, lastScanResults = "";
+    private String FILE_NAME = "";
+    private String[] locations = new String[]{};
+    private List<Device> devices = new ArrayList<>();
+    private String chosenSpeakerUniqueName = "", chosenSpeakerReadableName = "", chosenRoom = "";
+    private Hashtable<String, String> locationSpeakerName = new Hashtable<>();
+    private Hashtable<String, String> speakersNameID = new Hashtable<>();
+    private List<ScanResult> scanResults;
+    private Boolean scan = false;
     private OkHttpClient mOkHttpClient = new OkHttpClient();
     private IService spotifyService;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        ConfigurationViewModel configurationViewModel =
-                new ViewModelProvider(this).get(ConfigurationViewModel.class);
 
-        binding = FragmentConfigurationBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
-
-        mainActivity = (MainActivity) getParentFragment().getActivity();
-        mainActivity.attachConfigurationFragment(this);
-        FILE_NAME = mainActivity.getFileName();
-        locations = mainActivity.getLocation();
-        room = mainActivity.getRoomCurrentlyScanning();
-
-
-        wifiReceiver = mainActivity.getWifiReceiver();
-        spotifyService = mainActivity.getService();
-
-        editTextRoom = binding.editTextRoom;
-        buttonStartScanning = binding.btnStartScanning;
-        buttonStopScanning = binding.btnStopScanning;
-        buttonNewDataFile = binding.btnNewFile;
-        buttonStoreSpeakerRoom = binding.btnStoreSpeakerRoom;
-        textViewRoom = binding.textRoom;
-        textViewDataFile = binding.textFileName;
-        spinSpeaker = binding.spinnerSpeaker;
-        spinRoom = binding.spinnerRoom;
-
-
+        setupFromMainActivity();
+        setupBindings(inflater, container);
         setupSpeakerRoomSelection(spinSpeaker, spinRoom);
-
         updateTextViewDataFile();
         buttonStartScanning.setEnabled(true);
         buttonStopScanning.setEnabled(false);
         updateTextViewRoom(room);
-        locationSpeakerName = mainActivity.getLocationSpeakerName();
-
-        if (mainActivity.getInUseDataCollection()) { scan = true; startScanning(); }
-
 
         buttonStartScanning.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -208,10 +178,6 @@ public class ConfigurationFragment extends Fragment {
             public void onClick(View view) {
                 if(!chosenSpeakerUniqueName.equals("") && !chosenRoom.equals("")) {
                     changeLocationSpeakerName();
-
-                    // System.out.println("Hashtable old: " + locationSpeakerName);
-                    // locationSpeakerName.put(chosenRoom, chosenSpeakerReadableName);
-                    // System.out.println("Hashtable old: " + locationSpeakerName);
                     addLocationSpeakerNameToSettings();
                     mainActivity.updateLocationSpeakerName(locationSpeakerName);
                     Toast.makeText(mainActivity, "Rum: " + chosenRoom + "\nHøjtaler: " + chosenSpeakerReadableName, Toast.LENGTH_LONG).show();
@@ -222,6 +188,35 @@ public class ConfigurationFragment extends Fragment {
             }
         });
         return root;
+    }
+
+    private void setupBindings(LayoutInflater inflater, ViewGroup container) {
+        binding = FragmentConfigurationBinding.inflate(inflater, container, false);
+        root = binding.getRoot();
+
+        editTextRoom = binding.editTextRoom;
+        buttonStartScanning = binding.btnStartScanning;
+        buttonStopScanning = binding.btnStopScanning;
+        buttonNewDataFile = binding.btnNewFile;
+        buttonStoreSpeakerRoom = binding.btnStoreSpeakerRoom;
+        textViewRoom = binding.textRoom;
+        textViewDataFile = binding.textFileName;
+        spinSpeaker = binding.spinnerSpeaker;
+        spinRoom = binding.spinnerRoom;
+    }
+
+    private void setupFromMainActivity() {
+        mainActivity = (MainActivity) getParentFragment().getActivity();
+        mainActivity.attachConfigurationFragment(this);
+
+        FILE_NAME = mainActivity.getFileName();
+        locations = mainActivity.getLocation();
+        room = mainActivity.getRoomCurrentlyScanning();
+        wifiReceiver = mainActivity.getWifiReceiver();
+        spotifyService = mainActivity.getService();
+        locationSpeakerName = mainActivity.getLocationSpeakerName();
+
+        if (mainActivity.getInUseDataCollection()) { scan = true; startScanning(); }
     }
 
     private void addLocationToSettings(String room) {
@@ -299,16 +294,11 @@ public class ConfigurationFragment extends Fragment {
             spinRoom.setAdapter(adapterRoom);
         }
 
-
-
         spinSpeaker.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 chosenSpeakerReadableName = adapterView.getItemAtPosition(i).toString();
                 chosenSpeakerUniqueName = speakersNameID.get(chosenSpeakerReadableName);
-
-                // int indexRoom = deviceNames.indexOf(chosenSpeakerReadableName);
-                // chosenSpeakerUniqueName = devices.get(indexRoom).getId();
                 System.out.println("readable name: " + chosenSpeakerReadableName);
                 System.out.println("unique name: " + chosenSpeakerUniqueName);
             }
@@ -392,12 +382,6 @@ public class ConfigurationFragment extends Fragment {
 
     private void startScanning() {
         mainActivity.startScan();
-    }
-
-    private void cancelCall() {
-        if (mCall != null) {
-            mCall.cancel();
-        }
     }
 
     public void makeFile(View v, String fileName) {
