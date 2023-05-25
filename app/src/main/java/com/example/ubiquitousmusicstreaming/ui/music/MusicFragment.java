@@ -160,10 +160,10 @@ public class MusicFragment extends Fragment {
         }
     }
 
-    public void updateTrackInformation(String trackName, String artistName, ImageUri coverImage, Bitmap image) {
+    public void updateTrackInformation(String trackName, String artistName) {
         txtViewArtistName.setText(artistName);
         txtViewTrackName.setText(trackName);
-        coverImageView.setImageBitmap(image);
+        // coverImageView.setImageBitmap(image);
 
         // service.getInformation("image");
 
@@ -181,7 +181,7 @@ public class MusicFragment extends Fragment {
 
         mainActivity.setTrackName(trackName);
         mainActivity.setArtistName(artistName);
-        mainActivity.setCoverImage(coverImage);
+        // mainActivity.setCoverImage(coverImage);
     }
 
     public void updatePlayingSpeaker(String speakerName) {
@@ -194,5 +194,9 @@ public class MusicFragment extends Fragment {
             }
         });
         mainActivity.setPlayingSpeaker(playingSpeaker);
+    }
+
+    public void updateCoverImage(Bitmap coverImage) {
+        coverImageView.setImageBitmap(coverImage);
     }
 }

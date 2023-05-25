@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 
+import androidx.annotation.NonNull;
+
 import com.example.ubiquitousmusicstreaming.ui.configuration.Device;
 import com.example.ubiquitousmusicstreaming.ui.music.MusicFragment;
 import com.google.gson.Gson;
@@ -149,21 +151,63 @@ public class SpotifyService implements IService {
 
     private void updateMusicFragment(String trackName, String artistName, ImageUri coverImage, Boolean playing)
     {
-        final Bitmap[] image = new Bitmap[1];
-        System.out.println("her er image: " + image[0]);
+        // final Bitmap[] image = new Bitmap[1];
+        /*
+        getCoverImage(coverImage, new Callback() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+
+            }
+
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+            }
+
+            @Override
+            public void onSuccess(Bitmap bitmap) {
+                // Use the bitmap here
+            }
+        });
+
+         */
+
+        getCoverImage(coverImage);
+
+        musicFragment.updateTrackInformation(trackName, artistName);
+        musicFragment.updatePlaying(playing);
+    }
+
+    private void getCoverImage(ImageUri coverImage) {
+        // System.out.println("her er image 1: " + image[0]);
         spotifyAppRemote
                 .getImagesApi()
                 .getImage(coverImage, Image.Dimension.LARGE)
                 .setResultCallback(
                         bitmap -> {
-                            image[0] = bitmap;
+                            musicFragment.updateCoverImage(bitmap);
+                            //image[0] = bitmap;
+                            // System.out.println("her er image 2: " + bitmap);
                             // coverImageView.setImageBitmap(bitmap);
                         });
 
-        System.out.println("dernæst er image: " + image[0]);
-        musicFragment.updateTrackInformation(trackName, artistName, coverImage, image[0]);
-        musicFragment.updatePlaying(playing);
+        // System.out.println("dernæst er image: " + image[0]);
     }
+
+    /*
+    private void getCoverImage(ImageUri coverImage, final Callback callback) {
+        spotifyAppRemote
+                .getImagesApi()
+                .getImage(coverImage, Image.Dimension.LARGE)
+                .setResultCallback(
+                        bitmap -> {
+                            callback.onResponse(bitmap);
+                        });
+    }
+
+     */
+
+
     private void updateMusicFragmentPlaying() {musicFragment.updatePlaying(playing);}
     private void updateMusicFragmentSpeaker() { musicFragment.updatePlayingSpeaker(playingSpeaker); }
 

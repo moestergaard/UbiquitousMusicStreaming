@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
         loadSettings();
 
         service = new SpotifyService(this);
-        //spotify.connect();
+        service.connect();
         //spotifyService.refreshSpeakers();
         // System.out.println("*** NEW GETPLAYING ***: " + playing);
         // playing = spotify.getPlaying();
