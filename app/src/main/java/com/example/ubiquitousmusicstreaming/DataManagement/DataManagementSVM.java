@@ -55,6 +55,7 @@ public class DataManagementSVM {
         trainingSamples = generateSample(samplesString);
         trainingLabels = generateLabels(labelsString);
         // model = trainModel(trainingSamples, trainingLabels);
+
         try {
             model = loadModel("svm_model1.json");
         } catch (IOException e) {

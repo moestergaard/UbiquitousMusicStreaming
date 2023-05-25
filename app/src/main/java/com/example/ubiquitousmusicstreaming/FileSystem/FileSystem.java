@@ -34,7 +34,6 @@ public class FileSystem implements IFileSystem {
                 return null;
             }
         }
-
         try {
             if (settingFile.createNewFile()) {
                 Log.d(TAG, "Setting file created");
@@ -49,6 +48,10 @@ public class FileSystem implements IFileSystem {
     }
 
     public Settings loadSettings() {
+        File settingFile = new File(context.getFilesDir(), "Setting");
+        if (!settingFile.exists()) {
+            createSettingFile();
+        }
         try {
             FileInputStream fileInputStream = context.openFileInput("Setting");
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);

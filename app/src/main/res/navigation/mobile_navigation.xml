@@ -3,22 +3,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    app:startDestination="@+id/navigation_music">
 
     <fragment
-        android:id="@+id/navigation_home"
+        android:id="@+id/navigation_music"
         android:name="com.example.ubiquitousmusicstreaming.ui.music.MusicFragment"
         android:label="@string/title_music"
         tools:layout="@layout/fragment_music" />
 
     <fragment
-        android:id="@+id/navigation_dashboard"
+        android:id="@+id/navigation_location"
         android:name="com.example.ubiquitousmusicstreaming.ui.location.LocationFragment"
         android:label="@string/title_system"
         tools:layout="@layout/fragment_location" />
 
     <fragment
-        android:id="@+id/navigation_notifications"
+        android:id="@+id/navigation_configuration"
         android:name="com.example.ubiquitousmusicstreaming.ui.configuration.ConfigurationFragment"
         android:label="@string/title_configuring"
         tools:layout="@layout/fragment_configuration" />

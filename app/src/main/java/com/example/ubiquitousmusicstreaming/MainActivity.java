@@ -10,7 +10,7 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.Manifest;
 import android.view.Window;
-
+import android.widget.Toast;
 import com.example.ubiquitousmusicstreaming.DataManagement.DataManagement;
 import com.example.ubiquitousmusicstreaming.DataManagement.DataManagementSVM;
 import com.example.ubiquitousmusicstreaming.FileSystem.FileSystem;
@@ -20,7 +20,6 @@ import com.example.ubiquitousmusicstreaming.Services.SpotifyService;
 import com.example.ubiquitousmusicstreaming.ui.configuration.ConfigurationFragment;
 import com.example.ubiquitousmusicstreaming.ui.location.LocationFragment;
 import com.example.ubiquitousmusicstreaming.ui.music.MusicFragment;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -29,6 +28,8 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import com.example.ubiquitousmusicstreaming.databinding.ActivityMainBinding;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import java.util.Hashtable;
 import java.util.List;
 
@@ -47,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private static DataManagementSVM dmSVM;
     private static String predictedRoom, previousLocation = "";
     private String[] locations; // = /* new String[]{}; = */ new String[]{"Kontor", "Stue", "Køkken"};
-    private String[] locationsHardcodedForModelPurpose = new String[]{"Kontor", "Stue", "Køkken"};
+    private final String[] locationsHardcodedForModelPurpose = new String[]{"Kontor", "Stue", "Køkken"};
     private String fileName = "";
     private static String lastLocationFragmentTextView = "";
     private IService service;
@@ -60,63 +61,47 @@ public class MainActivity extends AppCompatActivity {
     private Boolean previousWasOutside = false;
     private String playingSpeaker = "";
 
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted, do something
-            } else {
-                if (ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    // Show an explanation to the user, then prompt again
-                } else {
-                    // Prompt the user to grant the permission
-                    ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
-                }
-                // Permission denied, handle the denial
-            }
-        }
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        // ONLY FOR TESTING OF FILE SYSTEM
-        // FileSystemTest fileSystemTest = new FileSystemTest(this);
-        // fileSystemTest.overAllTestMethod();
+
+        /*
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
+        }
+
+         */
+
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, REQUEST_CODE);
+            Toast.makeText(this, "Giv gerne adgang til baggrundsplacering. Derved virker servicen også i baggrunden.", Toast.LENGTH_LONG).show();
+        }
+
+
 
         super.onCreate(savedInstanceState);
-        // Request window feature
+
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getSupportActionBar().hide();
 
         fileSystem = new FileSystem(this);
+        System.out.println("Inden loadsettings");
 
+        fileSystem.createSettingFile();
+        Settings settings = new Settings();
+        fileSystem.storeSettings(settings);
 
         loadSettings();
-
+        System.out.println("På den anden side af loadsettings");
         service = new SpotifyService(this);
         service.connect();
-        //spotifyService.refreshSpeakers();
-        // System.out.println("*** NEW GETPLAYING ***: " + playing);
-        // playing = spotify.getPlaying();
-        // System.out.println("*** NEW GETPLAYING ***: " + playing);
-
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // Permission is not granted, request it
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
-        }
         BottomNavigationView navView = findViewById(R.id.nav_view);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-               R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
+               R.id.navigation_music, R.id.navigation_location, R.id.navigation_configuration)
                .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
@@ -144,6 +129,79 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         service.disconnect();
     }
+
+
+
+    /*
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            } else {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    Toast.makeText(this, "Det er nødvendigt at give adgang til placering for at bruge denne service, da det giver adgang til nødvendige Wi-Fi informationer.", Toast.LENGTH_LONG).show();
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
+                } else {
+                    Toast.makeText(this, "Det er nødvendigt at give adgang til placering for at bruge denne service, da det giver adgang til nødvendige Wi-Fi informationer.", Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+    }
+
+
+
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            } else {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
+                    Toast.makeText(this, "Det er nødvendigt at give adgang til placering for at bruge denne service, da det giver adgang til nødvendige Wi-Fi informationer.", Toast.LENGTH_LONG).show();
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, REQUEST_CODE);
+                } else {
+                    Toast.makeText(this, "Det er nødvendigt at give adgang til placering for at bruge denne service, da det giver adgang til nødvendige Wi-Fi informationer.", Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+    }
+
+
+     /*
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission to location granted
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    // Check if background location is necessary
+                    if (!(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
+                        // Ask for permission to background location
+                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, REQUEST_CODE);
+                        Toast.makeText(this, "For at appen kan fungere korrekt i baggrunden, er det nødvendigt at give adgang til baggrundsplacering.", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(this, "Appen fungerer i baggrunden.", Toast.LENGTH_LONG).show();
+                    }
+                }
+            } else {
+                // Permission to location is not granted
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    // Ask for permission again
+                    Toast.makeText(this, "Det er nødvendigt at give adgang til placering for at bruge denne service, da det giver adgang til nødvendige Wi-Fi informationer.", Toast.LENGTH_LONG).show();
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
+                } else {
+                    // Brugeren har afvist tilladelse permanent
+                    Toast.makeText(this, "Det er nødvendigt at give adgang til placering for at bruge denne service, da det giver adgang til nødvendige Wi-Fi informationer. Appen fungerer kun, når den er åben.", Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+    }
+
+      */
+
 
 
 
