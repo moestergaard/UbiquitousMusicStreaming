@@ -24,9 +24,9 @@ public class MusicFragment extends Fragment {
     private MainActivity mainActivity;
     private IService service;
     private View root;
-    ImageView coverImageView;
-    TextView txtViewTrackName, txtViewArtistName, txtViewPlaying, txtViewPlayingOn;
-    AppCompatImageButton playPauseButton, skipNext, skipPrevious;
+    private ImageView coverImageView;
+    private TextView txtViewTrackName, txtViewArtistName, txtViewPlaying, txtViewPlayingOn;
+    private AppCompatImageButton playPauseButton, skipNext, skipPrevious;
     private String playingSpeaker;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -77,7 +77,7 @@ public class MusicFragment extends Fragment {
 
     private void setupService() {
         service = mainActivity.getService();
-        service.attachMusicFragment(this);
+        service.attachFragment(this);
         service.updateActiveDevice();
     }
 

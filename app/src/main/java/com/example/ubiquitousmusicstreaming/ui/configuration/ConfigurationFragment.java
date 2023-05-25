@@ -394,48 +394,6 @@ public class ConfigurationFragment extends Fragment {
         mainActivity.startScan();
     }
 
-    private void getAvailableSpeakers() {
-        final Request request = new Request.Builder()
-                .url("https://api.spotify.com/v1/me/player/devices")
-                .addHeader("Authorization","Bearer " + mainActivity.getAccessToken())
-                .addHeader("Content-Type", "application/json")
-                .get()
-                .build();
-
-        cancelCall();
-        mCall = mOkHttpClient.newCall(request);
-
-        mCall.enqueue(new Callback() {
-
-            @Override
-            public void onFailure(Call call, IOException e) {
-                System.out.println("Noget gik galt.");
-            }
-            @Override
-            public void onResponse(Call call, Response response) {
-                if (response.code() == 200) {
-                    Gson gson = new Gson();
-                    try {
-                        JsonObject json = gson.fromJson(response.body().string(), JsonObject.class);
-                        JsonArray devicesJson = json.getAsJsonArray("devices");
-
-                        List<Device> tmpDevices = new ArrayList<>();
-
-                        for (JsonElement deviceJson : devicesJson) {
-                            Device device = gson.fromJson(deviceJson, Device.class);
-                            tmpDevices.add(device);
-                        }
-
-                        devices = tmpDevices;
-
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
-        });
-    }
-
     private void cancelCall() {
         if (mCall != null) {
             mCall.cancel();

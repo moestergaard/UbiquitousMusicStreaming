@@ -3,10 +3,7 @@ package com.example.ubiquitousmusicstreaming;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-
-import androidx.annotation.NonNull;
-
+import androidx.fragment.app.Fragment;
 import com.example.ubiquitousmusicstreaming.ui.configuration.Device;
 import com.example.ubiquitousmusicstreaming.ui.music.MusicFragment;
 import com.google.gson.Gson;
@@ -22,17 +19,13 @@ import com.spotify.protocol.types.Track;
 import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
-
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
-
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
@@ -47,7 +40,6 @@ public class SpotifyService implements IService {
     private Call mCall;
     private OkHttpClient mOkHttpClient = new OkHttpClient();
     private static List<Device> devices = new ArrayList<>();
-    private String responseMessage;
     private static final String CLIENT_ID = "6e101d8a913048819b5af5e6ee372b59";
     private static final String REDIRECT_URI = "ubiquitousmusicstreaming-login://callback";
     private Integer REQUEST_CODE = 42;
@@ -106,7 +98,6 @@ public class SpotifyService implements IService {
 
             @Override
             public void onFailure(Call call, IOException e) {
-                responseMessage = "Failure";
                 refreshSpeakers();
             }
             @Override
@@ -122,7 +113,6 @@ public class SpotifyService implements IService {
                             Device device = gson.fromJson(deviceJson, Device.class);
                             tmpDevices.add(device);
                         }
-                        responseMessage = "Received";
                         devices = tmpDevices;
                         updateSpeakerNameId();
 
@@ -242,7 +232,6 @@ public class SpotifyService implements IService {
         });
     }
 
-
     public void changeActivationOfDevice() {
         final Boolean[] isPlaying = {true};
         spotifyAppRemote
@@ -255,8 +244,6 @@ public class SpotifyService implements IService {
                                         .getPlayerApi()
                                         .resume();
                                 playing = true;
-                                //isPlaying[0] = false;
-                                //System.out.println("I spotify:" + isPlaying[0]);
                             } else {
                                 spotifyAppRemote
                                         .getPlayerApi()
@@ -265,28 +252,7 @@ public class SpotifyService implements IService {
                             }
                             updateMusicFragmentPlaying();
                         });
-        // System.out.println("end of method: " + isPlaying[0]);
-        // return isPlaying[0];
     }
-
-
-/*
-    public Boolean checkIfPlaying() {
-        final Boolean[] isPlaying = {true};
-        spotifyAppRemote
-                .getPlayerApi()
-                .getPlayerState()
-                .setResultCallback(
-                        playerState -> {
-                            if (playerState.isPaused) {
-                                isPlaying[0] = false;
-                            } else {
-                            }
-                        });
-        return isPlaying[0];
-    }
-
-     */
 
     public void updateActiveDevice() {
         final Request request = new Request.Builder()
@@ -343,11 +309,7 @@ public class SpotifyService implements IService {
                     .pause();
         }
     }
-
+    public void attachFragment(Fragment musicFragment) { this.musicFragment = (MusicFragment) musicFragment; }
     public List<Device> getAvailableDevices() { return devices; }
-    public String getAccessToken() { return accessToken; }
-    public SpotifyAppRemote getSpotifyAppRemote() { return spotifyAppRemote; }
     public Hashtable<String, String> getDeviceNameId() { return speakerNameId; }
-    public void attachMusicFragment(MusicFragment musicFragment) { this.musicFragment = musicFragment; }
-
 }

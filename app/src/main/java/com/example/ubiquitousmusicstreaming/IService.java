@@ -2,6 +2,8 @@ package com.example.ubiquitousmusicstreaming;
 
 import android.content.Intent;
 
+import androidx.fragment.app.Fragment;
+
 import com.example.ubiquitousmusicstreaming.ui.configuration.Device;
 import com.example.ubiquitousmusicstreaming.ui.music.MusicFragment;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
@@ -18,15 +20,6 @@ public interface IService {
     void handleRequest(String request);
     List<Device> getAvailableDevices();
     Hashtable<String, String> getDeviceNameId();
-    // void getInformation(String request);
-
     void changeActivationOfDevice();
-
-
-
-    String getAccessToken();
-    SpotifyAppRemote getSpotifyAppRemote();
-    void attachMusicFragment(MusicFragment musicFragment);
-
-
+    void attachFragment(Fragment fragment);
 }

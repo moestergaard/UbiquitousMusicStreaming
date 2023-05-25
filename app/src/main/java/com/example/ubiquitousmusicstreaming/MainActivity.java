@@ -365,7 +365,6 @@ public class MainActivity extends AppCompatActivity {
     public IService getService() { return service; }
     public WifiReceiver getWifiReceiver() { return wifiReceiver; }
     public static WifiManager getWifiManager() { return wifiManager; }
-    public String getAccessToken() { return service.getAccessToken(); }
     public static Hashtable<String, String> getLocationSpeakerName() { return locationSpeakerName; }
     public String getTrackName() { return trackName; }
     public String getArtistName() { return artistName; }
