@@ -1,15 +1,18 @@
 package com.example.ubiquitousmusicstreaming.FileSystem;
 
 import static android.content.ContentValues.TAG;
+import static android.content.Context.MODE_APPEND;
+import static android.content.Context.MODE_PRIVATE;
 
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.ubiquitousmusicstreaming.Settings;
-
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -70,6 +73,49 @@ public class FileSystem implements IFileSystem {
             Log.d(TAG, "Object written to file");
         } catch (IOException e) {
             Log.e(TAG, "Error writing object to file", e);
+        }
+    }
+
+    public void makeFile(String fileName) {
+        FileOutputStream fos = null;
+        try {
+            fos = context.openFileOutput(fileName, MODE_PRIVATE);
+            fos.write("WIFI DATA \n\n\n".getBytes());
+            Toast.makeText(context, "Fil oprettet med navn: " + fileName, Toast.LENGTH_LONG).show();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if(fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public void writeToFile(String data, String fileName) {
+        FileOutputStream fos = null;
+
+        try {
+            fos = context.openFileOutput(fileName, MODE_APPEND);
+            fos.write(data.getBytes());
+            Toast.makeText(context, "Data tilføjet til: " + fileName, Toast.LENGTH_LONG).show();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if(fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 

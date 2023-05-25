@@ -1,8 +1,5 @@
 package com.example.ubiquitousmusicstreaming.ui.configuration;
 
-import static android.content.Context.MODE_APPEND;
-import static android.content.Context.MODE_PRIVATE;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.net.wifi.ScanResult;
@@ -17,11 +14,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-
-import com.example.ubiquitousmusicstreaming.FileSystem.FileSystem;
 import com.example.ubiquitousmusicstreaming.FileSystem.IFileSystem;
 import com.example.ubiquitousmusicstreaming.Models.Device;
 import com.example.ubiquitousmusicstreaming.Services.IService;
@@ -29,17 +23,12 @@ import com.example.ubiquitousmusicstreaming.MainActivity;
 import com.example.ubiquitousmusicstreaming.R;
 import com.example.ubiquitousmusicstreaming.WifiReceiver;
 import com.example.ubiquitousmusicstreaming.databinding.FragmentConfigurationBinding;
-
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.time.LocalDateTime;
-
 import com.example.ubiquitousmusicstreaming.Settings;
 
 
@@ -54,15 +43,12 @@ public class ConfigurationFragment extends Fragment {
     private Button buttonStartScanning, buttonStopScanning, buttonNewDataFile, buttonStoreDeviceRoom;
     private TextView textViewRoom, textViewDataFile;
     private Spinner spinSpeaker, spinRoom;
-    private ArrayAdapter<String> adapterDevices, adapterRoom;
     private String room, lastScanResults = "";
-    private String FILE_NAME = "";
+    private String fileName = "";
     private String[] locations = new String[]{};
-    private List<Device> devices = new ArrayList<>();
     private String chosenDeviceUniqueName = "", chosenDeviceReadableName = "", chosenRoom = "";
     private Hashtable<String, String> locationDeviceName = new Hashtable<>();
     private Hashtable<String, String> devicesNameID = new Hashtable<>();
-    private List<ScanResult> scanResults;
     private Boolean scan = false;
     private IService service;
 
@@ -80,7 +66,7 @@ public class ConfigurationFragment extends Fragment {
         buttonStartScanning.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (FILE_NAME != null) {
+                if (fileName != null) {
                     room = editTextRoom.getText().toString();
                     if (!room.isEmpty()) {
                         List<String> l = locations != null ? new ArrayList<>(Arrays.asList(locations)) : new ArrayList<>();
@@ -100,7 +86,7 @@ public class ConfigurationFragment extends Fragment {
                         mainActivity.setLocations(locations);
                         mainActivity.setInUseDataCollection(true);
                         mainActivity.setRoomCurrentlyScanning(room);
-                        startScanning();
+                        mainActivity.startScan();
 
                         setupSpeakerRoomSelection(spinSpeaker, spinRoom);
                     } else { Toast.makeText(mainActivity, "Angiv rummets navn", Toast.LENGTH_LONG).show(); }
@@ -132,12 +118,12 @@ public class ConfigurationFragment extends Fragment {
                 builder.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        FILE_NAME = LocalDateTime.now().toString() + ".txt";
-                        makeFile(new View(mainActivity), FILE_NAME);
+                        fileName = LocalDateTime.now().toString() + ".txt";
+                        fileSystem.makeFile(fileName);
                         updateTextViewDataFile();
                         fileSystem.createSettingFile();
                         Settings settings = new Settings();
-                        settings.setFileName(FILE_NAME);
+                        settings.setFileName(fileName);
                         fileSystem.storeSettings(settings);
 
                         mainActivity.loadSettings();
@@ -200,7 +186,7 @@ public class ConfigurationFragment extends Fragment {
         mainActivity = (MainActivity) getParentFragment().getActivity();
         mainActivity.attachConfigurationFragment(this);
 
-        FILE_NAME = mainActivity.getFileName();
+        fileName = mainActivity.getFileName();
         locations = mainActivity.getLocation();
         room = mainActivity.getRoomCurrentlyScanning();
         wifiReceiver = mainActivity.getWifiReceiver();
@@ -208,7 +194,7 @@ public class ConfigurationFragment extends Fragment {
         locationDeviceName = mainActivity.getLocationSpeakerName();
         fileSystem = mainActivity.getFileSystem();
 
-        if (mainActivity.getInUseDataCollection()) { scan = true; startScanning(); }
+        if (mainActivity.getInUseDataCollection()) { scan = true; mainActivity.startScan(); }
     }
 
     private void addLocationToSettings(String room) {
@@ -237,11 +223,9 @@ public class ConfigurationFragment extends Fragment {
         fileSystem.storeSettings(settings);
     }
 
-
-
     private void updateTextViewDataFile() {
-        if (!FILE_NAME.equals("")) {
-            String date = FILE_NAME.split("T")[0];
+        if (!fileName.equals("")) {
+            String date = fileName.split("T")[0];
             textViewDataFile.setText("Nuværende datafil er fra " + date);
         }
     }
@@ -257,7 +241,7 @@ public class ConfigurationFragment extends Fragment {
     }
 
     private void setupSpeakerRoomSelection(Spinner spinSpeaker, Spinner spinRoom) {
-        devices = service.getAvailableDevices();
+        List<Device> devices = service.getAvailableDevices();
         List<String> deviceNames = new ArrayList<>();
 
         if (!devices.isEmpty()) {
@@ -271,13 +255,13 @@ public class ConfigurationFragment extends Fragment {
         deviceNames.toArray(deviceNamesArray);
 
         if (deviceNamesArray != null) {
-            adapterDevices = new ArrayAdapter<String>(mainActivity, R.layout.list_item, deviceNamesArray);
+            ArrayAdapter<String> adapterDevices = new ArrayAdapter<String>(mainActivity, R.layout.list_item, deviceNamesArray);
             adapterDevices.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinSpeaker.setAdapter(adapterDevices);
         }
 
         if (locations != null) {
-            adapterRoom = new ArrayAdapter<String>(mainActivity, R.layout.list_item, locations);
+            ArrayAdapter<String> adapterRoom = new ArrayAdapter<String>(mainActivity, R.layout.list_item, locations);
             adapterRoom.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinRoom.setAdapter(adapterRoom);
         }
@@ -317,38 +301,6 @@ public class ConfigurationFragment extends Fragment {
         locationDeviceName.put(chosenRoom, chosenDeviceReadableName);
     }
 
-    public void update() {
-        scanResults = wifiReceiver.getScanResult();
-        if(lastScanResults.equals("")) {
-            String result = makeScanResultString(scanResults);
-            lastScanResults = result;
-            save(new View(mainActivity), result, FILE_NAME);
-        }
-        else {
-            String resultElse = makeScanResultString(scanResults);
-            Boolean newAndLastScanAreEqual = !lastScanResults.equals(resultElse);
-            if(newAndLastScanAreEqual) {
-                System.out.println("***************");
-                System.out.println("lastscanresults: " + lastScanResults);
-                System.out.println("elseResult: " + resultElse);
-                System.out.println("--------------");
-                System.out.println(lastScanResults.equals(resultElse));
-                System.out.println("--------------");
-                System.out.println("***************");
-                save(new View(mainActivity), resultElse, FILE_NAME);
-            }
-            lastScanResults = resultElse;
-        }
-
-        if(scan) {
-            wifiReceiver.clearScanResult();
-            startScanning();
-        }
-
-    }
-
-
-
     private String makeScanResultString(List<ScanResult> scanResults) {
 
         String scanResultString = "Scanning: " + room + "\n\n";
@@ -364,52 +316,33 @@ public class ConfigurationFragment extends Fragment {
         return scanResultString;
     }
 
-    private void startScanning() {
-        mainActivity.startScan();
-    }
 
-    public void makeFile(View v, String fileName) {
-        FileOutputStream fos = null;
-
-        try {
-            fos = mainActivity.openFileOutput(fileName, MODE_PRIVATE);
-            fos.write("WIFI DATA \n\n\n".getBytes());
-
-            Toast.makeText(mainActivity, "Fil oprettet med navn: " + fileName, Toast.LENGTH_LONG).show();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if(fos != null) {
-                try {
-                    fos.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+    public void update() {
+        List<ScanResult> scanResults = wifiReceiver.getScanResult();
+        if(lastScanResults.equals("")) {
+            String result = makeScanResultString(scanResults);
+            lastScanResults = result;
+            fileSystem.writeToFile(result, fileName);
         }
-    }
-
-    public void save(View v, String data, String fileName) {
-        FileOutputStream fos = null;
-
-        try {
-            fos = mainActivity.openFileOutput(fileName, MODE_APPEND);
-            fos.write(data.getBytes());
-            Toast.makeText(mainActivity, "Data tilføjet til: " + fileName, Toast.LENGTH_LONG).show();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if(fos != null) {
-                try {
-                    fos.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        else {
+            String resultElse = makeScanResultString(scanResults);
+            Boolean newAndLastScanAreEqual = !lastScanResults.equals(resultElse);
+            if(newAndLastScanAreEqual) {
+                System.out.println("***************");
+                System.out.println("lastscanresults: " + lastScanResults);
+                System.out.println("elseResult: " + resultElse);
+                System.out.println("--------------");
+                System.out.println(lastScanResults.equals(resultElse));
+                System.out.println("--------------");
+                System.out.println("***************");
+                fileSystem.writeToFile(resultElse, fileName);
             }
+            lastScanResults = resultElse;
+        }
+
+        if(scan) {
+            wifiReceiver.clearScanResult();
+            mainActivity.startScan();
         }
     }
 }
