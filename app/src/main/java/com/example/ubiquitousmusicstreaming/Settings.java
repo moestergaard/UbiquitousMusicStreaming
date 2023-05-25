@@ -1,7 +1,6 @@
 package com.example.ubiquitousmusicstreaming;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Hashtable;
 
 public class Settings implements Serializable {
@@ -38,16 +37,5 @@ public class Settings implements Serializable {
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
-
-    /*
-    public static String convertToString() {
-        return "Settings{" +
-                "locationSpeakerID=" + locationSpeakerID +
-                ", locations=" + Arrays.toString(locations) +
-                ", fileName='" + fileName + '\'' +
-                '}';
-    }
-
-     */
 }
 

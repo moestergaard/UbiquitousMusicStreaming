@@ -13,6 +13,7 @@ import android.view.Window;
 import android.widget.Toast;
 import com.example.ubiquitousmusicstreaming.DataManagement.DataManagementNN;
 import com.example.ubiquitousmusicstreaming.DataManagement.DataManagementSVM;
+import com.example.ubiquitousmusicstreaming.DataManagement.IDataManagement;
 import com.example.ubiquitousmusicstreaming.FileSystem.FileSystem;
 import com.example.ubiquitousmusicstreaming.FileSystem.IFileSystem;
 import com.example.ubiquitousmusicstreaming.Services.IService;
@@ -39,24 +40,23 @@ public class MainActivity extends AppCompatActivity {
     private Integer REQUEST_CODE = 42;
     private static WifiReceiver wifiReceiver;
     private IFileSystem fileSystem;
-    private static WifiManager wifiManager;
-    private static ConfigurationFragment configurationFragment;
-    private static LocationFragment locationFragment;
-    private static MusicFragment musicFragment;
-    private static Boolean inUse = false, inUseTemp, inUseDataCollection = false;
-    private static DataManagementNN dmNN;
-    private static DataManagementSVM dmSVM;
-    private static String predictedRoom, previousLocation = "";
+    private WifiManager wifiManager;
+    private ConfigurationFragment configurationFragment;
+    private LocationFragment locationFragment;
+    private Boolean inUse = false, inUseTemp, inUseDataCollection = false;
+    private IDataManagement dmNN;
+    private IDataManagement dmSVM;
+    private String predictedRoom, previousLocation = "";
     private String[] locations;
     private final String[] locationsHardcodedForModelPurpose = new String[]{"Kontor", "Stue", "Køkken"};
     private String fileName = "";
-    private static String lastLocationFragmentTextView = "";
+    private String lastLocationFragmentTextView = "";
     private IService service;
-    private static Hashtable<String, String> locationSpeakerName = new Hashtable<>();
+    private Hashtable<String, String> locationSpeakerName = new Hashtable<>();
     private String trackName;
     private String artistName;
     private Bitmap coverImage;
-    private static Boolean playing;
+    private Boolean playing;
     private String roomCurrentlyScanning;
     private Boolean previousWasOutside = false;
     private String playingSpeaker = "";
@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().hide();
 
         fileSystem = new FileSystem(this);
-        loadSettings();
+        initializeSettings();
         service = new SpotifyService(this);
         service.connect();
         binding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -97,17 +97,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        service.disconnect();
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
         if (requestCode == REQUEST_CODE) {
             service.handleAuthorizationResponse(resultCode, intent);
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        service.disconnect();
     }
 
     @Override
@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 } else previousLocation = predictedRoom;
                 previousWasOutside = isOutsideArea;
-                wifiManager.startScan();
+                startScan();
             }
         }
         else { inUse = false; }
@@ -174,10 +174,14 @@ public class MainActivity extends AppCompatActivity {
         locationSpeakerName = _locationSpeakerName;
     }
 
-    public void loadSettings(){
+    public void initializeSettings(){
         Settings settings = fileSystem.loadSettings();
 
-        if (settings != null) {
+        if (settings == null) {
+            fileSystem.createSettingFile();
+            Settings newSettings = new Settings();
+            fileSystem.storeSettings(newSettings);
+        } else {
             String fileName = settings.getFileName();
             if (fileName != null) {
                 this.fileName = fileName;
@@ -202,6 +206,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
     public void setInUse(Boolean bool) {
         if (bool) {
             inUse = inUseTemp = true;
@@ -209,16 +214,15 @@ public class MainActivity extends AppCompatActivity {
             inUseTemp = false;
         }
     }
-    public static void startScan() { wifiManager.startScan(); }
+
+    public void startScan() { wifiManager.startScan(); }
     public String getFileName() { return fileName; }
     public String[] getLocation() { return locations; }
     public Boolean getInUse() { return inUse; }
-    public Boolean getInUseTemp() { return inUseTemp; }
     public String getLastLocationFragmentTextView() { return lastLocationFragmentTextView; }
     public IService getService() { return service; }
     public WifiReceiver getWifiReceiver() { return wifiReceiver; }
-    public static WifiManager getWifiManager() { return wifiManager; }
-    public static Hashtable<String, String> getLocationSpeakerName() { return locationSpeakerName; }
+    public Hashtable<String, String> getLocationSpeakerName() { return locationSpeakerName; }
     public String getTrackName() { return trackName; }
     public String getArtistName() { return artistName; }
     public Bitmap getCoverImage() { return coverImage; }
@@ -227,7 +231,6 @@ public class MainActivity extends AppCompatActivity {
     public Boolean getInUseDataCollection() { return inUseDataCollection; }
     public String getPlayingSpeaker() { return playingSpeaker; }
     public IFileSystem getFileSystem() { return fileSystem; }
-    public void attachMusicFragment(MusicFragment musicFragment) { this.musicFragment = musicFragment; }
     public void attachConfigurationFragment(ConfigurationFragment configurationFragment) { this.configurationFragment = configurationFragment; }
     public void attachLocationFragment(LocationFragment locationFragment) { this.locationFragment = locationFragment; }
     public void setLastLocationFragmentTextView(String lastLocation) { lastLocationFragmentTextView = lastLocation; }

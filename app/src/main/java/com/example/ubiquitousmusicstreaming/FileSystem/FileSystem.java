@@ -49,8 +49,10 @@ public class FileSystem implements IFileSystem {
 
     public Settings loadSettings() {
         File settingFile = new File(context.getFilesDir(), "Setting");
+
         if (!settingFile.exists()) {
-            createSettingFile();
+            return null;
+            // createSettingFile();
         }
         try {
             FileInputStream fileInputStream = context.openFileInput("Setting");

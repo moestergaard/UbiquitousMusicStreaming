@@ -124,7 +124,7 @@ public class ConfigurationFragment extends Fragment {
                         settings.setFileName(fileName);
                         fileSystem.storeSettings(settings);
 
-                        mainActivity.loadSettings();
+                        mainActivity.initializeSettings();
                         locations = new String[]{};
                         locationDeviceName = new Hashtable<>();
                         devicesNameID = new Hashtable<>();
