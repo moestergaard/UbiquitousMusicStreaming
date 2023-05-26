@@ -16,5 +16,4 @@ public interface IService {
     List<Device> getAvailableDevices();
     Hashtable<String, String> getDeviceNameId();
     void changeActivationOfDevice();
-    void attachFragment(Fragment fragment);
 }

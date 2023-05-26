@@ -7,7 +7,7 @@ import com.example.ubiquitousmusicstreaming.Settings;
 import java.io.File;
 
 public interface IFileSystem {
-    File createSettingFile();
+    void createSettingFile();
     Settings loadSettings();
     void storeSettings(Settings settings);
     void makeFile(String fileName);

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import androidx.fragment.app.Fragment;
 
+import com.example.ubiquitousmusicstreaming.MainActivity;
 import com.example.ubiquitousmusicstreaming.Models.Device;
 import com.example.ubiquitousmusicstreaming.ui.music.MusicFragment;
 import com.google.gson.Gson;
@@ -37,7 +38,7 @@ import okhttp3.Response;
 
 public class SpotifyService implements IService {
 
-    private final Context context;
+    private final MainActivity mainActivity;
     private Call mCall;
     private final OkHttpClient mOkHttpClient = new OkHttpClient();
     private static List<Device> devices = new ArrayList<>();
@@ -50,8 +51,8 @@ public class SpotifyService implements IService {
     private Boolean playing;
     private String playingSpeaker = "";
 
-    public SpotifyService(Context context) {
-        this.context = context;
+    public SpotifyService(MainActivity mainActivity) {
+        this.mainActivity = mainActivity;
         connect();
     }
 
@@ -63,7 +64,7 @@ public class SpotifyService implements IService {
         AuthorizationRequest request = builder.build();
 
         Integer REQUEST_CODE = 42;
-        AuthorizationClient.openLoginActivity((Activity) context, REQUEST_CODE, request);
+        AuthorizationClient.openLoginActivity(mainActivity, REQUEST_CODE, request);
     }
 
     private void subscribeToTrack() {
@@ -133,7 +134,7 @@ public class SpotifyService implements IService {
                 speakerNameId.put(d.getName(), d.getId());
                 if (d.isActive()) {
                     playingSpeaker = d.getName();
-                    updateMusicFragmentSpeaker();
+                    updateMainActivitySpeaker();
                 }
             }
         }
@@ -156,11 +157,11 @@ public class SpotifyService implements IService {
                         });
     }
 
-    private void updateMusicFragmentPlaying() {musicFragment.updatePlaying(playing);}
-    private void updateMusicFragmentSpeaker() { musicFragment.updatePlayingSpeaker(playingSpeaker); }
+    private void updateMainActivityPlaying() { mainActivity.updatePlaying(playing); }
+    private void updateMainActivitySpeaker() { mainActivity.updateSpeaker(playingSpeaker); }
 
     public void connect() {
-        SpotifyAppRemote.connect(context, new ConnectionParams.Builder(CLIENT_ID)
+        SpotifyAppRemote.connect(mainActivity, new ConnectionParams.Builder(CLIENT_ID)
                 .setRedirectUri(REDIRECT_URI)
                 .showAuthView(true)
                 .build(), new Connector.ConnectionListener() {
@@ -171,7 +172,7 @@ public class SpotifyService implements IService {
                 subscribeToTrack();
                 retrieveAccessToken();
                 refreshSpeakers();
-                updateMusicFragmentPlaying();
+                updateMainActivityPlaying();
                 updateActiveDevice();
             }
 
@@ -250,7 +251,7 @@ public class SpotifyService implements IService {
                                         .pause();
                                 playing = false;
                             }
-                            updateMusicFragmentPlaying();
+                            updateMainActivityPlaying();
                         });
     }
 
@@ -278,7 +279,7 @@ public class SpotifyService implements IService {
                             Device device = gson.fromJson(deviceJson, Device.class);
                             if (device.isActive()) {
                                 playingSpeaker = device.getName();
-                                updateMusicFragmentSpeaker();
+                                updateMainActivitySpeaker();
                             }
                         }
                     } catch (IOException e) {
@@ -314,7 +315,6 @@ public class SpotifyService implements IService {
                 break;
         }
     }
-    public void attachFragment(Fragment musicFragment) { this.musicFragment = (MusicFragment) musicFragment; }
     public List<Device> getAvailableDevices() { return devices; }
     public Hashtable<String, String> getDeviceNameId() { return speakerNameId; }
 }

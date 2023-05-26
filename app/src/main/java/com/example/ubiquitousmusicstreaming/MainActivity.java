@@ -32,6 +32,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.example.ubiquitousmusicstreaming.databinding.ActivityMainBinding;
+import com.example.ubiquitousmusicstreaming.ui.music.MusicFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.Hashtable;
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private WifiManager wifiManager;
     private ConfigurationFragment configurationFragment;
     private LocationFragment locationFragment;
+    private MusicFragment musicFragment;
     private Boolean inUse = false, inUseTemp, inUseDataCollection = false;
     private IDataManagement dmNN;
     private IDataManagement dmSVM;
@@ -231,7 +233,6 @@ public class MainActivity extends AppCompatActivity {
     public String[] getLocation() { return locations; }
     public Boolean getInUse() { return inUse; }
     public String getLastLocationFragmentTextView() { return lastLocationFragmentTextView; }
-    public IService getService() { return service; }
     public Hashtable<String, String> getLocationSpeakerName() { return locationSpeakerName; }
     public String getTrackName() { return trackName; }
     public String getArtistName() { return artistName; }
@@ -246,6 +247,7 @@ public class MainActivity extends AppCompatActivity {
     public Hashtable<String, String> getDeviceNameId() { return service.getDeviceNameId(); }
     public void attachConfigurationFragment(ConfigurationFragment configurationFragment) { this.configurationFragment = configurationFragment; }
     public void attachLocationFragment(LocationFragment locationFragment) { this.locationFragment = locationFragment; }
+    public void attachMusicFragment(MusicFragment musicFragment) { this.musicFragment = musicFragment; }
     public void setLastLocationFragmentTextView(String lastLocation) { lastLocationFragmentTextView = lastLocation; }
     public void setInUseDataCollection(Boolean bool) { inUseDataCollection = bool; }
     public void setTrackName(String trackName) { this.trackName = trackName; }
@@ -257,5 +259,23 @@ public class MainActivity extends AppCompatActivity {
     public void removeLocationFragment() {locationFragment = null ;}
     public void clearScanResult() { wifiReceiver.clearScanResult(); }
     public void changeDevice(String deviceId) { service.changeDevice(deviceId); }
+    public void changeActivationOfDevice() { service.changeActivationOfDevice(); }
+    public void handleRequestDevice(String request) {
+        service.handleRequest(request);
+
+        switch (request) {
+            case "pause": setPlaying(false);
+            default: setPlaying(true);
+        }
+    }
+    public void updateActiveDevice() {service.updateActiveDevice();}
+    public void updatePlaying(Boolean playing) {
+        this.playing = playing;
+        musicFragment.updatePlaying(this.playing);
+    }
+    public void updateSpeaker(String playingSpeaker) {
+        this.playingSpeaker = playingSpeaker;
+        musicFragment.updatePlayingSpeaker(this.playingSpeaker);
+    }
     public void setLocations(String[] locations) { this.locations = locations; }
 }

@@ -25,13 +25,12 @@ public class FileSystem implements IFileSystem {
         this.context = context;
     }
 
-    public File createSettingFile() {
+    public void createSettingFile() {
         File settingFile = new File(context.getFilesDir(), "Setting");
 
         if (settingFile.exists()) {
             if (!settingFile.delete()) {
                 Log.e(TAG, "Error deleting existing setting file");
-                return null;
             }
         }
         try {
@@ -44,7 +43,6 @@ public class FileSystem implements IFileSystem {
             e.printStackTrace();
             Log.e(TAG, "Error creating setting file", e);
         }
-        return settingFile;
     }
 
     public Settings loadSettings() {
