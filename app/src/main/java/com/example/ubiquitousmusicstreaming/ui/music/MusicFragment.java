@@ -1,5 +1,6 @@
 package com.example.ubiquitousmusicstreaming.ui.music;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -31,6 +32,7 @@ public class MusicFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
+        assert getParentFragment() != null;
         mainActivity = (MainActivity) getParentFragment().getActivity();
 
         setupService();
@@ -40,31 +42,20 @@ public class MusicFragment extends Fragment {
         Boolean playing = mainActivity.getPlaying();
         updatePlaying(playing);
 
-        playPauseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                service.changeActivationOfDevice();
-            }
+        playPauseButton.setOnClickListener(view -> service.changeActivationOfDevice());
+
+        skipNext.setOnClickListener(view -> {
+            service.handleRequest("next");
+            playPauseButton.setImageResource(R.drawable.btn_pause);
+            mainActivity.setPlaying(true);
+            updateTxtViews(true);
         });
 
-        skipNext.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                service.handleRequest("next");
-                playPauseButton.setImageResource(R.drawable.btn_pause);
-                mainActivity.setPlaying(true);
-                updateTxtViews(true);
-            }
-        });
-
-        skipPrevious.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                service.handleRequest("prev");
-                playPauseButton.setImageResource(R.drawable.btn_pause);
-                mainActivity.setPlaying(true);
-                updateTxtViews(true);
-            }
+        skipPrevious.setOnClickListener(view -> {
+            service.handleRequest("prev");
+            playPauseButton.setImageResource(R.drawable.btn_pause);
+            mainActivity.setPlaying(true);
+            updateTxtViews(true);
         });
         return root;
     }
@@ -94,10 +85,11 @@ public class MusicFragment extends Fragment {
         txtViewPlayingOn = binding.playingOn;
     }
 
+    @SuppressLint("SetTextI18n")
     private void updateTxtViews(Boolean playing) {
         if (playing) {
             service.updateActiveDevice();
-            if (mainActivity.getPlayingSpeaker() != "") {
+            if (!mainActivity.getPlayingSpeaker().equals("")) {
                 txtViewPlaying.setText("Afspiller på");
                 txtViewPlayingOn.setText(mainActivity.getPlayingSpeaker());
             }
@@ -141,14 +133,12 @@ public class MusicFragment extends Fragment {
         mainActivity.setArtistName(artistName);
     }
 
+    @SuppressLint("SetTextI18n")
     public void updatePlayingSpeaker(String speakerName) {
         playingSpeaker = speakerName;
-        mainActivity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                txtViewPlaying.setText("Afspiller på");
-                txtViewPlayingOn.setText(playingSpeaker);
-            }
+        mainActivity.runOnUiThread(() -> {
+            txtViewPlaying.setText("Afspiller på");
+            txtViewPlayingOn.setText(playingSpeaker);
         });
         mainActivity.setPlayingSpeaker(playingSpeaker);
     }
