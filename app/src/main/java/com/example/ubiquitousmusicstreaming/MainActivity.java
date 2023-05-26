@@ -1,6 +1,5 @@
 package com.example.ubiquitousmusicstreaming;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -44,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private ConfigurationFragment configurationFragment;
     private LocationFragment locationFragment;
     private MusicFragment musicFragment;
-    private Boolean inUse = false, inUseTemp, inUseDataCollection = false;
+    private Boolean inUseTracking = false, inUseDataCollection = false;
     private IDataManagement dmNN;
     private IDataManagement dmSVM;
     private String previousLocation = "";
@@ -134,13 +133,11 @@ public class MainActivity extends AppCompatActivity {
         String predictedRoom = locationsHardcodedForModelPurpose[locationIndex];
         boolean isOutsideArea = checkIfOutsideArea(scanResults);
 
-        if (inUseTemp) {
-            if (isOutsideArea && previousWasOutside) { return "outside"; }
-            if (predictedRoom.equals(previousLocation)) { return predictedRoom; }
-            previousLocation = predictedRoom;
-            previousWasOutside = isOutsideArea;
-            return null;
-            }
+        if (isOutsideArea && previousWasOutside) { return "outside"; }
+        if (predictedRoom.equals(previousLocation)) { return predictedRoom; }
+
+        previousLocation = predictedRoom;
+        previousWasOutside = isOutsideArea;
         return null;
     }
 
@@ -202,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void update() {
-        if (inUse) {
+        if (inUseTracking) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "Det er nødvendigt at give adgang til placering for at bruge denne service, da det giver adgang til nødvendige Wi-Fi informationer.", Toast.LENGTH_LONG).show();
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
@@ -237,8 +234,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-            if (inUseTemp) { startScan(); }
-            else { inUse = false; }
+            startScan();
         } else {
             if(inUseDataCollection) {
                 if(configurationFragment != null) {
@@ -250,17 +246,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setInUse(Boolean bool) {
-        if (bool) {
-            inUse = inUseTemp = true;
-        } else {
-            inUse = inUseTemp = false;
-        }
+        inUseTracking = bool;
     }
 
     public void startScan() { wifiManager.startScan(); }
     public String getFileName() { return fileName; }
     public String[] getLocation() { return locations; }
-    public Boolean getInUse() { return inUse; }
+    public Boolean getInUseTracking() { return inUseTracking; }
     public String getLastLocationFragmentTextView() { return lastLocationFragmentTextView; }
     public Hashtable<String, String> getLocationSpeakerName() { return locationSpeakerName; }
     public String getTrackName() { return trackName; }

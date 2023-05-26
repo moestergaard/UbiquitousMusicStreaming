@@ -87,7 +87,7 @@ public class LocationFragment extends Fragment {
 
     private void setupFromMainActivity() {
         mainActivity = (MainActivity) getParentFragment().getActivity();
-        inUse = mainActivity.getInUse();
+        inUse = mainActivity.getInUseTracking();
         locationSpeakerName = mainActivity.getLocationSpeakerName();
     }
 
