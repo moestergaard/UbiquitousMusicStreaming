@@ -2,7 +2,6 @@ package com.example.ubiquitousmusicstreaming.ui.configurationUI;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.net.wifi.ScanResult;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +15,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import com.example.ubiquitousmusicstreaming.FileSystem.IFileSystem;
 import com.example.ubiquitousmusicstreaming.Models.Device;
 import com.example.ubiquitousmusicstreaming.MainActivity;
 import com.example.ubiquitousmusicstreaming.R;
@@ -29,31 +27,28 @@ import java.util.List;
 import java.time.LocalDateTime;
 import com.example.ubiquitousmusicstreaming.Settings;
 
-
 public class ConfigurationFragment extends Fragment {
 
     private FragmentConfigurationBinding binding;
-    private IFileSystem fileSystem;
     private MainActivity mainActivity;
     private EditText editTextRoom;
     private View root;
     private Button buttonStartScanning, buttonStopScanning, buttonNewDataFile, buttonStoreDeviceRoom;
     private TextView textViewRoom, textViewDataFile;
-    private Spinner spinSpeaker, spinRoom;
-    private String room, lastScanResults = "";
+    private Spinner spinDevices, spinRoom;
+    private String room;
     private String fileName = "";
     private String[] locations = new String[]{};
     private String chosenDeviceUniqueName = "", chosenDeviceReadableName = "", chosenRoom = "";
     private Hashtable<String, String> locationDeviceName = new Hashtable<>();
     private Hashtable<String, String> devicesNameID = new Hashtable<>();
-    private Boolean scan = false;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
         setupFromMainActivity();
         setupBindings(inflater, container);
-        setupSpeakerRoomSelection(spinSpeaker, spinRoom);
+        setupDeviceRoomSelection(spinDevices, spinRoom);
         updateTextViewDataFile();
         updateButtonsScanningActive(false);
         updateTextViewRoom(room);
@@ -68,7 +63,7 @@ public class ConfigurationFragment extends Fragment {
 
                         if (!l.contains(room)) {
                             l.add(room);
-                            addLocationToSettings(room);
+                            mainActivity.addLocationToSettings(room);
                         }
 
                         if (locations != null) {
@@ -77,13 +72,12 @@ public class ConfigurationFragment extends Fragment {
 
                         editTextRoom.getText().clear();
                         updateTextViewRoom(room);
-                        scan = true;
                         mainActivity.setLocations(locations);
                         mainActivity.setInUseDataCollection(true);
                         mainActivity.setRoomCurrentlyScanning(room);
                         mainActivity.startScan();
 
-                        setupSpeakerRoomSelection(spinSpeaker, spinRoom);
+                        setupDeviceRoomSelection(spinDevices, spinRoom);
                     } else { Toast.makeText(mainActivity, "Angiv rummets navn", Toast.LENGTH_LONG).show(); }
                 }
                 else { textViewRoom.setText("Lav en ny datafil først"); }
@@ -93,7 +87,6 @@ public class ConfigurationFragment extends Fragment {
         buttonStopScanning.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                scan = false;
                 mainActivity.setInUseDataCollection(false);
                 mainActivity.setRoomCurrentlyScanning(null);
                 String message = "Scanning stoppet for: ";
@@ -113,18 +106,15 @@ public class ConfigurationFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         fileName = LocalDateTime.now().toString() + ".txt";
-                        fileSystem.makeFile(fileName);
                         updateTextViewDataFile();
-                        fileSystem.createSettingFile();
-                        Settings settings = new Settings();
-                        settings.setFileName(fileName);
-                        fileSystem.storeSettings(settings);
 
+                        mainActivity.makeFile(fileName);
                         mainActivity.initializeSettings();
+
                         locations = new String[]{};
                         locationDeviceName = new Hashtable<>();
                         devicesNameID = new Hashtable<>();
-                        setupSpeakerRoomSelection(spinSpeaker, spinRoom);
+                        setupDeviceRoomSelection(spinDevices, spinRoom);
                     }
                 });
 
@@ -143,9 +133,9 @@ public class ConfigurationFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if(!chosenDeviceUniqueName.equals("") && !chosenRoom.equals("")) {
-                    changeLocationSpeakerName();
-                    addLocationSpeakerNameToSettings();
-                    mainActivity.updateLocationSpeakerName(locationDeviceName);
+                    changeLocationDeviceName();
+                    addLocationDeviceNameToSettings();
+                    mainActivity.updateLocationDeviceName(locationDeviceName);
                     Toast.makeText(mainActivity, "Rum: " + chosenRoom + "\nHøjtaler: " + chosenDeviceReadableName, Toast.LENGTH_LONG).show();
                 }
                 else {
@@ -172,7 +162,7 @@ public class ConfigurationFragment extends Fragment {
         buttonStoreDeviceRoom = binding.btnStoreDeviceRoom;
         textViewRoom = binding.textRoom;
         textViewDataFile = binding.textFileName;
-        spinSpeaker = binding.spinnerDevice;
+        spinDevices = binding.spinnerDevice;
         spinRoom = binding.spinnerRoom;
     }
 
@@ -182,15 +172,11 @@ public class ConfigurationFragment extends Fragment {
 
         locations = mainActivity.getLocation();
         room = mainActivity.getRoomCurrentlyScanning();
-        locationDeviceName = mainActivity.getLocationSpeakerName();
-        fileSystem = mainActivity.getFileSystem();
+        locationDeviceName = mainActivity.getLocationDeviceName();
         fileName = mainActivity.getFileName();
         if(fileName.equals("")) { fileName = LocalDateTime.now().toString() + ".txt"; }
-
-        if (mainActivity.getInUseDataCollection()) { scan = true; mainActivity.startScan(); }
+        if (mainActivity.getInUseDataCollection()) { mainActivity.startScan(); }
     }
-
-
 
     private void updateTextViewDataFile() {
         if (!fileName.equals("")) {
@@ -213,33 +199,15 @@ public class ConfigurationFragment extends Fragment {
         }
     }
 
-    private void addLocationToSettings(String room) {
-        Settings settings = fileSystem.loadSettings();
-
-        if (settings != null) {
-            String[] locations = settings.getLocations();
-            String[] newLocations;
-            if (locations != null) {
-                newLocations = Arrays.copyOf(locations, locations.length + 1);
-            } else {
-                newLocations = new String[1];
-            }
-
-            newLocations[newLocations.length - 1] = room;
-            settings.setLocations(newLocations);
-        }
-        fileSystem.storeSettings(settings);
-    }
-
-    private void addLocationSpeakerNameToSettings() {
-        Settings settings = fileSystem.loadSettings();
+    private void addLocationDeviceNameToSettings() {
+        Settings settings = mainActivity.getSettings();
         if (settings != null) {
             settings.setLocationSpeakerName(locationDeviceName);
         }
-        fileSystem.storeSettings(settings);
+        mainActivity.storeSettings(settings);
     }
 
-    private void setupSpeakerRoomSelection(Spinner spinSpeaker, Spinner spinRoom) {
+    private void setupDeviceRoomSelection(Spinner spinDevices, Spinner spinRoom) {
         List<Device> devices = mainActivity.getAvailableDevices();
         List<String> deviceNames = new ArrayList<>();
 
@@ -253,11 +221,9 @@ public class ConfigurationFragment extends Fragment {
         String[] deviceNamesArray = new String[deviceNames.size()];
         deviceNames.toArray(deviceNamesArray);
 
-        if (deviceNamesArray != null) {
-            ArrayAdapter<String> adapterDevices = new ArrayAdapter<String>(mainActivity, R.layout.list_item, deviceNamesArray);
-            adapterDevices.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinSpeaker.setAdapter(adapterDevices);
-        }
+        ArrayAdapter<String> adapterDevices = new ArrayAdapter<String>(mainActivity, R.layout.list_item, deviceNamesArray);
+        adapterDevices.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinDevices.setAdapter(adapterDevices);
 
         if (locations != null) {
             ArrayAdapter<String> adapterRoom = new ArrayAdapter<String>(mainActivity, R.layout.list_item, locations);
@@ -265,7 +231,7 @@ public class ConfigurationFragment extends Fragment {
             spinRoom.setAdapter(adapterRoom);
         }
 
-        spinSpeaker.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        spinDevices.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 chosenDeviceReadableName = adapterView.getItemAtPosition(i).toString();
@@ -285,9 +251,9 @@ public class ConfigurationFragment extends Fragment {
         });
     }
 
-    private void changeLocationSpeakerName() {
-        Boolean containsChosenSpeaker = locationDeviceName.containsValue(chosenDeviceReadableName);
-        while (containsChosenSpeaker) {
+    private void changeLocationDeviceName() {
+        boolean containsChosenDevices = locationDeviceName.containsValue(chosenDeviceReadableName);
+        while (containsChosenDevices) {
             Iterator<String> iterator = locationDeviceName.keySet().iterator();
             while (iterator.hasNext()) {
                 String key = iterator.next();
@@ -295,44 +261,8 @@ public class ConfigurationFragment extends Fragment {
                     iterator.remove();
                 }
             }
-            containsChosenSpeaker = locationDeviceName.containsValue(chosenDeviceReadableName);
+            containsChosenDevices = locationDeviceName.containsValue(chosenDeviceReadableName);
         }
         locationDeviceName.put(chosenRoom, chosenDeviceReadableName);
-    }
-
-    private String makeScanResultString(List<ScanResult> scanResults) {
-
-        String scanResultString = "Scanning: " + room + "\n\n";
-
-        for (ScanResult result : scanResults) {
-            scanResultString += "SSID: " + result.SSID + "\n";
-            scanResultString += "BSSID: " + result.BSSID + "\n";
-            scanResultString += "ResultLevel: " + result.level + "\n";
-            scanResultString += "Frequency: " + result.frequency + "\n";
-            scanResultString += "Timestamp: " + result.timestamp + "\n\n\n";
-        }
-        scanResultString += "************** \n\n";
-        return scanResultString;
-    }
-
-    public void update() {
-        List<ScanResult> scanResults = mainActivity.getScanResult();
-        if(lastScanResults.equals("")) {
-            String result = makeScanResultString(scanResults);
-            lastScanResults = result;
-            fileSystem.writeToFile(result, fileName);
-        }
-        else {
-            String resultElse = makeScanResultString(scanResults);
-            Boolean newAndLastScanAreEqual = !lastScanResults.equals(resultElse);
-            if(newAndLastScanAreEqual) {
-                fileSystem.writeToFile(resultElse, fileName);
-            }
-            lastScanResults = resultElse;
-        }
-        if(scan) {
-            mainActivity.clearScanResult();
-            mainActivity.startScan();
-        }
     }
 }

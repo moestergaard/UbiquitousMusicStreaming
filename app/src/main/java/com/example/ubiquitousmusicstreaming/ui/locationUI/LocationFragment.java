@@ -86,7 +86,7 @@ public class LocationFragment extends Fragment {
     private void setupFromMainActivity() {
         mainActivity = (MainActivity) getParentFragment().getActivity();
         inUse = mainActivity.getInUseTracking();
-        locationSpeakerName = mainActivity.getLocationSpeakerName();
+        locationSpeakerName = mainActivity.getLocationDeviceName();
     }
 
     @SuppressLint("SetTextI18n")

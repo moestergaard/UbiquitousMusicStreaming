@@ -11,6 +11,9 @@ import android.os.Bundle;
 import android.Manifest;
 import android.view.Window;
 import android.widget.Toast;
+
+import com.example.ubiquitousmusicstreaming.Configuration.Configuration;
+import com.example.ubiquitousmusicstreaming.Configuration.IConfiguration;
 import com.example.ubiquitousmusicstreaming.DataManagement.DataManagementNN;
 import com.example.ubiquitousmusicstreaming.DataManagement.DataManagementSVM;
 import com.example.ubiquitousmusicstreaming.DataManagement.IDataManagement;
@@ -33,6 +36,8 @@ import androidx.navigation.ui.NavigationUI;
 import com.example.ubiquitousmusicstreaming.databinding.ActivityMainBinding;
 import com.example.ubiquitousmusicstreaming.ui.musicUI.MusicFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -60,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private List<ScanResult> scanResult;
     private String currentLocation;
     private ILocation locationClass;
+    private IConfiguration configurationClass;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,14 +79,14 @@ public class MainActivity extends AppCompatActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getSupportActionBar().hide();
 
-        setupView();
         setupVariables();
+        setupView();
+
     }
 
     private void setupView() {
         com.example.ubiquitousmusicstreaming.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
         BottomNavigationView navView = findViewById(R.id.nav_view);
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_music, R.id.navigation_location, R.id.navigation_configuration)
@@ -104,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
         IDataManagement dmSVM = new DataManagementSVM(this);
 
         locationClass = new Location(dmNN, dmSVM);
+        configurationClass = new Configuration(this);
     }
 
     @Override
@@ -176,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
         if(inUseDataCollection) {
             if(configurationFragment != null) {
                 scanResult = wifiReceiver.getScanResult();
-                configurationFragment.update();
+                configurationClass.update(scanResult, inUseDataCollection, roomCurrentlyScanning);
             }
         } else if (inUseTracking) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -215,6 +222,22 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private Settings addLocationToSettings(String room, Settings settings) {
+        if (settings != null) {
+            String[] locations = settings.getLocations();
+            String[] newLocations;
+            if (locations != null) {
+                newLocations = Arrays.copyOf(locations, locations.length + 1);
+            } else {
+                newLocations = new String[1];
+            }
+
+            newLocations[newLocations.length - 1] = room;
+            settings.setLocations(newLocations);
+        }
+        return settings;
+    }
+
     public void startScan() { wifiManager.startScan(); }
     public void handleRequestDevice(String request) {
         service.handleRequest(request);
@@ -225,15 +248,22 @@ public class MainActivity extends AppCompatActivity {
         setPlaying(true);
     }
     public void setPlaying(Boolean playing) {this.playing = playing; }
-    public Hashtable<String, String> getLocationSpeakerName() { return locationSpeakerName; }
+    public Hashtable<String, String> getLocationDeviceName() { return locationSpeakerName; }
 
     /**
      * Configuration fragment
      */
     public void attachConfigurationFragment(ConfigurationFragment configurationFragment) { this.configurationFragment = configurationFragment; }
     public void clearScanResult() { wifiReceiver.clearScanResult(); }
-    public void updateLocationSpeakerName(Hashtable<String, String> _locationSpeakerName) {
+    public void updateLocationDeviceName(Hashtable<String, String> _locationSpeakerName) {
         locationSpeakerName = _locationSpeakerName;
+    }
+    public void makeFile(String fileName) { fileSystem.makeFile(fileName); }
+    public void storeSettings(Settings settings) { fileSystem.storeSettings(settings); }
+    public void addLocationToSettings(String location) {
+        Settings settingsOld = getSettings();
+        Settings settingsUpdated = addLocationToSettings(location, settingsOld);
+        storeSettings(settingsUpdated);
     }
     public void setInUseDataCollection(Boolean bool) { inUseDataCollection = bool; }
     public void setRoomCurrentlyScanning(String roomCurrentlyScanning) { this.roomCurrentlyScanning = roomCurrentlyScanning; }
@@ -242,9 +272,8 @@ public class MainActivity extends AppCompatActivity {
     public String[] getLocation() { return locations; }
     public String getRoomCurrentlyScanning() { return roomCurrentlyScanning; }
     public Boolean getInUseDataCollection() { return inUseDataCollection; }
-    public IFileSystem getFileSystem() { return fileSystem; } // SE PÅ DENNE HER!!!
-    public List<ScanResult> getScanResult() {return scanResult; } // SKAL SES PÅ SAMMEN MED REFACTORERING
     public List<Device> getAvailableDevices() { return service.getAvailableDevices(); }
+    public Settings getSettings() { return fileSystem.loadSettings(); }
 
     /**
      * Location fragment
@@ -293,4 +322,12 @@ public class MainActivity extends AppCompatActivity {
         coverImage = image;
         musicFragment.updateCoverImage(image);
     }
+
+    /**
+     * Configuration Class
+     */
+    public void writeToFile(String data) {
+        fileSystem.writeToFile(data, fileName);
+    }
+
 }

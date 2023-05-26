@@ -50,7 +50,6 @@ public class FileSystem implements IFileSystem {
 
         if (!settingFile.exists()) {
             return null;
-            // createSettingFile();
         }
         try {
             FileInputStream fileInputStream = context.openFileInput("Setting");
