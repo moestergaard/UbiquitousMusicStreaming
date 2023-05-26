@@ -34,8 +34,6 @@
             android:textSize="24sp"
             android:textColor="@color/textOnBackground"/>
 
-
-
         <LinearLayout
             android:id="@+id/linear_layout_buttons"
             android:layout_width="match_parent"
@@ -47,14 +45,6 @@
             android:layout_marginLeft="24dp"
             android:gravity="center">
 
-            <!--Button
-                android:id="@+id/btnUseSystem"
-                android:layout_width="wrap_content"
-                android:layout_height="60sp"
-                android:layout_margin="8dp"
-                android:text="Aktiver sporing"
-                android:backgroundTint="@color/button"
-                android:textColor="@color/textOnButton"/-->
             <Button
                 android:id="@+id/btnUseSystem"
                 style="@style/Widget.Cat.Button.Small"
@@ -63,7 +53,7 @@
                 android:filterTouchesWhenObscured="false"
                 android:state_focused="true"
                 android:layout_weight="1"
-                android:text="Aktiver      sporing" />
+                android:text="@string/activateTracking" />
 
             <Button
                 android:id="@+id/btnStopSystem"
@@ -71,17 +61,8 @@
                 android:layout_width="1in"
                 android:layout_height="wrap_content"
                 android:filterTouchesWhenObscured="false"
-                android:text="Deaktiver sporing"
+                android:text="@string/deactivateTracking"
                 android:layout_weight="1" />
-
-            <!--Button
-                android:id="@+id/btnStopSystem"
-                android:layout_width="wrap_content"
-                android:layout_height="60sp"
-                android:layout_margin="8dp"
-                android:text="Deaktiver sporing"
-                android:backgroundTint="@color/button"
-                android:textColor="@color/textOnButton"/-->
         </LinearLayout>
 
         <LinearLayout
@@ -104,7 +85,7 @@
                     android:textStyle="bold"
                     android:layout_margin="8dp"
                     android:textAlignment="viewEnd"
-                    android:text="Rum"
+                    android:text="@string/rooms"
                     android:textColor="@color/textOnBackground"/>
 
                 <TextView
@@ -129,7 +110,7 @@
                     android:textStyle="bold"
                     android:textAlignment="viewStart"
                     android:layout_margin="8dp"
-                    android:text="Højtalere"
+                    android:text="@string/speakers"
                     android:textColor="@color/textOnBackground"/>
 
                 <TextView

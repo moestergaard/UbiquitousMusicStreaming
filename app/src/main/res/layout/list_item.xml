@@ -7,5 +7,4 @@
     android:maxLines="1"
     android:textColor="@color/textOnBackground"
     android:textAppearance="?attr/textAppearanceSubtitle1">
-
 </TextView>

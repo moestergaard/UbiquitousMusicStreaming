@@ -1,19 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
     <item
         android:id="@+id/navigation_music"
         android:icon="@drawable/baseline_music_note_24"
         android:title="@string/title_music" />
-
     <item
         android:id="@+id/navigation_location"
         android:icon="@drawable/baseline_my_location_24"
-        android:title="@string/title_system" />
-
+        android:title="@string/title_location" />
     <item
         android:id="@+id/navigation_configuration"
         android:icon="@drawable/baseline_wifi_24"
         android:title="@string/title_configuring" />
-
 </menu>

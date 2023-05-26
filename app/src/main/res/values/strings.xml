@@ -1,36 +1,25 @@
 <resources>
     <string name="app_name">UbiMusic</string>
     <string name="title_music">Musik</string>
-    <string name="title_system">Sporing</string>
+    <string name="title_location">Sporing</string>
     <string name="title_configuring">Konfigurering</string>
 
-    <!-- Connect Auth -->
-    <string name="connect">Connect</string>
-    <string name="authorize">Connect and Authorize</string>
-    <string name="connecting">Connecting</string>
-    <string name="connected">Connected</string>
-    <string name="disconnect">Disconnect</string>
+    <!-- Configuration Fragment -->
+    <string name="firstStep">FØRSTE STEP: Indsaml data</string>
+    <string name="secondStep">ANDET STEP: Vælg højtalere</string>
+    <string name="firstStepExplanation">Lav en model til sporing ved at indsamle datapunkter. Dette gøres ved at indsamle i de ønskede rum et efter et. Indsaml i et rum ved at indtaste rummets navn og trykke start scanning. Gå derefter rundt i rummet uden at forlade denne side. Hvis der ønskes en ny model lav da en ny datafil og indsaml data på ny.</string>
+    <string name="secondStepExplanation">Vælg den ønskede højtaler, og hvilket rum den hører til. Tryk derefter gem. Gør dette for alle højtalere.</string>
+    <string name="nameOfRoom">Skriv rummets navn</string>
+    <string name="startScanning">Start Wifi Scanning</string>
+    <string name="stopScanning">Stop Wifi Scanning</string>
+    <string name="newDataFile">Lav ny datafil</string>
+    <string name="choseRoom">Vælg rum</string>
+    <string name="choseSpeaker">Vælg højtaler</string>
+    <string name="save">Gem</string>
 
-    <!-- Controls -->
-    <string name="on_demand_feedback">Can play on demand? %1$b</string>
-    <string name="is_in_collection_feedback">Is in the user collection? %1$s</string>
-    <string name="command_feedback">"'%1$s' command successful!"</string>
-    <string name="command_response">"'%1$s' command response"</string>
-    <string name="connect_switch_to_local">Switch to Local Playback</string>
-    <string name="play_podcast_button_label">Play podcast</string>
-    <string name="play_album_button_label">Play album</string>
-    <string name="play_artist_button_label">Play artist</string>
-    <string name="play_playlist_button_label">Play playlist</string>
-    <string name="play_track_button_label">Play track</string>
-    <string name="get_collection_state">Get Collection state</string>
-    <string name="save_uri">Save to Collection</string>
-    <string name="remove_uri">Remove from Collection</string>
-    <string name="browse_content">Browse Content</string>
-    <string name="subscribe_to_capabilities">Get Capabilities</string>
-    <string name="subscribe_to_current_track">Subscribe to playerstate</string>
-    <string name="subscribe_to_player_context">Subscribe to playercontext</string>
-    <string name="title_player_context">Player Context</string>
-    <string name="title_current_track">Current Track</string>
-    <string name="title_image_size">Image size</string>
-    <string name="title_image_scale_type">Scale type</string>
+    <!-- Location Fragment -->
+    <string name="activateTracking">Aktiver sporing</string>
+    <string name="deactivateTracking">Deaktiver sporing</string>
+    <string name="rooms">Rum</string>
+    <string name="speakers">Højtalere</string>
 </resources>

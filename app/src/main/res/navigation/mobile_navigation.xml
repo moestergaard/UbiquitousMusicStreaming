@@ -14,7 +14,7 @@
     <fragment
         android:id="@+id/navigation_location"
         android:name="com.example.ubiquitousmusicstreaming.ui.location.LocationFragment"
-        android:label="@string/title_system"
+        android:label="@string/title_location"
         tools:layout="@layout/fragment_location" />
 
     <fragment

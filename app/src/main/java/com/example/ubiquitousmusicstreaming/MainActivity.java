@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.Manifest;
 import android.view.Window;
 import android.widget.Toast;
+
 import com.example.ubiquitousmusicstreaming.DataManagement.DataManagementNN;
 import com.example.ubiquitousmusicstreaming.DataManagement.DataManagementSVM;
 import com.example.ubiquitousmusicstreaming.DataManagement.IDataManagement;
@@ -21,6 +22,7 @@ import com.example.ubiquitousmusicstreaming.Services.SpotifyService;
 import com.example.ubiquitousmusicstreaming.ui.configuration.ConfigurationFragment;
 import com.example.ubiquitousmusicstreaming.ui.location.LocationFragment;
 import com.example.ubiquitousmusicstreaming.ui.music.MusicFragment;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -28,6 +30,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+
 import com.example.ubiquitousmusicstreaming.databinding.ActivityMainBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -82,8 +85,8 @@ public class MainActivity extends AppCompatActivity {
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-               R.id.navigation_music, R.id.navigation_location, R.id.navigation_configuration)
-               .build();
+                R.id.navigation_music, R.id.navigation_location, R.id.navigation_configuration)
+                .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
@@ -132,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
         predictedRoom = locationsHardcodedForModelPurpose[locationIndex];
         boolean isOutsideArea = checkIfOutsideArea(scanResults);
 
-        if(inUseTemp) {
+        if (inUseTemp) {
             if (isOutsideArea && previousWasOutside) {
                 service.handleRequest("pause");
                 playing = false;
@@ -150,8 +153,9 @@ public class MainActivity extends AppCompatActivity {
                 previousWasOutside = isOutsideArea;
                 startScan();
             }
+        } else {
+            inUse = false;
         }
-        else { inUse = false; }
     }
 
     private Boolean checkIfOutsideArea(List<ScanResult> scanResults) {
@@ -160,10 +164,10 @@ public class MainActivity extends AppCompatActivity {
         boolean outside = true;
 
         double epsilon = Math.ulp(1.0);
-        double treshold = 1.0/location.length + epsilon;
+        double treshold = 1.0 / location.length + epsilon;
 
         for (int i = 0; i < location.length; i++) {
-            if(location[i] > treshold) {
+            if (location[i] > treshold) {
                 outside = false;
             }
         }
@@ -174,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
         locationSpeakerName = _locationSpeakerName;
     }
 
-    public void initializeSettings(){
+    public void initializeSettings() {
         Settings settings = fileSystem.loadSettings();
 
         if (settings == null) {
@@ -195,7 +199,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void update() {
-        if(inUse) {
+        if (inUse) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Det er nødvendigt at give adgang til placering for at bruge denne service, da det giver adgang til nødvendige Wi-Fi informationer.", Toast.LENGTH_LONG).show();
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
+                return;
+            }
             List<ScanResult> scanResults = wifiManager.getScanResults();
             determineLocation(scanResults);
         } else {

@@ -22,7 +22,6 @@
             android:gravity="center"
             app:layout_constraintBottom_toBottomOf="parent">
 
-
             <TextView
                 android:id="@+id/dataHeader"
                 android:layout_width="match_parent"
@@ -31,7 +30,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_marginBottom="8dp"
-                android:text="FØRSTE STEP: Indsaml data"
+                android:text="@string/firstStep"
                 android:textColor="@color/textOnBackground"
                 android:textSize="20sp"
                 android:textStyle="bold" />
@@ -43,7 +42,7 @@
                 android:textSize="16sp"
                 android:layout_margin="8dp"
                 android:layout_marginBottom="8dp"
-                android:text="Lav en model til sporing ved at indsamle datapunkter. Dette gøres ved at indsamle i de ønskede rum et efter et. Indsaml i et rum ved at indtaste rummets navn og trykke start scanning. Gå derefter rundt i rummet uden at forlade denne side. Hvis der ønskes en ny model lav da en ny datafil og indsaml data på ny."
+                android:text="@string/firstStepExplanation"
                 android:textColor="@color/textOnBackground"/>
 
             <EditText
@@ -54,7 +53,7 @@
                 android:ems="10"
                 android:gravity="center"
                 android:inputType="textPersonName"
-                android:hint="Skriv rummets navn"
+                android:hint="@string/nameOfRoom"
                 android:layout_marginTop="8dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
@@ -77,7 +76,7 @@
                     android:layout_width="1in"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Start Wifi Scanning" />
+                    android:text="@string/startScanning" />
 
                 <Button
                     android:id="@+id/btnStopScanning"
@@ -86,9 +85,7 @@
                     android:layout_weight="1"
                     android:filterTouchesWhenObscured="false"
                     style="@style/Widget.Cat.Button.Small"
-                    android:text="Stop Wifi Scanning"
-                    />
-
+                    android:text="@string/stopScanning" />
             </LinearLayout>
 
             <TextView
@@ -124,7 +121,7 @@
                 android:layout_marginBottom="16dp"
                 android:layout_marginLeft="0dp"
                 android:layout_marginRight="0dp"
-                android:text="Lav ny datafil" />
+                android:text="@string/newDataFile" />
 
             <TextView
                 android:id="@+id/speakerHeader"
@@ -133,7 +130,7 @@
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:layout_margin="8dp"
-                android:text="ANDET STEP: Vælg højtalere"
+                android:text="@string/secondStep"
                 android:textColor="@color/textOnBackground"/>
 
             <TextView
@@ -142,7 +139,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
                 android:layout_margin="8dp"
-                android:text="Vælg den ønskede højtaler, og hvilket rum den hører til. Tryk derefter gem. Gør dette for alle højtalere."
+                android:text="@string/secondStepExplanation"
                 android:textColor="@color/textOnBackground"/>
 
             <LinearLayout
@@ -164,7 +161,7 @@
                         android:layout_height="wrap_content"
                         android:textSize="16sp"
                         android:layout_marginStart="8dp"
-                        android:text="Vælg rum"
+                        android:text="@string/choseRoom"
                         android:textColor="@color/textOnBackground"/>
 
                     <Spinner
@@ -188,7 +185,7 @@
                         android:layout_height="wrap_content"
                         android:textSize="16sp"
                         android:layout_marginStart="8dp"
-                        android:text="Vælg højtaler"
+                        android:text="@string/choseSpeaker"
                         android:textColor="@color/textOnBackground"/>
 
                     <Spinner
@@ -210,8 +207,7 @@
                 android:layout_marginLeft="0dp"
                 android:layout_marginRight="0dp"
                 android:layout_marginBottom="8dp"
-                android:text="Gem"
-                />
+                android:text="@string/save"/>
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
