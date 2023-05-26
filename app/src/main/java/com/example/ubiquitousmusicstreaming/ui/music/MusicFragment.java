@@ -30,6 +30,7 @@ public class MusicFragment extends Fragment {
 
         assert getParentFragment() != null;
         mainActivity = (MainActivity) getParentFragment().getActivity();
+        assert mainActivity != null;
         mainActivity.attachMusicFragment(this);
 
         setupBindings(inflater, container);
@@ -116,8 +117,6 @@ public class MusicFragment extends Fragment {
     public void updateTrackInformation(String trackName, String artistName) {
         txtViewArtistName.setText(artistName);
         txtViewTrackName.setText(trackName);
-        mainActivity.setTrackName(trackName);
-        mainActivity.setArtistName(artistName);
     }
 
     @SuppressLint("SetTextI18n")
@@ -131,6 +130,5 @@ public class MusicFragment extends Fragment {
 
     public void updateCoverImage(Bitmap coverImage) {
         coverImageView.setImageBitmap(coverImage);
-        mainActivity.setCoverImage(coverImage);
     }
 }

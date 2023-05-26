@@ -1,13 +1,8 @@
 package com.example.ubiquitousmusicstreaming.Services;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import androidx.fragment.app.Fragment;
-
 import com.example.ubiquitousmusicstreaming.MainActivity;
 import com.example.ubiquitousmusicstreaming.Models.Device;
-import com.example.ubiquitousmusicstreaming.ui.music.MusicFragment;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -46,8 +41,7 @@ public class SpotifyService implements IService {
     private static final String REDIRECT_URI = "ubiquitousmusicstreaming-login://callback";
     private static SpotifyAppRemote spotifyAppRemote;
     private String accessToken;
-    private MusicFragment musicFragment;
-    private Hashtable<String, String> speakerNameId = new Hashtable<String, String>();
+    private final Hashtable<String, String> speakerNameId = new Hashtable<String, String>();
     private Boolean playing;
     private String playingSpeaker = "";
 
@@ -63,7 +57,7 @@ public class SpotifyService implements IService {
         builder.setScopes(new String[]{"streaming", "user-read-email", "user-read-currently-playing", "user-read-playback-state"});
         AuthorizationRequest request = builder.build();
 
-        Integer REQUEST_CODE = 42;
+        int REQUEST_CODE = 42;
         AuthorizationClient.openLoginActivity(mainActivity, REQUEST_CODE, request);
     }
 
@@ -75,7 +69,7 @@ public class SpotifyService implements IService {
             ImageUri coverImage = track.imageUri;
             playing = !playerState.isPaused;
 
-            updateMusicFragment(trackName, artistName, coverImage, playing);
+            updateMainActivity(trackName, artistName, coverImage, playing);
         });
     }
 
@@ -140,11 +134,11 @@ public class SpotifyService implements IService {
         }
     }
 
-    private void updateMusicFragment(String trackName, String artistName, ImageUri coverImage, Boolean playing)
+    private void updateMainActivity(String trackName, String artistName, ImageUri coverImage, Boolean playing)
     {
         updateCoverImage(coverImage);
-        musicFragment.updateTrackInformation(trackName, artistName);
-        musicFragment.updatePlaying(playing);
+        mainActivity.updateTrackInformation(trackName, artistName);
+        mainActivity.updatePlaying(playing);
     }
 
     private void updateCoverImage(ImageUri coverImage) {
@@ -153,7 +147,7 @@ public class SpotifyService implements IService {
                 .getImage(coverImage, Image.Dimension.LARGE)
                 .setResultCallback(
                         bitmap -> {
-                            musicFragment.updateCoverImage(bitmap);
+                            mainActivity.updateCoverImage(bitmap);
                         });
     }
 

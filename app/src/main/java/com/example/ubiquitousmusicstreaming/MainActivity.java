@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     private Boolean previousWasOutside = false;
     private String playingSpeaker = "";
     private List<ScanResult> scanResult;
+    private String currentLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -217,19 +218,18 @@ public class MainActivity extends AppCompatActivity {
                     playing = false;
                 } else {
 
-                    boolean needForChangingLocation = location.equals(previousLocation);
+                    boolean needForChangingLocation = needToChangeLocation(location);
 
                     if (needForChangingLocation) {
                         String[] device = determineDevice(location);
 
-                        if (device[0] != null) {
+                        if (device != null) {
                             setPlayingSpeaker(device[0]);
                             changeDevice(device[1]);
                             playing = true;
                             lastLocationFragmentTextView = location;
                             locationFragment.SetTextView(lastLocationFragmentTextView);
-                        } else {
-                            playing = false;
+                            currentLocation = location;
                         }
                     }
                 }
@@ -243,6 +243,13 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    private boolean needToChangeLocation(String location) {
+        boolean sameLocationAsPrevious = location.equals(previousLocation);
+        boolean alreadyChosenLocation = location.equals(currentLocation);
+
+        return sameLocationAsPrevious && !alreadyChosenLocation;
     }
 
     public void setInUse(Boolean bool) {
@@ -271,9 +278,6 @@ public class MainActivity extends AppCompatActivity {
     public void attachMusicFragment(MusicFragment musicFragment) { this.musicFragment = musicFragment; }
     public void setLastLocationFragmentTextView(String lastLocation) { lastLocationFragmentTextView = lastLocation; }
     public void setInUseDataCollection(Boolean bool) { inUseDataCollection = bool; }
-    public void setTrackName(String trackName) { this.trackName = trackName; }
-    public void setArtistName(String artistName) { this.artistName = artistName; }
-    public void setCoverImage(Bitmap coverImage) { this.coverImage = coverImage; }
     public void setPlayingSpeaker(String speakerName) { playingSpeaker = speakerName; }
     public void setPlaying(Boolean playing) {this.playing = playing; }
     public void setRoomCurrentlyScanning(String roomCurrentlyScanning) { this.roomCurrentlyScanning = roomCurrentlyScanning; }
@@ -284,10 +288,10 @@ public class MainActivity extends AppCompatActivity {
     public void handleRequestDevice(String request) {
         service.handleRequest(request);
 
-        switch (request) {
-            case "pause": setPlaying(false);
-            default: setPlaying(true);
+        if ("pause".equals(request)) {
+            setPlaying(false);
         }
+        setPlaying(true);
     }
     public void updateActiveDevice() {service.updateActiveDevice();}
     public void updatePlaying(Boolean playing) {
@@ -299,4 +303,15 @@ public class MainActivity extends AppCompatActivity {
         musicFragment.updatePlayingSpeaker(this.playingSpeaker);
     }
     public void setLocations(String[] locations) { this.locations = locations; }
+
+    public void updateTrackInformation(String trackName, String artistName) {
+        this.trackName = trackName;
+        this.artistName = artistName;
+        musicFragment.updateTrackInformation(trackName, artistName);
+    }
+
+    public void updateCoverImage(Bitmap image) {
+        coverImage = image;
+        musicFragment.updateCoverImage(image);
+    }
 }
