@@ -127,6 +127,8 @@ public class LocationFragment extends Fragment {
     public void SetTextView(String text) { txtViewLocation.setText(text); }
 
     public boolean updateSpeaker(String location) {
+
+
         if (!playingLocation.equals(location)) {
             playingLocation = location;
 

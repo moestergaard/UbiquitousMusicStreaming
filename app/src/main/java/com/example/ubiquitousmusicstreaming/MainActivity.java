@@ -1,5 +1,6 @@
 package com.example.ubiquitousmusicstreaming;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -11,7 +12,6 @@ import android.os.Bundle;
 import android.Manifest;
 import android.view.Window;
 import android.widget.Toast;
-
 import com.example.ubiquitousmusicstreaming.DataManagement.DataManagementNN;
 import com.example.ubiquitousmusicstreaming.DataManagement.DataManagementSVM;
 import com.example.ubiquitousmusicstreaming.DataManagement.IDataManagement;
@@ -22,7 +22,6 @@ import com.example.ubiquitousmusicstreaming.Services.IService;
 import com.example.ubiquitousmusicstreaming.Services.SpotifyService;
 import com.example.ubiquitousmusicstreaming.ui.configuration.ConfigurationFragment;
 import com.example.ubiquitousmusicstreaming.ui.location.LocationFragment;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -30,11 +29,9 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-
 import com.example.ubiquitousmusicstreaming.databinding.ActivityMainBinding;
 import com.example.ubiquitousmusicstreaming.ui.music.MusicFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
 import java.util.Hashtable;
 import java.util.List;
 
@@ -131,33 +128,36 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void determineLocation(List<ScanResult> scanResults) {
+    private String determineLocation(List<ScanResult> scanResults) {
         double[] location = dmSVM.getPrediction(scanResults);
         int locationIndex = (int) location[0];
         String predictedRoom = locationsHardcodedForModelPurpose[locationIndex];
         boolean isOutsideArea = checkIfOutsideArea(scanResults);
 
         if (inUseTemp) {
-            if (isOutsideArea && previousWasOutside) {
-                service.handleRequest("pause");
-                playing = false;
-                lastLocationFragmentTextView = "";
-                locationFragment.SetTextView(lastLocationFragmentTextView);
-            } else {
-                if (predictedRoom.equals(previousLocation)) {
-                    boolean result = locationFragment.updateSpeaker(predictedRoom);
-                    playing = result;
-                    if (result) {
-                        lastLocationFragmentTextView = predictedRoom;
-                        locationFragment.SetTextView(lastLocationFragmentTextView);
-                    }
-                } else previousLocation = predictedRoom;
-                previousWasOutside = isOutsideArea;
-                startScan();
+            if (isOutsideArea && previousWasOutside) { return "outside"; }
+            if (predictedRoom.equals(previousLocation)) { return predictedRoom; }
+            previousLocation = predictedRoom;
+            previousWasOutside = isOutsideArea;
+            return null;
             }
-        } else {
-            inUse = false;
+        return null;
+    }
+
+    private String[] determineDevice(String location) {
+        String speakerName = locationSpeakerName.get(location);
+        if(speakerName == null) {
+            Toast.makeText(this, "Vælg hvilken højtaler, der hører til " + location, Toast.LENGTH_LONG).show();
+            return null;
         }
+        Hashtable<String, String> speakerNameId = getDeviceNameId();
+        String speakerId = speakerNameId.get(speakerName);
+
+        if (speakerId == null) {
+            Toast.makeText(this, "Højtaleren " + speakerName + " er ikke tilgængelig.", Toast.LENGTH_LONG).show();
+            return null;
+        }
+        return new String[]{speakerName, speakerId};
     }
 
     private Boolean checkIfOutsideArea(List<ScanResult> scanResults) {
@@ -208,8 +208,37 @@ public class MainActivity extends AppCompatActivity {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
                 return;
             }
+
             List<ScanResult> scanResults = wifiManager.getScanResults();
-            determineLocation(scanResults);
+            String location = determineLocation(scanResults);
+
+            if (location != null) {
+                if (location.equals("outside")) {
+                    handleRequestDevice("pause");
+                    lastLocationFragmentTextView = "";
+                    locationFragment.SetTextView(lastLocationFragmentTextView);
+                    playing = false;
+                } else {
+
+                    boolean needForChangingLocation = location.equals(previousLocation);
+
+                    if (needForChangingLocation) {
+                        String[] device = determineDevice(location);
+
+                        if (device[0] != null) {
+                            setPlayingSpeaker(device[0]);
+                            changeDevice(device[1]);
+                            playing = true;
+                            lastLocationFragmentTextView = location;
+                            locationFragment.SetTextView(lastLocationFragmentTextView);
+                        } else {
+                            playing = false;
+                        }
+                    }
+                }
+            }
+            if (inUseTemp) { startScan(); }
+            else { inUse = false; }
         } else {
             if(inUseDataCollection) {
                 if(configurationFragment != null) {
@@ -224,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
         if (bool) {
             inUse = inUseTemp = true;
         } else {
-            inUseTemp = false;
+            inUse = inUseTemp = false;
         }
     }
 
