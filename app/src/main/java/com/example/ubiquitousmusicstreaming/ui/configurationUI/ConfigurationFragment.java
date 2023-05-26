@@ -330,7 +330,6 @@ public class ConfigurationFragment extends Fragment {
             }
             lastScanResults = resultElse;
         }
-
         if(scan) {
             mainActivity.clearScanResult();
             mainActivity.startScan();

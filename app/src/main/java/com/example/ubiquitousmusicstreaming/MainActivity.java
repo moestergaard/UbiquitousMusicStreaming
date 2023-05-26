@@ -202,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
 
                         if (device != null) {
                             playingSpeaker = device[0];
-                            changeDevice(device[1]);
+                            service.changeDevice(device[1]);
                             playing = true;
                             lastLocationFragmentTextView = location;
                             locationFragment.SetTextView(lastLocationFragmentTextView);
@@ -215,70 +215,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     public void startScan() { wifiManager.startScan(); }
-    public Hashtable<String, String> getLocationSpeakerName() { return locationSpeakerName; }
-    /**
-     * Configuration fragment
-     */
-    public String getFileName() { return fileName; }
-    public String[] getLocation() { return locations; }
-    public String getRoomCurrentlyScanning() { return roomCurrentlyScanning; }
-    public Boolean getInUseDataCollection() { return inUseDataCollection; }
-    public IFileSystem getFileSystem() { return fileSystem; } // SE PÅ DENNE HER!!!
-    public List<ScanResult> getScanResult() {return scanResult; } // SKAL SES PÅ SAMMEN MED REFACTORERING
-    public List<Device> getAvailableDevices() { return service.getAvailableDevices(); }
-    public void attachConfigurationFragment(ConfigurationFragment configurationFragment) { this.configurationFragment = configurationFragment; }
-    public void setInUseDataCollection(Boolean bool) { inUseDataCollection = bool; }
-
-
-
-
-
-
-    /**
-     * Location fragment
-     */
-    public void setInUse(Boolean bool) { inUseTracking = bool; }
-    public Boolean getInUseTracking() { return inUseTracking; }
-
-
-    // SE PÅ DENNE HER!!! MÅSKE KAN CURRENTLOCATION BRUGES
-    public String getLastLocationFragmentTextView() { return lastLocationFragmentTextView; }
-    // SE OGSÅ PÅ DENNE HER!!!!
-    public void setLastLocationFragmentTextView(String lastLocation) { lastLocationFragmentTextView = lastLocation; }
-
-    public void attachLocationFragment(LocationFragment locationFragment) { this.locationFragment = locationFragment; }
-
-
-
-
-
-    /**
-     * Music fragment
-     */
-    public String getTrackName() { return trackName; }
-    public String getArtistName() { return artistName; }
-    public Bitmap getCoverImage() { return coverImage; }
-    public Boolean getPlaying() { return playing; }
-    public String getPlayingSpeaker() { return playingSpeaker; }
-    public void attachMusicFragment(MusicFragment musicFragment) { this.musicFragment = musicFragment; }
-
-
-
-
-
-
-
-
-
-
-    public void setPlaying(Boolean playing) {this.playing = playing; }
-    public void setRoomCurrentlyScanning(String roomCurrentlyScanning) { this.roomCurrentlyScanning = roomCurrentlyScanning; }
-    public void setCurrentLocation(String currentLocation) { this.currentLocation = currentLocation; }
-    public void clearScanResult() { wifiReceiver.clearScanResult(); }
-    public void changeDevice(String deviceId) { service.changeDevice(deviceId); }
-    public void changeActivationOfDevice() { service.changeActivationOfDevice(); }
     public void handleRequestDevice(String request) {
         service.handleRequest(request);
 
@@ -287,16 +224,64 @@ public class MainActivity extends AppCompatActivity {
         }
         setPlaying(true);
     }
+    public void setPlaying(Boolean playing) {this.playing = playing; }
+    public Hashtable<String, String> getLocationSpeakerName() { return locationSpeakerName; }
+
+    /**
+     * Configuration fragment
+     */
+    public void attachConfigurationFragment(ConfigurationFragment configurationFragment) { this.configurationFragment = configurationFragment; }
+    public void clearScanResult() { wifiReceiver.clearScanResult(); }
+    public void updateLocationSpeakerName(Hashtable<String, String> _locationSpeakerName) {
+        locationSpeakerName = _locationSpeakerName;
+    }
+    public void setInUseDataCollection(Boolean bool) { inUseDataCollection = bool; }
+    public void setRoomCurrentlyScanning(String roomCurrentlyScanning) { this.roomCurrentlyScanning = roomCurrentlyScanning; }
+    public void setLocations(String[] locations) { this.locations = locations; }
+    public String getFileName() { return fileName; }
+    public String[] getLocation() { return locations; }
+    public String getRoomCurrentlyScanning() { return roomCurrentlyScanning; }
+    public Boolean getInUseDataCollection() { return inUseDataCollection; }
+    public IFileSystem getFileSystem() { return fileSystem; } // SE PÅ DENNE HER!!!
+    public List<ScanResult> getScanResult() {return scanResult; } // SKAL SES PÅ SAMMEN MED REFACTORERING
+    public List<Device> getAvailableDevices() { return service.getAvailableDevices(); }
+
+    /**
+     * Location fragment
+     */
+    public void attachLocationFragment(LocationFragment locationFragment) { this.locationFragment = locationFragment; }
+    public void setCurrentLocation(String currentLocation) { this.currentLocation = currentLocation; }
+    public void setInUse(Boolean bool) { inUseTracking = bool; }
+    // SE OGSÅ PÅ DENNE HER!!!!
+    public void setLastLocationFragmentTextView(String lastLocation) { lastLocationFragmentTextView = lastLocation; }
+    // SE PÅ DENNE HER!!! MÅSKE KAN CURRENTLOCATION BRUGES
+    public String getLastLocationFragmentTextView() { return lastLocationFragmentTextView; }
+    public Boolean getInUseTracking() { return inUseTracking; }
+
+    /**
+     * Music fragment
+     */
+    public void attachMusicFragment(MusicFragment musicFragment) { this.musicFragment = musicFragment; }
+    public void changeActivationOfDevice() { service.changeActivationOfDevice(); }
     public void updateActiveDevice() {service.updateActiveDevice();}
+    public String getTrackName() { return trackName; }
+    public String getArtistName() { return artistName; }
+    public Bitmap getCoverImage() { return coverImage; }
+    public Boolean getPlaying() { return playing; }
+    public String getPlayingSpeaker() { return playingSpeaker; }
+
+    /**
+     * Spotify Service
+     */
     public void updatePlaying(Boolean playing) {
         this.playing = playing;
         musicFragment.updatePlaying(this.playing);
     }
+
     public void updateSpeaker(String playingSpeaker) {
         this.playingSpeaker = playingSpeaker;
         musicFragment.updatePlayingSpeaker(this.playingSpeaker);
     }
-    public void setLocations(String[] locations) { this.locations = locations; }
 
     public void updateTrackInformation(String trackName, String artistName) {
         this.trackName = trackName;
@@ -307,9 +292,5 @@ public class MainActivity extends AppCompatActivity {
     public void updateCoverImage(Bitmap image) {
         coverImage = image;
         musicFragment.updateCoverImage(image);
-    }
-
-    public void updateLocationSpeakerName(Hashtable<String, String> _locationSpeakerName) {
-        locationSpeakerName = _locationSpeakerName;
     }
 }

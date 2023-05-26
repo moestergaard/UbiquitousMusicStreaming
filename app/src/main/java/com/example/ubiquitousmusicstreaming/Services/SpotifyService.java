@@ -138,7 +138,7 @@ public class SpotifyService implements IService {
     {
         updateCoverImage(coverImage);
         mainActivity.updateTrackInformation(trackName, artistName);
-        mainActivity.updatePlaying(playing);
+        updateMainActivityPlaying();
     }
 
     private void updateCoverImage(ImageUri coverImage) {
