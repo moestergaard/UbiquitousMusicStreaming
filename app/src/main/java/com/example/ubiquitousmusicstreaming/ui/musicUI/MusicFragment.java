@@ -1,4 +1,4 @@
-package com.example.ubiquitousmusicstreaming.ui.music;
+package com.example.ubiquitousmusicstreaming.ui.musicUI;
 
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;

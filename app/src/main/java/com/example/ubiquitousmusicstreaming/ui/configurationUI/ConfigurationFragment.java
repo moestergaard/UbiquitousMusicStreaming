@@ -1,4 +1,4 @@
-package com.example.ubiquitousmusicstreaming.ui.configuration;
+package com.example.ubiquitousmusicstreaming.ui.configurationUI;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;

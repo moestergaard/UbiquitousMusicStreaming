@@ -7,19 +7,19 @@
 
     <fragment
         android:id="@+id/navigation_music"
-        android:name="com.example.ubiquitousmusicstreaming.ui.music.MusicFragment"
+        android:name="com.example.ubiquitousmusicstreaming.ui.musicUI.MusicFragment"
         android:label="@string/title_music"
         tools:layout="@layout/fragment_music" />
 
     <fragment
         android:id="@+id/navigation_location"
-        android:name="com.example.ubiquitousmusicstreaming.ui.location.LocationFragment"
+        android:name="com.example.ubiquitousmusicstreaming.ui.locationUI.LocationFragment"
         android:label="@string/title_location"
         tools:layout="@layout/fragment_location" />
 
     <fragment
         android:id="@+id/navigation_configuration"
-        android:name="com.example.ubiquitousmusicstreaming.ui.configuration.ConfigurationFragment"
+        android:name="com.example.ubiquitousmusicstreaming.ui.configurationUI.ConfigurationFragment"
         android:label="@string/title_configuring"
         tools:layout="@layout/fragment_configuration" />
 </navigation>

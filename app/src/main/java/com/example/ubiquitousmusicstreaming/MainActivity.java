@@ -16,11 +16,13 @@ import com.example.ubiquitousmusicstreaming.DataManagement.DataManagementSVM;
 import com.example.ubiquitousmusicstreaming.DataManagement.IDataManagement;
 import com.example.ubiquitousmusicstreaming.FileSystem.FileSystem;
 import com.example.ubiquitousmusicstreaming.FileSystem.IFileSystem;
+import com.example.ubiquitousmusicstreaming.Location.ILocation;
+import com.example.ubiquitousmusicstreaming.Location.Location;
 import com.example.ubiquitousmusicstreaming.Models.Device;
 import com.example.ubiquitousmusicstreaming.Services.IService;
 import com.example.ubiquitousmusicstreaming.Services.SpotifyService;
-import com.example.ubiquitousmusicstreaming.ui.configuration.ConfigurationFragment;
-import com.example.ubiquitousmusicstreaming.ui.location.LocationFragment;
+import com.example.ubiquitousmusicstreaming.ui.configurationUI.ConfigurationFragment;
+import com.example.ubiquitousmusicstreaming.ui.locationUI.LocationFragment;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -29,7 +31,7 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import com.example.ubiquitousmusicstreaming.databinding.ActivityMainBinding;
-import com.example.ubiquitousmusicstreaming.ui.music.MusicFragment;
+import com.example.ubiquitousmusicstreaming.ui.musicUI.MusicFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.Hashtable;
 import java.util.List;
@@ -44,11 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private LocationFragment locationFragment;
     private MusicFragment musicFragment;
     private Boolean inUseTracking = false, inUseDataCollection = false;
-    private IDataManagement dmNN;
-    private IDataManagement dmSVM;
-    private String previousLocation = "";
     private String[] locations;
-    private final String[] locationsHardcodedForModelPurpose = new String[]{"Kontor", "Stue", "Køkken"};
     private String fileName = "";
     private String lastLocationFragmentTextView = "";
     private IService service;
@@ -58,10 +56,10 @@ public class MainActivity extends AppCompatActivity {
     private Bitmap coverImage;
     private Boolean playing;
     private String roomCurrentlyScanning;
-    private Boolean previousWasOutside = false;
     private String playingSpeaker = "";
     private List<ScanResult> scanResult;
     private String currentLocation;
+    private ILocation locationClass;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,8 +92,11 @@ public class MainActivity extends AppCompatActivity {
         wifiReceiver = new WifiReceiver();
         registerReceiver(wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         wifiReceiver.attach(this);
-        dmNN = new DataManagementNN();
-        dmSVM = new DataManagementSVM(this);
+        IDataManagement dmNN = new DataManagementNN();
+        IDataManagement dmSVM = new DataManagementSVM(this);
+
+        IDataManagement[] dataManagements = new IDataManagement[]{dmNN, dmSVM};
+        locationClass = new Location(dataManagements);
     }
 
     @Override
@@ -128,20 +129,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private String determineLocation(List<ScanResult> scanResults) {
-        double[] location = dmSVM.getPrediction(scanResults);
-        int locationIndex = (int) location[0];
-        String predictedRoom = locationsHardcodedForModelPurpose[locationIndex];
-        boolean isOutsideArea = checkIfOutsideArea(scanResults);
-
-        if (isOutsideArea && previousWasOutside) { return "outside"; }
-        if (predictedRoom.equals(previousLocation)) { return predictedRoom; }
-
-        previousLocation = predictedRoom;
-        previousWasOutside = isOutsideArea;
-        return null;
-    }
-
     private String[] determineDevice(String location) {
         String speakerName = locationSpeakerName.get(location);
         if(speakerName == null) {
@@ -158,26 +145,7 @@ public class MainActivity extends AppCompatActivity {
         return new String[]{speakerName, speakerId};
     }
 
-    private Boolean checkIfOutsideArea(List<ScanResult> scanResults) {
-        double[] location = dmNN.getPrediction(scanResults);
 
-        boolean outside = true;
-
-        double epsilon = Math.ulp(1.0);
-        double treshold = 1.0 / location.length + epsilon;
-
-        for (double v : location) {
-            if (v > treshold) {
-                outside = false;
-                break;
-            }
-        }
-        return outside;
-    }
-
-    public void updateLocationSpeakerName(Hashtable<String, String> _locationSpeakerName) {
-        locationSpeakerName = _locationSpeakerName;
-    }
 
     public void initializeSettings() {
         Settings settings = fileSystem.loadSettings();
@@ -208,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             List<ScanResult> scanResults = wifiManager.getScanResults();
-            String location = determineLocation(scanResults);
+            String location = locationClass.determineLocation(scanResults);
 
             if (location != null) {
                 if (location.equals("outside")) {
@@ -217,8 +185,7 @@ public class MainActivity extends AppCompatActivity {
                     locationFragment.SetTextView(lastLocationFragmentTextView);
                     playing = false;
                 } else {
-
-                    boolean needForChangingLocation = needToChangeLocation(location);
+                    boolean needForChangingLocation = locationClass.needToChangeLocation(location, currentLocation);
 
                     if (needForChangingLocation) {
                         String[] device = determineDevice(location);
@@ -245,17 +212,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private boolean needToChangeLocation(String location) {
-        boolean sameLocationAsPrevious = location.equals(previousLocation);
-        boolean alreadyChosenLocation = location.equals(currentLocation);
 
-        return sameLocationAsPrevious && !alreadyChosenLocation;
-    }
 
     public void setInUse(Boolean bool) {
         inUseTracking = bool;
     }
-
     public void startScan() { wifiManager.startScan(); }
     public String getFileName() { return fileName; }
     public String[] getLocation() { return locations; }
@@ -281,6 +242,7 @@ public class MainActivity extends AppCompatActivity {
     public void setPlayingSpeaker(String speakerName) { playingSpeaker = speakerName; }
     public void setPlaying(Boolean playing) {this.playing = playing; }
     public void setRoomCurrentlyScanning(String roomCurrentlyScanning) { this.roomCurrentlyScanning = roomCurrentlyScanning; }
+    public void setCurrentLocation(String currentLocation) { this.currentLocation = currentLocation; }
     public void removeLocationFragment() {locationFragment = null ;}
     public void clearScanResult() { wifiReceiver.clearScanResult(); }
     public void changeDevice(String deviceId) { service.changeDevice(deviceId); }
@@ -313,5 +275,9 @@ public class MainActivity extends AppCompatActivity {
     public void updateCoverImage(Bitmap image) {
         coverImage = image;
         musicFragment.updateCoverImage(image);
+    }
+
+    public void updateLocationSpeakerName(Hashtable<String, String> _locationSpeakerName) {
+        locationSpeakerName = _locationSpeakerName;
     }
 }
