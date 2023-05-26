@@ -1,5 +1,6 @@
 package com.example.ubiquitousmusicstreaming.ui.location;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,12 +10,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-
-import com.example.ubiquitousmusicstreaming.Services.IService;
 import com.example.ubiquitousmusicstreaming.MainActivity;
 import com.example.ubiquitousmusicstreaming.databinding.FragmentLocationBinding;
 import java.util.Hashtable;
-import java.util.Objects;
 
 public class LocationFragment extends Fragment {
 
@@ -25,7 +23,6 @@ public class LocationFragment extends Fragment {
     private String playingLocation = "";
     private Hashtable<String, String> locationSpeakerName = new Hashtable<>();
     private MainActivity mainActivity;
-    private IService service;
     private View root;
 
 
@@ -92,9 +89,9 @@ public class LocationFragment extends Fragment {
         mainActivity = (MainActivity) getParentFragment().getActivity();
         inUse = mainActivity.getInUse();
         locationSpeakerName = mainActivity.getLocationSpeakerName();
-        service = mainActivity.getService();
     }
 
+    @SuppressLint("SetTextI18n")
     private void updateTextView() {
         if(inUse) {
             txtViewInUse.setText("Sporing er aktiveret");
@@ -113,18 +110,18 @@ public class LocationFragment extends Fragment {
 
     private void updateLocationSpeakerTextView() {
         String[] rooms = locationSpeakerName.keySet().toArray(new String[0]);
-        String roomTextView = "";
+        StringBuilder roomTextView = new StringBuilder();
         for (String r : rooms) {
-            roomTextView += r + "\n";
+            roomTextView.append(r).append("\n");
         }
-        txtViewRoom.setText(roomTextView);
+        txtViewRoom.setText(roomTextView.toString());
 
         String[] speaker = locationSpeakerName.values().toArray(new String[0]);
-        String speakerTextView = "";
+        StringBuilder speakerTextView = new StringBuilder();
         for (String s : speaker) {
-            speakerTextView += s + "\n";
+            speakerTextView.append(s).append("\n");
         }
-        txtViewSpeaker.setText(speakerTextView);
+        txtViewSpeaker.setText(speakerTextView.toString());
     }
 
     public void SetTextView(String text) { txtViewLocation.setText(text); }
@@ -138,7 +135,8 @@ public class LocationFragment extends Fragment {
                 Toast.makeText(mainActivity, "Vælg hvilken højtaler, der hører til " + location, Toast.LENGTH_LONG).show();
                 return false;
             }
-            Hashtable<String, String> speakerNameId = service.getDeviceNameId();
+
+            Hashtable<String, String> speakerNameId = mainActivity.getDeviceNameId();
             String speakerId = speakerNameId.get(speakerName);
 
             if (speakerId == null) {
@@ -146,7 +144,7 @@ public class LocationFragment extends Fragment {
                 return false;
             }
             mainActivity.setPlayingSpeaker(speakerName);
-            service.changeDevice(speakerId);
+            mainActivity.changeDevice(speakerId);
             return true;
         }
         return true;

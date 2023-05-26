@@ -39,8 +39,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ActivityMainBinding binding;
-    private Integer REQUEST_CODE = 42;
+    private final Integer REQUEST_CODE = 42;
     private static WifiReceiver wifiReceiver;
     private IFileSystem fileSystem;
     private WifiManager wifiManager;
@@ -49,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private Boolean inUse = false, inUseTemp, inUseDataCollection = false;
     private IDataManagement dmNN;
     private IDataManagement dmSVM;
-    private String predictedRoom, previousLocation = "";
+    private String previousLocation = "";
     private String[] locations;
     private final String[] locationsHardcodedForModelPurpose = new String[]{"Kontor", "Stue", "Køkken"};
     private String fileName = "";
@@ -81,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
         initializeSettings();
         service = new SpotifyService(this);
         service.connect();
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        com.example.ubiquitousmusicstreaming.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
@@ -133,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
     private void determineLocation(List<ScanResult> scanResults) {
         double[] location = dmSVM.getPrediction(scanResults);
         int locationIndex = (int) location[0];
-        predictedRoom = locationsHardcodedForModelPurpose[locationIndex];
+        String predictedRoom = locationsHardcodedForModelPurpose[locationIndex];
         boolean isOutsideArea = checkIfOutsideArea(scanResults);
 
         if (inUseTemp) {
@@ -144,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
                 locationFragment.SetTextView(lastLocationFragmentTextView);
             } else {
                 if (predictedRoom.equals(previousLocation)) {
-                    Boolean result = locationFragment.updateSpeaker(predictedRoom);
+                    boolean result = locationFragment.updateSpeaker(predictedRoom);
                     playing = result;
                     if (result) {
                         lastLocationFragmentTextView = predictedRoom;
@@ -167,9 +166,10 @@ public class MainActivity extends AppCompatActivity {
         double epsilon = Math.ulp(1.0);
         double treshold = 1.0 / location.length + epsilon;
 
-        for (int i = 0; i < location.length; i++) {
-            if (location[i] > treshold) {
+        for (double v : location) {
+            if (v > treshold) {
                 outside = false;
+                break;
             }
         }
         return outside;
@@ -243,6 +243,7 @@ public class MainActivity extends AppCompatActivity {
     public IFileSystem getFileSystem() { return fileSystem; }
     public List<ScanResult> getScanResult() {return scanResult; }
     public List<Device> getAvailableDevices() { return service.getAvailableDevices(); }
+    public Hashtable<String, String> getDeviceNameId() { return service.getDeviceNameId(); }
     public void attachConfigurationFragment(ConfigurationFragment configurationFragment) { this.configurationFragment = configurationFragment; }
     public void attachLocationFragment(LocationFragment locationFragment) { this.locationFragment = locationFragment; }
     public void setLastLocationFragmentTextView(String lastLocation) { lastLocationFragmentTextView = lastLocation; }
@@ -255,5 +256,6 @@ public class MainActivity extends AppCompatActivity {
     public void setRoomCurrentlyScanning(String roomCurrentlyScanning) { this.roomCurrentlyScanning = roomCurrentlyScanning; }
     public void removeLocationFragment() {locationFragment = null ;}
     public void clearScanResult() { wifiReceiver.clearScanResult(); }
+    public void changeDevice(String deviceId) { service.changeDevice(deviceId); }
     public void setLocations(String[] locations) { this.locations = locations; }
 }
