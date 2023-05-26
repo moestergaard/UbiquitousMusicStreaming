@@ -17,11 +17,11 @@ import com.example.ubiquitousmusicstreaming.DataManagement.DataManagementSVM;
 import com.example.ubiquitousmusicstreaming.DataManagement.IDataManagement;
 import com.example.ubiquitousmusicstreaming.FileSystem.FileSystem;
 import com.example.ubiquitousmusicstreaming.FileSystem.IFileSystem;
+import com.example.ubiquitousmusicstreaming.Models.Device;
 import com.example.ubiquitousmusicstreaming.Services.IService;
 import com.example.ubiquitousmusicstreaming.Services.SpotifyService;
 import com.example.ubiquitousmusicstreaming.ui.configuration.ConfigurationFragment;
 import com.example.ubiquitousmusicstreaming.ui.location.LocationFragment;
-import com.example.ubiquitousmusicstreaming.ui.music.MusicFragment;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     private String roomCurrentlyScanning;
     private Boolean previousWasOutside = false;
     private String playingSpeaker = "";
+    private List<ScanResult> scanResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -210,6 +211,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             if(inUseDataCollection) {
                 if(configurationFragment != null) {
+                    scanResult = wifiReceiver.getScanResult();
                     configurationFragment.update();
                 }
             }
@@ -230,7 +232,6 @@ public class MainActivity extends AppCompatActivity {
     public Boolean getInUse() { return inUse; }
     public String getLastLocationFragmentTextView() { return lastLocationFragmentTextView; }
     public IService getService() { return service; }
-    public WifiReceiver getWifiReceiver() { return wifiReceiver; }
     public Hashtable<String, String> getLocationSpeakerName() { return locationSpeakerName; }
     public String getTrackName() { return trackName; }
     public String getArtistName() { return artistName; }
@@ -240,6 +241,8 @@ public class MainActivity extends AppCompatActivity {
     public Boolean getInUseDataCollection() { return inUseDataCollection; }
     public String getPlayingSpeaker() { return playingSpeaker; }
     public IFileSystem getFileSystem() { return fileSystem; }
+    public List<ScanResult> getScanResult() {return scanResult; }
+    public List<Device> getAvailableDevices() { return service.getAvailableDevices(); }
     public void attachConfigurationFragment(ConfigurationFragment configurationFragment) { this.configurationFragment = configurationFragment; }
     public void attachLocationFragment(LocationFragment locationFragment) { this.locationFragment = locationFragment; }
     public void setLastLocationFragmentTextView(String lastLocation) { lastLocationFragmentTextView = lastLocation; }
@@ -251,5 +254,6 @@ public class MainActivity extends AppCompatActivity {
     public void setPlaying(Boolean playing) {this.playing = playing; }
     public void setRoomCurrentlyScanning(String roomCurrentlyScanning) { this.roomCurrentlyScanning = roomCurrentlyScanning; }
     public void removeLocationFragment() {locationFragment = null ;}
+    public void clearScanResult() { wifiReceiver.clearScanResult(); }
     public void setLocations(String[] locations) { this.locations = locations; }
 }

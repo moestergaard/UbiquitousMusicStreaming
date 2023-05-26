@@ -18,10 +18,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import com.example.ubiquitousmusicstreaming.FileSystem.IFileSystem;
 import com.example.ubiquitousmusicstreaming.Models.Device;
-import com.example.ubiquitousmusicstreaming.Services.IService;
 import com.example.ubiquitousmusicstreaming.MainActivity;
 import com.example.ubiquitousmusicstreaming.R;
-import com.example.ubiquitousmusicstreaming.WifiReceiver;
 import com.example.ubiquitousmusicstreaming.databinding.FragmentConfigurationBinding;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,7 +35,6 @@ public class ConfigurationFragment extends Fragment {
     private FragmentConfigurationBinding binding;
     private IFileSystem fileSystem;
     private MainActivity mainActivity;
-    private WifiReceiver wifiReceiver;
     private EditText editTextRoom;
     private View root;
     private Button buttonStartScanning, buttonStopScanning, buttonNewDataFile, buttonStoreDeviceRoom;
@@ -50,7 +47,6 @@ public class ConfigurationFragment extends Fragment {
     private Hashtable<String, String> locationDeviceName = new Hashtable<>();
     private Hashtable<String, String> devicesNameID = new Hashtable<>();
     private Boolean scan = false;
-    private IService service;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -186,8 +182,6 @@ public class ConfigurationFragment extends Fragment {
 
         locations = mainActivity.getLocation();
         room = mainActivity.getRoomCurrentlyScanning();
-        wifiReceiver = mainActivity.getWifiReceiver();
-        service = mainActivity.getService();
         locationDeviceName = mainActivity.getLocationSpeakerName();
         fileSystem = mainActivity.getFileSystem();
         fileName = mainActivity.getFileName();
@@ -246,7 +240,7 @@ public class ConfigurationFragment extends Fragment {
     }
 
     private void setupSpeakerRoomSelection(Spinner spinSpeaker, Spinner spinRoom) {
-        List<Device> devices = service.getAvailableDevices();
+        List<Device> devices = mainActivity.getAvailableDevices();
         List<String> deviceNames = new ArrayList<>();
 
         if (!devices.isEmpty()) {
@@ -322,7 +316,7 @@ public class ConfigurationFragment extends Fragment {
     }
 
     public void update() {
-        List<ScanResult> scanResults = wifiReceiver.getScanResult();
+        List<ScanResult> scanResults = mainActivity.getScanResult();
         if(lastScanResults.equals("")) {
             String result = makeScanResultString(scanResults);
             lastScanResults = result;
@@ -338,7 +332,7 @@ public class ConfigurationFragment extends Fragment {
         }
 
         if(scan) {
-            wifiReceiver.clearScanResult();
+            mainActivity.clearScanResult();
             mainActivity.startScan();
         }
     }
