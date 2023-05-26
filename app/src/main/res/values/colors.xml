@@ -6,6 +6,9 @@
     <color name="textOnBackground">@color/white</color>
     <color name="button">@color/spotifyGreen</color>
 
+    <!-- Background launch -->
+    <color name="ic_launcher_spotify2_background">@android:color/transparent</color>
+
     <!--For navigation bar-->
     <color name="selected_color">@color/white</color>
     <color name="unselected_color">#66ffffff</color>
