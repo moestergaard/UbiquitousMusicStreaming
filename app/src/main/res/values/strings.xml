@@ -18,7 +18,7 @@
     <string name="save">Gem</string>
 
     <!-- Location Fragment -->
-    <string name="activateTracking">Aktiver sporing</string>
+    <string name="activateTracking">Aktiver\nsporing</string>
     <string name="deactivateTracking">Deaktiver sporing</string>
     <string name="rooms">Rum</string>
     <string name="speakers">Højtalere</string>

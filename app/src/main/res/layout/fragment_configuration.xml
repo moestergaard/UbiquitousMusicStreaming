@@ -73,14 +73,14 @@
                 <Button
                     android:id="@+id/btnStartScanning"
                     style="@style/Widget.Cat.Button.Small"
-                    android:layout_width="1in"
+                    android:layout_width="131dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/startScanning" />
 
                 <Button
                     android:id="@+id/btnStopScanning"
-                    android:layout_width="1in"
+                    android:layout_width="131dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:filterTouchesWhenObscured="false"
@@ -115,7 +115,7 @@
             <Button
                 android:id="@+id/btnNewFile"
                 style="@style/Widget.Cat.Button.Small"
-                android:layout_width="1in"
+                android:layout_width="131dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="16dp"
@@ -201,7 +201,7 @@
             <Button
                 android:id="@+id/btnStoreDeviceRoom"
                 style="@style/Widget.Cat.Button.Small"
-                android:layout_width="1in"
+                android:layout_width="131dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="0dp"
                 android:layout_marginLeft="0dp"

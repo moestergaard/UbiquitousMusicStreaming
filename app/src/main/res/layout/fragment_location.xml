@@ -48,7 +48,7 @@
             <Button
                 android:id="@+id/btnUseSystem"
                 style="@style/Widget.Cat.Button.Small"
-                android:layout_width="1in"
+                android:layout_width="131dp"
                 android:layout_height="wrap_content"
                 android:filterTouchesWhenObscured="false"
                 android:state_focused="true"
@@ -58,7 +58,7 @@
             <Button
                 android:id="@+id/btnStopSystem"
                 style="@style/Widget.Cat.Button.Small"
-                android:layout_width="1in"
+                android:layout_width="131dp"
                 android:layout_height="wrap_content"
                 android:filterTouchesWhenObscured="false"
                 android:text="@string/deactivateTracking"
