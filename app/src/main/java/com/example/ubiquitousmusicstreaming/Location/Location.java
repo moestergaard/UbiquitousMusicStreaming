@@ -1,24 +1,23 @@
 package com.example.ubiquitousmusicstreaming.Location;
 
 import android.net.wifi.ScanResult;
-
 import com.example.ubiquitousmusicstreaming.DataManagement.IDataManagement;
-
 import java.util.List;
 
 public class Location implements ILocation{
     private final String[] locationsHardcodedForModelPurpose = new String[]{"Kontor", "Stue", "Køkken"};
-    private IDataManagement[] dataManagements;
+    private final IDataManagement dataManagementNN;
+    private final IDataManagement dataManagementSVM;
     private String previousLocation;
     private Boolean previousWasOutside = false;
-    private String currentLocation;
 
-    public Location(IDataManagement[] dataManagements) {
-        this.dataManagements = dataManagements;
+    public Location(IDataManagement dataManagementNN, IDataManagement dataManagementSVM) {
+        this.dataManagementNN = dataManagementNN;
+        this.dataManagementSVM = dataManagementSVM;
     }
 
     public String determineLocation(List<ScanResult> scanResults) {
-        double[] location = dataManagements[1].getPrediction(scanResults);
+        double[] location = dataManagementSVM.getPrediction(scanResults);
         int locationIndex = (int) location[0];
         String predictedRoom = locationsHardcodedForModelPurpose[locationIndex];
         boolean isOutsideArea = checkIfOutsideArea(scanResults);
@@ -38,10 +37,8 @@ public class Location implements ILocation{
         return sameLocationAsPrevious && !alreadyChosenLocation;
     }
 
-
-
     private Boolean checkIfOutsideArea(List<ScanResult> scanResults) {
-        double[] location = dataManagements[0].getPrediction(scanResults);
+        double[] location = dataManagementNN.getPrediction(scanResults);
 
         boolean outside = true;
 

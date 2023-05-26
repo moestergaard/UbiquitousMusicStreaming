@@ -95,8 +95,7 @@ public class MainActivity extends AppCompatActivity {
         IDataManagement dmNN = new DataManagementNN();
         IDataManagement dmSVM = new DataManagementSVM(this);
 
-        IDataManagement[] dataManagements = new IDataManagement[]{dmNN, dmSVM};
-        locationClass = new Location(dataManagements);
+        locationClass = new Location(dmNN, dmSVM);
     }
 
     @Override
@@ -168,7 +167,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void update() {
-        if (inUseTracking) {
+        if(inUseDataCollection) {
+            if(configurationFragment != null) {
+                scanResult = wifiReceiver.getScanResult();
+                configurationFragment.update();
+            }
+        } else if (inUseTracking) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "Det er nødvendigt at give adgang til placering for at bruge denne service, da det giver adgang til nødvendige Wi-Fi informationer.", Toast.LENGTH_LONG).show();
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
@@ -202,21 +206,12 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             startScan();
-        } else {
-            if(inUseDataCollection) {
-                if(configurationFragment != null) {
-                    scanResult = wifiReceiver.getScanResult();
-                    configurationFragment.update();
-                }
-            }
         }
     }
 
 
 
-    public void setInUse(Boolean bool) {
-        inUseTracking = bool;
-    }
+    public void setInUse(Boolean bool) { inUseTracking = bool; }
     public void startScan() { wifiManager.startScan(); }
     public String getFileName() { return fileName; }
     public String[] getLocation() { return locations; }
@@ -243,7 +238,6 @@ public class MainActivity extends AppCompatActivity {
     public void setPlaying(Boolean playing) {this.playing = playing; }
     public void setRoomCurrentlyScanning(String roomCurrentlyScanning) { this.roomCurrentlyScanning = roomCurrentlyScanning; }
     public void setCurrentLocation(String currentLocation) { this.currentLocation = currentLocation; }
-    public void removeLocationFragment() {locationFragment = null ;}
     public void clearScanResult() { wifiReceiver.clearScanResult(); }
     public void changeDevice(String deviceId) { service.changeDevice(deviceId); }
     public void changeActivationOfDevice() { service.changeActivationOfDevice(); }

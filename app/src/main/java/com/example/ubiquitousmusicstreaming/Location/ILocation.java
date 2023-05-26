@@ -1,7 +1,6 @@
 package com.example.ubiquitousmusicstreaming.Location;
 
 import android.net.wifi.ScanResult;
-
 import java.util.List;
 
 public interface ILocation {

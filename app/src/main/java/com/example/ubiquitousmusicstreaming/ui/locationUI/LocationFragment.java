@@ -53,13 +53,10 @@ public class LocationFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 inUse = false;
-
-                // mainActivity.removeLocationFragment();
                 mainActivity.setInUse(false);
                 playingLocation = "";
                 mainActivity.setCurrentLocation(playingLocation);
                 mainActivity.setLastLocationFragmentTextView("");
-
                 txtViewLocation.setText("");
                 updateTextView();
                 updateButtonsTrackingActive(false);
