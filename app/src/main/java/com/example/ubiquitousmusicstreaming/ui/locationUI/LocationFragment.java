@@ -57,7 +57,7 @@ public class LocationFragment extends Fragment {
                 playingLocation = "";
                 mainActivity.setCurrentLocation(playingLocation);
                 mainActivity.setLastLocationFragmentTextView("");
-                txtViewLocation.setText("");
+                txtViewLocation.setText(playingLocation);
                 updateTextView();
                 updateButtonsTrackingActive(false);
             }
@@ -123,30 +123,4 @@ public class LocationFragment extends Fragment {
     }
 
     public void SetTextView(String text) { txtViewLocation.setText(text); }
-
-    public boolean updateSpeaker(String location) {
-
-
-        if (!playingLocation.equals(location)) {
-            playingLocation = location;
-
-            String speakerName = locationSpeakerName.get(location);
-            if(speakerName == null) {
-                Toast.makeText(mainActivity, "Vælg hvilken højtaler, der hører til " + location, Toast.LENGTH_LONG).show();
-                return false;
-            }
-
-            Hashtable<String, String> speakerNameId = mainActivity.getDeviceNameId();
-            String speakerId = speakerNameId.get(speakerName);
-
-            if (speakerId == null) {
-                Toast.makeText(mainActivity, "Højtaleren " + speakerName + " er ikke tilgængelig.", Toast.LENGTH_LONG).show();
-                return false;
-            }
-            mainActivity.setPlayingSpeaker(speakerName);
-            mainActivity.changeDevice(speakerId);
-            return true;
-        }
-        return true;
-    }
 }

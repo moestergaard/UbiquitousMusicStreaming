@@ -73,10 +73,11 @@ public class MainActivity extends AppCompatActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getSupportActionBar().hide();
 
-        fileSystem = new FileSystem(this);
-        initializeSettings();
-        service = new SpotifyService(this);
-        service.connect();
+        setupView();
+        setupVariables();
+    }
+
+    private void setupView() {
         com.example.ubiquitousmusicstreaming.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -87,11 +88,18 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
+    }
 
-        wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+    private void setupVariables() {
+        fileSystem = new FileSystem(this);
+        service = new SpotifyService(this);
         wifiReceiver = new WifiReceiver();
+        wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         registerReceiver(wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         wifiReceiver.attach(this);
+        initializeSettings();
+        service.connect();
+
         IDataManagement dmNN = new DataManagementNN();
         IDataManagement dmSVM = new DataManagementSVM(this);
 
@@ -134,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Vælg hvilken højtaler, der hører til " + location, Toast.LENGTH_LONG).show();
             return null;
         }
-        Hashtable<String, String> speakerNameId = getDeviceNameId();
+        Hashtable<String, String> speakerNameId = service.getDeviceNameId();
         String speakerId = speakerNameId.get(speakerName);
 
         if (speakerId == null) {
@@ -143,8 +151,6 @@ public class MainActivity extends AppCompatActivity {
         }
         return new String[]{speakerName, speakerId};
     }
-
-
 
     public void initializeSettings() {
         Settings settings = fileSystem.loadSettings();
@@ -195,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
                         String[] device = determineDevice(location);
 
                         if (device != null) {
-                            setPlayingSpeaker(device[0]);
+                            playingSpeaker = device[0];
                             changeDevice(device[1]);
                             playing = true;
                             lastLocationFragmentTextView = location;
@@ -210,31 +216,63 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-    public void setInUse(Boolean bool) { inUseTracking = bool; }
     public void startScan() { wifiManager.startScan(); }
+    public Hashtable<String, String> getLocationSpeakerName() { return locationSpeakerName; }
+    /**
+     * Configuration fragment
+     */
     public String getFileName() { return fileName; }
     public String[] getLocation() { return locations; }
+    public String getRoomCurrentlyScanning() { return roomCurrentlyScanning; }
+    public Boolean getInUseDataCollection() { return inUseDataCollection; }
+    public IFileSystem getFileSystem() { return fileSystem; } // SE PÅ DENNE HER!!!
+    public List<ScanResult> getScanResult() {return scanResult; } // SKAL SES PÅ SAMMEN MED REFACTORERING
+    public List<Device> getAvailableDevices() { return service.getAvailableDevices(); }
+    public void attachConfigurationFragment(ConfigurationFragment configurationFragment) { this.configurationFragment = configurationFragment; }
+    public void setInUseDataCollection(Boolean bool) { inUseDataCollection = bool; }
+
+
+
+
+
+
+    /**
+     * Location fragment
+     */
+    public void setInUse(Boolean bool) { inUseTracking = bool; }
     public Boolean getInUseTracking() { return inUseTracking; }
+
+
+    // SE PÅ DENNE HER!!! MÅSKE KAN CURRENTLOCATION BRUGES
     public String getLastLocationFragmentTextView() { return lastLocationFragmentTextView; }
-    public Hashtable<String, String> getLocationSpeakerName() { return locationSpeakerName; }
+    // SE OGSÅ PÅ DENNE HER!!!!
+    public void setLastLocationFragmentTextView(String lastLocation) { lastLocationFragmentTextView = lastLocation; }
+
+    public void attachLocationFragment(LocationFragment locationFragment) { this.locationFragment = locationFragment; }
+
+
+
+
+
+    /**
+     * Music fragment
+     */
     public String getTrackName() { return trackName; }
     public String getArtistName() { return artistName; }
     public Bitmap getCoverImage() { return coverImage; }
     public Boolean getPlaying() { return playing; }
-    public String getRoomCurrentlyScanning() { return roomCurrentlyScanning; }
-    public Boolean getInUseDataCollection() { return inUseDataCollection; }
     public String getPlayingSpeaker() { return playingSpeaker; }
-    public IFileSystem getFileSystem() { return fileSystem; }
-    public List<ScanResult> getScanResult() {return scanResult; }
-    public List<Device> getAvailableDevices() { return service.getAvailableDevices(); }
-    public Hashtable<String, String> getDeviceNameId() { return service.getDeviceNameId(); }
-    public void attachConfigurationFragment(ConfigurationFragment configurationFragment) { this.configurationFragment = configurationFragment; }
-    public void attachLocationFragment(LocationFragment locationFragment) { this.locationFragment = locationFragment; }
     public void attachMusicFragment(MusicFragment musicFragment) { this.musicFragment = musicFragment; }
-    public void setLastLocationFragmentTextView(String lastLocation) { lastLocationFragmentTextView = lastLocation; }
-    public void setInUseDataCollection(Boolean bool) { inUseDataCollection = bool; }
-    public void setPlayingSpeaker(String speakerName) { playingSpeaker = speakerName; }
+
+
+
+
+
+
+
+
+
+
     public void setPlaying(Boolean playing) {this.playing = playing; }
     public void setRoomCurrentlyScanning(String roomCurrentlyScanning) { this.roomCurrentlyScanning = roomCurrentlyScanning; }
     public void setCurrentLocation(String currentLocation) { this.currentLocation = currentLocation; }
