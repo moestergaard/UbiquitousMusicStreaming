@@ -11,8 +11,7 @@ public interface IService {
     void handleAuthorizationResponse(int resultCode, Intent intent);
     void handleRequest(String request);
     void stopService();
-    void changeRoom(String location);
-    void changeDevice(String deviceID);
+    void changeLocation(String location);
     void updateActiveDevice();
     List<Device> getAvailableDevices();
     Hashtable<String, String> getDeviceNameId();

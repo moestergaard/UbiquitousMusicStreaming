@@ -160,6 +160,12 @@ public class SpotifyService implements IService {
 
     private void updateMainActivityPlaying() { mainActivity.updatePlaying(playing); }
     private void updateMainActivitySpeaker() { mainActivity.updateSpeaker(playingSpeaker); }
+    private String getSpeakerIdFromLocation(String location) {
+        Hashtable<String, String> locationDeviceName = mainActivity.getLocationDeviceName();
+        String deviceName = locationDeviceName.get(location);
+
+        return speakerNameId.get(deviceName);
+    }
 
     public void connect() {
 
@@ -199,6 +205,10 @@ public class SpotifyService implements IService {
         }
     }
 
+    public void changeLocation(String location) {
+        String speakerId = getSpeakerIdFromLocation(location);
+        changeDevice(speakerId);
+    }
 
     public void changeDevice(String speakerID) {
         JSONArray device = new JSONArray();

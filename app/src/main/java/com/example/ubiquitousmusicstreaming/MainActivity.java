@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private String[] determineDevice(String location) {
+    private String determineDevice(String location) {
         String speakerName = locationDeviceName.get(location);
         if(speakerName == null) {
             Toast.makeText(this, "Vælg hvilken højtaler, der hører til " + location, Toast.LENGTH_LONG).show();
@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Højtaleren " + speakerName + " er ikke tilgængelig.", Toast.LENGTH_LONG).show();
             return null;
         }
-        return new String[]{speakerName, speakerId};
+        return speakerName;
     }
 
     public void initializeSettings() {
@@ -194,15 +194,15 @@ public class MainActivity extends AppCompatActivity {
                     boolean needForChangingLocation = locationClass.needToChangeLocation(location, currentLocation);
 
                     if (needForChangingLocation) {
-                        String[] device = determineDevice(location);
+                        String deviceName = determineDevice(location);
 
-                        if (device != null) {
+                        if (deviceName != null) {
                             playing = true;
                             previousLocation = currentLocation;
                             currentLocation = location;
                             locationFragment.setTextView(currentLocation);
-                            playingSpeaker = device[0];
-                            service.changeDevice(device[1]);
+                            playingSpeaker = deviceName;
+                            service.changeLocation(currentLocation);
 
                             if (!previousLocation.equals("")) { locationFragment.updateButtonChangeDevice(true); }
                         }
@@ -270,18 +270,17 @@ public class MainActivity extends AppCompatActivity {
     public void changeToPreviousLocation() {
         if (previousLocation.equals("")) { return; }
 
-        String[] device = determineDevice(previousLocation);
+        String deviceName = determineDevice(previousLocation);
 
-        if (device != null) {
+        if (deviceName != null) {
             playing = true;
             currentLocation = previousLocation;
             previousLocation = "";
             locationClass.setPreviousLocation(previousLocation);
             locationFragment.setTextView(currentLocation);
             locationFragment.updateButtonChangeDevice(true);
-            playingSpeaker = device[0];
-            service.changeDevice(device[1]);
-
+            playingSpeaker = deviceName;
+            service.changeLocation(previousLocation);
         }
     }
     public String getCurrentLocation() { return currentLocation; }
