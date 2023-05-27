@@ -9,9 +9,11 @@ public interface IService {
     void connect();
     void disconnect();
     void handleAuthorizationResponse(int resultCode, Intent intent);
+    void handleRequest(String request);
+    void stopService();
+    void changeRoom(String location);
     void changeDevice(String deviceID);
     void updateActiveDevice();
-    void handleRequest(String request);
     List<Device> getAvailableDevices();
     Hashtable<String, String> getDeviceNameId();
     void changeActivationOfDevice();

@@ -199,6 +199,7 @@ public class SpotifyService implements IService {
         }
     }
 
+
     public void changeDevice(String speakerID) {
         JSONArray device = new JSONArray();
         device.put(speakerID);
@@ -292,6 +293,12 @@ public class SpotifyService implements IService {
         });
     }
 
+    public void stopService() {
+        spotifyAppRemote
+                .getPlayerApi()
+                .pause();
+    }
+
     public void handleRequest(String request) {
         switch (request) {
             case "next":
@@ -304,18 +311,11 @@ public class SpotifyService implements IService {
                         .getPlayerApi()
                         .skipPrevious();
                 break;
-            case "play":
-                spotifyAppRemote
-                        .getPlayerApi()
-                        .resume();
-                break;
-            case "pause":
-                spotifyAppRemote
-                        .getPlayerApi()
-                        .pause();
-                break;
         }
     }
+
+
+
     public List<Device> getAvailableDevices() { return devices; }
     public Hashtable<String, String> getDeviceNameId() { return speakerNameId; }
 }

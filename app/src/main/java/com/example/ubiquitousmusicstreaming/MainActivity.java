@@ -186,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
 
             if (location != null) {
                 if (location.equals("outside")) {
-                    handleRequestDevice("pause");
+                    service.stopService();
                     currentLocation = "";
                     locationFragment.setTextView(currentLocation);
                     playing = false;
@@ -230,15 +230,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startScan() { wifiManager.startScan(); }
-    public void handleRequestDevice(String request) {
-        service.handleRequest(request);
-
-        if ("pause".equals(request)) {
-            setPlaying(false);
-        }
-        setPlaying(true);
-    }
-    public void setPlaying(Boolean playing) {this.playing = playing; }
     public Hashtable<String, String> getLocationDeviceName() { return locationDeviceName; }
 
     /**
@@ -302,6 +293,10 @@ public class MainActivity extends AppCompatActivity {
      */
     public void attachMusicFragment(MusicFragment musicFragment) { this.musicFragment = musicFragment; }
     public void changeActivationOfDevice() { service.changeActivationOfDevice(); }
+    public void handleRequestDevice(String request) {
+        service.handleRequest(request);
+        playing = true;
+    }
     public void updateActiveDevice() {service.updateActiveDevice();}
     public String getTrackName() { return trackName; }
     public String getArtistName() { return artistName; }
