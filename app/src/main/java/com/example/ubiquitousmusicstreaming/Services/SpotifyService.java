@@ -35,7 +35,7 @@ public class SpotifyService implements IService {
 
     private final MainActivity mainActivity;
     private Call mCall;
-    private final OkHttpClient mOkHttpClient = new OkHttpClient();
+    private final OkHttpClient mOkHttpClient;
     private static List<Device> devices = new ArrayList<>();
     private static final String CLIENT_ID = "6e101d8a913048819b5af5e6ee372b59";
     private static final String REDIRECT_URI = "ubiquitousmusicstreaming-login://callback";
@@ -47,6 +47,7 @@ public class SpotifyService implements IService {
 
     public SpotifyService(MainActivity mainActivity) {
         this.mainActivity = mainActivity;
+        this.mOkHttpClient = new OkHttpClient();
         connect();
     }
 
@@ -87,7 +88,6 @@ public class SpotifyService implements IService {
                 .get()
                 .build();
 
-        cancelCall();
         mCall = mOkHttpClient.newCall(request);
 
         mCall.enqueue(new Callback() {
@@ -98,7 +98,7 @@ public class SpotifyService implements IService {
             }
             @Override
             public void onResponse(Call call, Response response) {
-                if (response.code() == 200) {
+                if (response.isSuccessful()) {
                     Gson gson = new Gson();
                     try {
                         JsonObject json = gson.fromJson(response.body().string(), JsonObject.class);
@@ -111,13 +111,20 @@ public class SpotifyService implements IService {
                         }
                         devices = tmpDevices;
                         updateSpeakerNameId();
-
+                        response.close();
+                        cancelCall();
                     } catch (IOException e) {
+                        e.printStackTrace();
+                        response.close();
+                        cancelCall();
                         refreshSpeakers();
-                        throw new RuntimeException(e);
                     }
                 }
-                else { refreshSpeakers(); }
+                else {
+                    response.close();
+                    cancelCall();
+                    refreshSpeakers();
+                }
             }
         });
     }
@@ -171,7 +178,7 @@ public class SpotifyService implements IService {
             }
 
             @Override
-            public void onFailure(Throwable throwable) { }
+            public void onFailure(Throwable throwable) { throwable.printStackTrace(); }
         });
     }
 
@@ -185,13 +192,8 @@ public class SpotifyService implements IService {
     public void handleAuthorizationResponse(int resultCode, Intent intent) {
         AuthorizationResponse response = AuthorizationClient.getResponse(resultCode, intent);
 
-        switch (response.getType()) {
-            case TOKEN:
-                accessToken = response.getAccessToken();
-                break;
-            case ERROR:
-                break;
-            default:
+        if (response.getType() == AuthorizationResponse.Type.TOKEN) {
+            accessToken = response.getAccessToken();
         }
     }
 
@@ -204,7 +206,8 @@ public class SpotifyService implements IService {
             body.put("device_ids", device);
             body.put("play", true);
         } catch (JSONException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            return;
         }
 
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
@@ -216,15 +219,14 @@ public class SpotifyService implements IService {
                 .addHeader("Authorization","Bearer " + accessToken)
                 .build();
 
-        cancelCall();
         mCall = mOkHttpClient.newCall(request);
 
         mCall.enqueue(new Callback() {
 
             @Override
-            public void onFailure(Call call, IOException e) { e.printStackTrace(); }
+            public void onFailure(Call call, IOException e) { e.printStackTrace(); cancelCall(); }
             @Override
-            public void onResponse(Call call, Response response) { }
+            public void onResponse(Call call, Response response) { response.close(); cancelCall(); }
         });
     }
 
@@ -256,14 +258,13 @@ public class SpotifyService implements IService {
                 .addHeader("Authorization","Bearer " + accessToken)
                 .build();
 
-        cancelCall();
         mCall = mOkHttpClient.newCall(request);
         mCall.enqueue(new Callback() {
             @Override
-            public void onFailure(Call call, IOException e) { e.printStackTrace(); }
+            public void onFailure(Call call, IOException e) { e.printStackTrace(); cancelCall(); }
             @Override
             public void onResponse(Call call, Response response) {
-                if (response.code() == 200) {
+                if (response.isSuccessful()) {
                     Gson gson = new Gson();
                     try {
                         JsonObject json = gson.fromJson(response.body().string(), JsonObject.class);
@@ -277,10 +278,14 @@ public class SpotifyService implements IService {
                             }
                         }
                     } catch (IOException e) {
+                        e.printStackTrace();
+                        response.close();
+                        cancelCall();
                         refreshSpeakers();
-                        throw new RuntimeException(e);
                     }
                 }
+                response.close();
+                cancelCall();
             }
         });
     }

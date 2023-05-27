@@ -51,47 +51,75 @@ public class FileSystem implements IFileSystem {
         if (!settingFile.exists()) {
             return null;
         }
+        FileInputStream fileInputStream = null;
+        ObjectInputStream objectInputStream = null;
         try {
-            FileInputStream fileInputStream = context.openFileInput("Setting");
-            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+            fileInputStream = context.openFileInput("Setting");
+            objectInputStream = new ObjectInputStream(fileInputStream);
             Settings settings = (Settings) objectInputStream.readObject();
-            objectInputStream.close();
-            fileInputStream.close();
             Log.d(TAG, "Object read from file");
             return settings;
         } catch (IOException | ClassNotFoundException e) {
             Log.e(TAG, "Error reading object from file", e);
             return null;
+        } finally {
+            if (fileInputStream != null) {
+                try {
+                    fileInputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (objectInputStream != null) {
+                try {
+                    objectInputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
     public void storeSettings(Settings settings) {
+        FileOutputStream fileOutputStream = null;
+        ObjectOutputStream objectOutputStream = null;
         try {
-            FileOutputStream fileOutputStream = context.openFileOutput("Setting", Context.MODE_PRIVATE);
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+            fileOutputStream = context.openFileOutput("Setting", Context.MODE_PRIVATE);
+            objectOutputStream = new ObjectOutputStream(fileOutputStream);
             objectOutputStream.writeObject(settings);
-            objectOutputStream.close();
-            fileOutputStream.close();
             Log.d(TAG, "Object written to file");
         } catch (IOException e) {
             Log.e(TAG, "Error writing object to file", e);
+        } finally {
+            if(fileOutputStream != null) {
+                try {
+                    fileOutputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if(objectOutputStream != null) {
+                try {
+                    objectOutputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
     public void makeFile(String fileName) {
-        FileOutputStream fos = null;
+        FileOutputStream fileOutputStream = null;
         try {
-            fos = context.openFileOutput(fileName, MODE_PRIVATE);
-            fos.write("WIFI DATA \n\n\n".getBytes());
+            fileOutputStream = context.openFileOutput(fileName, MODE_PRIVATE);
+            fileOutputStream.write("WIFI DATA \n\n\n".getBytes());
             Toast.makeText(context, "Fil oprettet med navn: " + fileName, Toast.LENGTH_LONG).show();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            if(fos != null) {
+            if(fileOutputStream != null) {
                 try {
-                    fos.close();
+                    fileOutputStream.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -100,78 +128,21 @@ public class FileSystem implements IFileSystem {
     }
 
     public void writeToFile(String data, String fileName) {
-        FileOutputStream fos = null;
-
+        FileOutputStream fileOutputStream = null;
         try {
-            fos = context.openFileOutput(fileName, MODE_APPEND);
-            fos.write(data.getBytes());
+            fileOutputStream = context.openFileOutput(fileName, MODE_APPEND);
+            fileOutputStream.write(data.getBytes());
             Toast.makeText(context, "Data tilføjet til: " + fileName, Toast.LENGTH_LONG).show();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            if(fos != null) {
+            if(fileOutputStream != null) {
                 try {
-                    fos.close();
+                    fileOutputStream.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }
     }
-
-    /*
-    public static Settings loadSettings(View v) {
-        Settings settings = null;
-        try {
-            FileInputStream fileInputStream = new FileInputStream(new File("Settings"));
-            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-            settings = (Settings) objectInputStream.readObject();
-            objectInputStream.close();
-            fileInputStream.close();
-            // Do something with the loaded settings object
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return settings;
-
-     */
-        /*
-        if (settings == null) {
-            // Failed to load settings from file
-            return;
-        }
-
-
-
-        FileInputStream fis = null;
-
-        try {
-            fis = mainActivity.openFileInput(fileName);
-            InputStreamReader isr = new InputStreamReader(fis);
-            BufferedReader br = new BufferedReader(isr);
-            StringBuilder sb = new StringBuilder();
-            String text;
-
-            while((text = br.readLine()) != null) {
-                sb.append(text).append("\n");
-            }
-            textViewStopScanning.setText(sb.toString());
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (fis != null) {
-                try {
-                    fis.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-         */
-
 }

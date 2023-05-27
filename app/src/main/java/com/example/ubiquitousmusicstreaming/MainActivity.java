@@ -24,7 +24,6 @@ import com.example.ubiquitousmusicstreaming.Location.Location;
 import com.example.ubiquitousmusicstreaming.Models.Device;
 import com.example.ubiquitousmusicstreaming.Services.IService;
 import com.example.ubiquitousmusicstreaming.Services.SpotifyService;
-import com.example.ubiquitousmusicstreaming.ui.configurationUI.ConfigurationFragment;
 import com.example.ubiquitousmusicstreaming.ui.locationUI.LocationFragment;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -36,7 +35,6 @@ import androidx.navigation.ui.NavigationUI;
 import com.example.ubiquitousmusicstreaming.databinding.ActivityMainBinding;
 import com.example.ubiquitousmusicstreaming.ui.musicUI.MusicFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
