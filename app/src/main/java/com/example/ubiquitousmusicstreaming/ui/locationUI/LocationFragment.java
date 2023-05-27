@@ -18,9 +18,9 @@ public class LocationFragment extends Fragment {
 
     private FragmentLocationBinding binding;
     private TextView txtViewInUse, txtViewLocation, txtViewRoom, txtViewSpeaker;
-    private Button buttonInUse, buttonStop;
+    private Button buttonInUse, buttonStop, buttonChangeDeviceBack;
     private Boolean inUse = false;
-    private String playingLocation = "";
+    private String playingLocation = "", previousPlayingLocation = "";
     private Hashtable<String, String> locationSpeakerName = new Hashtable<>();
     private MainActivity mainActivity;
     private View root;
@@ -30,11 +30,11 @@ public class LocationFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
 
         setupBindings(inflater, container);
+        updateButtonChangeDevice(false);
         setupFromMainActivity();
         updateTextView();
         updateLocationSpeakerTextView();
         txtViewLocation.setText(mainActivity.getCurrentLocation());
-        // txtViewLocation.setText(mainActivity.getLastLocationFragmentTextView());
 
         buttonInUse.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,10 +57,17 @@ public class LocationFragment extends Fragment {
                 mainActivity.setInUse(false);
                 playingLocation = "";
                 mainActivity.setCurrentLocation(playingLocation);
-                // mainActivity.setLastLocationFragmentTextView("");
                 txtViewLocation.setText(playingLocation);
                 updateTextView();
                 updateButtonsTrackingActive(false);
+            }
+        });
+
+        buttonChangeDeviceBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mainActivity.changeToPreviousLocation();
+                buttonChangeDeviceBack.setEnabled(false);
             }
         });
         return root;
@@ -80,6 +87,7 @@ public class LocationFragment extends Fragment {
         txtViewLocation = binding.textLocation;
         buttonInUse = binding.btnUseSystem;
         buttonStop = binding.btnStopSystem;
+        buttonChangeDeviceBack = binding.btnChangeDeviceBack;
         txtViewRoom = binding.textRoom;
         txtViewSpeaker = binding.textSpeaker;
     }
@@ -88,6 +96,8 @@ public class LocationFragment extends Fragment {
         mainActivity = (MainActivity) getParentFragment().getActivity();
         inUse = mainActivity.getInUseTracking();
         playingLocation = mainActivity.getCurrentLocation();
+        previousPlayingLocation = mainActivity.getPreviousLocation();
+        if (!previousPlayingLocation.equals("")) { buttonChangeDeviceBack.setEnabled(true); }
         locationSpeakerName = mainActivity.getLocationDeviceName();
     }
 
@@ -124,5 +134,6 @@ public class LocationFragment extends Fragment {
         txtViewSpeaker.setText(speakerTextView.toString());
     }
 
-    public void SetTextView(String text) { txtViewLocation.setText(text); }
+    public void setTextView(String text) { txtViewLocation.setText(text); }
+    public void updateButtonChangeDevice(Boolean enabled) { buttonChangeDeviceBack.setEnabled(enabled); }
 }

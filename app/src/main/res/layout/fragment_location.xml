@@ -69,6 +69,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="75dp"
+            android:layout_marginBottom="75dp"
             android:orientation="horizontal"
             android:gravity="center_horizontal">
 
@@ -123,5 +124,13 @@
                     android:textColor="@color/textOnBackground"/>
             </LinearLayout>
         </LinearLayout>
+        <Button
+            android:id="@+id/btnChangeDeviceBack"
+            style="@style/Widget.Cat.Button.Small"
+            android:layout_width="131dp"
+            android:layout_height="wrap_content"
+            android:filterTouchesWhenObscured="false"
+            android:state_focused="false"
+            android:text="@string/changeDeviceBack" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

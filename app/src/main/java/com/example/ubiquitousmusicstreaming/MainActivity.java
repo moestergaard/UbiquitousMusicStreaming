@@ -50,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
     private Boolean inUseTracking = false, inUseDataCollection = false;
     private String[] locations;
     private String fileName = "";
-    private String lastLocationFragmentTextView = "";
     private IService service;
     private Hashtable<String, String> locationDeviceName = new Hashtable<>();
     private String trackName;
@@ -60,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private String roomCurrentlyScanning;
     private String playingSpeaker = "";
     private List<ScanResult> scanResult;
-    private String currentLocation;
+    private String currentLocation = "", previousLocation = "";
     private ILocation locationClass;
     private IConfiguration configurationClass;
 
@@ -193,8 +192,8 @@ public class MainActivity extends AppCompatActivity {
             if (location != null) {
                 if (location.equals("outside")) {
                     handleRequestDevice("pause");
-                    lastLocationFragmentTextView = "";
-                    locationFragment.SetTextView(lastLocationFragmentTextView);
+                    currentLocation = "";
+                    locationFragment.setTextView(currentLocation);
                     playing = false;
                 } else {
                     boolean needForChangingLocation = locationClass.needToChangeLocation(location, currentLocation);
@@ -203,12 +202,14 @@ public class MainActivity extends AppCompatActivity {
                         String[] device = determineDevice(location);
 
                         if (device != null) {
+                            playing = true;
+                            previousLocation = currentLocation;
+                            currentLocation = location;
+                            locationFragment.setTextView(currentLocation);
                             playingSpeaker = device[0];
                             service.changeDevice(device[1]);
-                            playing = true;
-                            lastLocationFragmentTextView = location;
-                            locationFragment.SetTextView(lastLocationFragmentTextView);
-                            currentLocation = location;
+
+                            if (!previousLocation.equals("")) { locationFragment.updateButtonChangeDevice(true); }
                         }
                     }
                 }
@@ -280,7 +281,25 @@ public class MainActivity extends AppCompatActivity {
     public void attachLocationFragment(LocationFragment locationFragment) { this.locationFragment = locationFragment; }
     public void setCurrentLocation(String currentLocation) { this.currentLocation = currentLocation; }
     public void setInUse(Boolean bool) { inUseTracking = bool; }
+    public void changeToPreviousLocation() {
+        if (previousLocation.equals("")) { return; }
+
+        String[] device = determineDevice(previousLocation);
+
+        if (device != null) {
+            playing = true;
+            currentLocation = previousLocation;
+            previousLocation = "";
+            locationClass.setPreviousLocation(previousLocation);
+            locationFragment.setTextView(currentLocation);
+            locationFragment.updateButtonChangeDevice(true);
+            playingSpeaker = device[0];
+            service.changeDevice(device[1]);
+
+        }
+    }
     public String getCurrentLocation() { return currentLocation; }
+    public String getPreviousLocation() { return previousLocation; }
     public Boolean getInUseTracking() { return inUseTracking; }
 
     /**

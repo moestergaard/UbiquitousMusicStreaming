@@ -25,7 +25,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.time.LocalDateTime;
-import com.example.ubiquitousmusicstreaming.Settings;
 
 public class ConfigurationFragment extends Fragment {
 

@@ -37,6 +37,8 @@ public class Location implements ILocation{
         return sameLocationAsPrevious && !alreadyChosenLocation;
     }
 
+    public void setPreviousLocation(String location) { previousLocation = location; }
+
     private Boolean checkIfOutsideArea(List<ScanResult> scanResults) {
         double[] location = dataManagementNN.getPrediction(scanResults);
 

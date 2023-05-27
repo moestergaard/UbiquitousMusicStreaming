@@ -20,6 +20,7 @@
     <!-- Location Fragment -->
     <string name="activateTracking">Aktiver\nsporing</string>
     <string name="deactivateTracking">Deaktiver sporing</string>
+    <string name="changeDeviceBack">Fortryd skift af højtaler</string>
     <string name="rooms">Rum</string>
     <string name="speakers">Højtalere</string>
 </resources>

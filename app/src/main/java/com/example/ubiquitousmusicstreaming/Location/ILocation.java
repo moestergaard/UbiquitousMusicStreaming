@@ -6,4 +6,5 @@ import java.util.List;
 public interface ILocation {
     String determineLocation(List<ScanResult> scanResults);
     Boolean needToChangeLocation(String location, String currentLocation);
+    void setPreviousLocation(String location);
 }
