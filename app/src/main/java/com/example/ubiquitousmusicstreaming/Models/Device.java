@@ -1,6 +1,7 @@
 package com.example.ubiquitousmusicstreaming.Models;
 
 public class Device {
+
     private String id;
     private boolean isActive;
     private boolean isPrivateSession;

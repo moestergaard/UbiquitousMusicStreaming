@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import com.example.ubiquitousmusicstreaming.MainActivity;
@@ -20,7 +19,7 @@ public class LocationFragment extends Fragment {
     private TextView txtViewInUse, txtViewLocation, txtViewRoom, txtViewSpeaker;
     private Button buttonInUse, buttonStop, buttonChangeDeviceBack;
     private Boolean inUse = false;
-    private String playingLocation = "", previousPlayingLocation = "";
+    private String playingLocation = "";
     private Hashtable<String, String> locationSpeakerName = new Hashtable<>();
     private MainActivity mainActivity;
     private View root;
@@ -36,39 +35,31 @@ public class LocationFragment extends Fragment {
         updateLocationSpeakerTextView();
         txtViewLocation.setText(mainActivity.getCurrentLocation());
 
-        buttonInUse.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                inUse = true;
+        buttonInUse.setOnClickListener(view -> {
+            inUse = true;
 
-                mainActivity.attachLocationFragment(LocationFragment.this);
-                mainActivity.setInUse(true);
-                mainActivity.startScan();
+            mainActivity.attachLocationFragment(LocationFragment.this);
+            mainActivity.setInUse(true);
+            mainActivity.startScan();
 
-                updateTextView();
-                updateButtonsTrackingActive(true);
-            }
+            updateTextView();
+            updateButtonsTrackingActive(true);
         });
 
-        buttonStop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                inUse = false;
-                mainActivity.setInUse(false);
-                playingLocation = "";
-                mainActivity.setCurrentLocation(playingLocation);
-                txtViewLocation.setText(playingLocation);
-                updateTextView();
-                updateButtonsTrackingActive(false);
-            }
+        buttonStop.setOnClickListener(view -> {
+            inUse = false;
+            mainActivity.setInUse(false);
+            playingLocation = "";
+            mainActivity.setCurrentLocation(playingLocation);
+            txtViewLocation.setText(playingLocation);
+            updateTextView();
+            updateButtonsTrackingActive(false);
+            updateButtonChangeDevice(false);
         });
 
-        buttonChangeDeviceBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mainActivity.changeToPreviousLocation();
-                buttonChangeDeviceBack.setEnabled(false);
-            }
+        buttonChangeDeviceBack.setOnClickListener(view -> {
+            mainActivity.changeToPreviousLocation();
+            buttonChangeDeviceBack.setEnabled(false);
         });
         return root;
     }
@@ -93,10 +84,12 @@ public class LocationFragment extends Fragment {
     }
 
     private void setupFromMainActivity() {
+        assert getParentFragment() != null;
         mainActivity = (MainActivity) getParentFragment().getActivity();
+        assert mainActivity != null;
         inUse = mainActivity.getInUseTracking();
         playingLocation = mainActivity.getCurrentLocation();
-        previousPlayingLocation = mainActivity.getPreviousLocation();
+        String previousPlayingLocation = mainActivity.getPreviousLocation();
         if (!previousPlayingLocation.equals("")) { buttonChangeDeviceBack.setEnabled(true); }
         locationSpeakerName = mainActivity.getLocationDeviceName();
     }

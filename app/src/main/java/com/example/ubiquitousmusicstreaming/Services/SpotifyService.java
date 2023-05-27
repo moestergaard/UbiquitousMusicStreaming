@@ -36,12 +36,12 @@ public class SpotifyService implements IService {
     private final MainActivity mainActivity;
     private Call mCall;
     private final OkHttpClient mOkHttpClient;
-    private static List<Device> devices = new ArrayList<>();
-    private static final String CLIENT_ID = "6e101d8a913048819b5af5e6ee372b59";
-    private static final String REDIRECT_URI = "ubiquitousmusicstreaming-login://callback";
-    private static SpotifyAppRemote spotifyAppRemote;
+    private List<Device> devices = new ArrayList<>();
+    private final String CLIENT_ID = "6e101d8a913048819b5af5e6ee372b59";
+    private final String REDIRECT_URI = "ubiquitousmusicstreaming-login://callback";
+    private SpotifyAppRemote spotifyAppRemote;
     private String accessToken;
-    private final Hashtable<String, String> speakerNameId = new Hashtable<String, String>();
+    private Hashtable<String, String> speakerNameId = new Hashtable<String, String>();
     private Boolean playing;
     private String playingSpeaker = "";
 
@@ -70,7 +70,7 @@ public class SpotifyService implements IService {
             ImageUri coverImage = track.imageUri;
             playing = !playerState.isPaused;
 
-            updateMainActivity(trackName, artistName, coverImage, playing);
+            updateMainActivity(trackName, artistName, coverImage);
         });
     }
 
@@ -141,7 +141,7 @@ public class SpotifyService implements IService {
         }
     }
 
-    private void updateMainActivity(String trackName, String artistName, ImageUri coverImage, Boolean playing)
+    private void updateMainActivity(String trackName, String artistName, ImageUri coverImage)
     {
         updateCoverImage(coverImage);
         mainActivity.updateTrackInformation(trackName, artistName);

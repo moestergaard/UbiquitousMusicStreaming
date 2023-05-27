@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.Manifest;
 import android.view.Window;
 import android.widget.Toast;
-
 import com.example.ubiquitousmusicstreaming.Configuration.Configuration;
 import com.example.ubiquitousmusicstreaming.Configuration.IConfiguration;
 import com.example.ubiquitousmusicstreaming.DataManagement.DataManagementNN;
@@ -34,7 +33,6 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import com.example.ubiquitousmusicstreaming.databinding.ActivityMainBinding;
 import com.example.ubiquitousmusicstreaming.ui.musicUI.MusicFragment;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
@@ -58,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
     private Boolean playing;
     private String roomCurrentlyScanning;
     private String playingSpeaker = "";
-    private List<ScanResult> scanResult;
     private String currentLocation = "", previousLocation = "";
     private ILocation locationClass;
     private IConfiguration configurationClass;
@@ -83,7 +80,6 @@ public class MainActivity extends AppCompatActivity {
     private void setupView() {
         com.example.ubiquitousmusicstreaming.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        BottomNavigationView navView = findViewById(R.id.nav_view);
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_music, R.id.navigation_location, R.id.navigation_configuration)
                 .build();
@@ -127,8 +123,7 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            } else {
+            if (!(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.ACCESS_FINE_LOCATION)) {
                     Toast.makeText(this, "Det er nødvendigt at give adgang til placering for at bruge denne service, da det giver adgang til nødvendige Wi-Fi informationer.", Toast.LENGTH_LONG).show();
                     ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
@@ -177,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void update() {
         if(inUseDataCollection) {
-            scanResult = wifiReceiver.getScanResult();
+            List<ScanResult> scanResult = wifiReceiver.getScanResult();
             configurationClass.update(scanResult, inUseDataCollection, roomCurrentlyScanning);
         } else if (inUseTracking) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {

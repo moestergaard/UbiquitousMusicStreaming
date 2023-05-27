@@ -1,10 +1,7 @@
 package com.example.ubiquitousmusicstreaming.FileSystem;
 
-import android.view.View;
-
 import com.example.ubiquitousmusicstreaming.Settings;
 
-import java.io.File;
 
 public interface IFileSystem {
     void createSettingFile();

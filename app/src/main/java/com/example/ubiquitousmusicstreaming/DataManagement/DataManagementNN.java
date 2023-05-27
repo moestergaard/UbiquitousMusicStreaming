@@ -78,9 +78,8 @@ public class DataManagementNN implements IDataManagement {
 
     public double[] getPrediction(List<ScanResult> scanResult) {
         double[] newDataPoint = getNewDataPoint(scanResult);
-        double[] predictedLocation = getLocation(newDataPoint);
 
-        return predictedLocation;
+        return getLocation(newDataPoint);
     }
 }
 

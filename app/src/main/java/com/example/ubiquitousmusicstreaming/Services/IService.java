@@ -1,7 +1,6 @@
 package com.example.ubiquitousmusicstreaming.Services;
 
 import android.content.Intent;
-import androidx.fragment.app.Fragment;
 import com.example.ubiquitousmusicstreaming.Models.Device;
 import java.util.Hashtable;
 import java.util.List;

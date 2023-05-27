@@ -3,16 +3,12 @@ package com.example.ubiquitousmusicstreaming.FileSystem;
 import static android.content.ContentValues.TAG;
 import static android.content.Context.MODE_APPEND;
 import static android.content.Context.MODE_PRIVATE;
-
 import android.content.Context;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
-
 import com.example.ubiquitousmusicstreaming.Settings;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;

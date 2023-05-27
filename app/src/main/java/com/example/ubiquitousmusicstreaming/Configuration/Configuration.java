@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Configuration implements IConfiguration{
 
-    private MainActivity mainActivity;
+    private final MainActivity mainActivity;
     private String lastScanResults = "";
 
     public Configuration(MainActivity mainActivity) {
@@ -22,7 +22,7 @@ public class Configuration implements IConfiguration{
         }
         else {
             String resultElse = makeScanResultString(scanResults, roomCurrentlyScanning);
-            Boolean newAndLastScanAreEqual = !lastScanResults.equals(resultElse);
+            boolean newAndLastScanAreEqual = !lastScanResults.equals(resultElse);
             if(newAndLastScanAreEqual) {
                 mainActivity.writeToFile(resultElse);
             }
@@ -36,16 +36,16 @@ public class Configuration implements IConfiguration{
 
     private String makeScanResultString(List<ScanResult> scanResults, String roomCurrentlyScanning) {
 
-        String scanResultString = "Scanning: " + roomCurrentlyScanning + "\n\n";
+        StringBuilder scanResultString = new StringBuilder("Scanning: " + roomCurrentlyScanning + "\n\n");
 
         for (ScanResult result : scanResults) {
-            scanResultString += "SSID: " + result.SSID + "\n";
-            scanResultString += "BSSID: " + result.BSSID + "\n";
-            scanResultString += "ResultLevel: " + result.level + "\n";
-            scanResultString += "Frequency: " + result.frequency + "\n";
-            scanResultString += "Timestamp: " + result.timestamp + "\n\n\n";
+            scanResultString.append("SSID: ").append(result.SSID).append("\n");
+            scanResultString.append("BSSID: ").append(result.BSSID).append("\n");
+            scanResultString.append("ResultLevel: ").append(result.level).append("\n");
+            scanResultString.append("Frequency: ").append(result.frequency).append("\n");
+            scanResultString.append("Timestamp: ").append(result.timestamp).append("\n\n\n");
         }
-        scanResultString += "************** \n\n";
-        return scanResultString;
+        scanResultString.append("************** \n\n");
+        return scanResultString.toString();
     }
 }
