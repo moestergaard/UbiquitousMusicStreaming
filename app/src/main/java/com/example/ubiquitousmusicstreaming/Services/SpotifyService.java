@@ -162,11 +162,13 @@ public class SpotifyService implements IService {
     private void updateMainActivitySpeaker() { mainActivity.updateSpeaker(playingSpeaker); }
 
     public void connect() {
-        SpotifyAppRemote.connect(mainActivity, new ConnectionParams.Builder(CLIENT_ID)
+
+        ConnectionParams connectionParams = new ConnectionParams.Builder(CLIENT_ID)
                 .setRedirectUri(REDIRECT_URI)
                 .showAuthView(true)
-                .build(), new Connector.ConnectionListener() {
+                .build();
 
+        SpotifyAppRemote.connect(mainActivity, connectionParams, new Connector.ConnectionListener() {
             @Override
             public void onConnected(SpotifyAppRemote _spotifyAppRemote) {
                 spotifyAppRemote = _spotifyAppRemote;
