@@ -134,7 +134,7 @@ public class ConfigurationFragment extends Fragment {
             public void onClick(View view) {
                 if(!chosenDeviceUniqueName.equals("") && !chosenRoom.equals("")) {
                     changeLocationDeviceName();
-                    addLocationDeviceNameToSettings();
+                    mainActivity.addLocationDeviceNameToSettings(locationDeviceName);
                     mainActivity.updateLocationDeviceName(locationDeviceName);
                     Toast.makeText(mainActivity, "Rum: " + chosenRoom + "\nHøjtaler: " + chosenDeviceReadableName, Toast.LENGTH_LONG).show();
                 }
@@ -168,9 +168,8 @@ public class ConfigurationFragment extends Fragment {
 
     private void setupFromMainActivity() {
         mainActivity = (MainActivity) getParentFragment().getActivity();
-        mainActivity.attachConfigurationFragment(this);
 
-        locations = mainActivity.getLocation();
+        locations = mainActivity.getLocations();
         room = mainActivity.getRoomCurrentlyScanning();
         locationDeviceName = mainActivity.getLocationDeviceName();
         fileName = mainActivity.getFileName();
@@ -197,14 +196,6 @@ public class ConfigurationFragment extends Fragment {
             textViewRoom.setText(displayStartScanning + room);
             updateButtonsScanningActive(true);
         }
-    }
-
-    private void addLocationDeviceNameToSettings() {
-        Settings settings = mainActivity.getSettings();
-        if (settings != null) {
-            settings.setLocationSpeakerName(locationDeviceName);
-        }
-        mainActivity.storeSettings(settings);
     }
 
     private void setupDeviceRoomSelection(Spinner spinDevices, Spinner spinRoom) {

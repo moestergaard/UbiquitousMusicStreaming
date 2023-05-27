@@ -47,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
     private static WifiReceiver wifiReceiver;
     private IFileSystem fileSystem;
     private WifiManager wifiManager;
-    private ConfigurationFragment configurationFragment;
     private LocationFragment locationFragment;
     private MusicFragment musicFragment;
     private Boolean inUseTracking = false, inUseDataCollection = false;
@@ -55,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private String fileName = "";
     private String lastLocationFragmentTextView = "";
     private IService service;
-    private Hashtable<String, String> locationSpeakerName = new Hashtable<>();
+    private Hashtable<String, String> locationDeviceName = new Hashtable<>();
     private String trackName;
     private String artistName;
     private Bitmap coverImage;
@@ -144,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String[] determineDevice(String location) {
-        String speakerName = locationSpeakerName.get(location);
+        String speakerName = locationDeviceName.get(location);
         if(speakerName == null) {
             Toast.makeText(this, "Vælg hvilken højtaler, der hører til " + location, Toast.LENGTH_LONG).show();
             return null;
@@ -171,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
             if (fileName != null) {
                 this.fileName = fileName;
             }
-            locationSpeakerName = settings.getLocationSpeakerName();
+            locationDeviceName = settings.getLocationSpeakerName();
             String[] settingLocations = settings.getLocations();
             if (settingLocations != null) {
                 locations = settingLocations;
@@ -181,10 +180,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void update() {
         if(inUseDataCollection) {
-            if(configurationFragment != null) {
-                scanResult = wifiReceiver.getScanResult();
-                configurationClass.update(scanResult, inUseDataCollection, roomCurrentlyScanning);
-            }
+            scanResult = wifiReceiver.getScanResult();
+            configurationClass.update(scanResult, inUseDataCollection, roomCurrentlyScanning);
         } else if (inUseTracking) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "Det er nødvendigt at give adgang til placering for at bruge denne service, da det giver adgang til nødvendige Wi-Fi informationer.", Toast.LENGTH_LONG).show();
@@ -248,28 +245,32 @@ public class MainActivity extends AppCompatActivity {
         setPlaying(true);
     }
     public void setPlaying(Boolean playing) {this.playing = playing; }
-    public Hashtable<String, String> getLocationDeviceName() { return locationSpeakerName; }
+    public Hashtable<String, String> getLocationDeviceName() { return locationDeviceName; }
 
     /**
      * Configuration fragment
      */
-    public void attachConfigurationFragment(ConfigurationFragment configurationFragment) { this.configurationFragment = configurationFragment; }
-    public void clearScanResult() { wifiReceiver.clearScanResult(); }
-    public void updateLocationDeviceName(Hashtable<String, String> _locationSpeakerName) {
-        locationSpeakerName = _locationSpeakerName;
+    public void updateLocationDeviceName(Hashtable<String, String> _locationDeviceName) {
+        locationDeviceName = _locationDeviceName;
     }
-    public void makeFile(String fileName) { fileSystem.makeFile(fileName); }
     public void storeSettings(Settings settings) { fileSystem.storeSettings(settings); }
     public void addLocationToSettings(String location) {
         Settings settingsOld = getSettings();
         Settings settingsUpdated = addLocationToSettings(location, settingsOld);
         storeSettings(settingsUpdated);
     }
+    public void addLocationDeviceNameToSettings(Hashtable<String, String> locationDeviceName) {
+            Settings settings = getSettings();
+            if (settings != null) {
+                settings.setLocationSpeakerName(locationDeviceName);
+            }
+            storeSettings(settings);
+    }
     public void setInUseDataCollection(Boolean bool) { inUseDataCollection = bool; }
     public void setRoomCurrentlyScanning(String roomCurrentlyScanning) { this.roomCurrentlyScanning = roomCurrentlyScanning; }
     public void setLocations(String[] locations) { this.locations = locations; }
     public String getFileName() { return fileName; }
-    public String[] getLocation() { return locations; }
+    public String[] getLocations() { return locations; }
     public String getRoomCurrentlyScanning() { return roomCurrentlyScanning; }
     public Boolean getInUseDataCollection() { return inUseDataCollection; }
     public List<Device> getAvailableDevices() { return service.getAvailableDevices(); }
@@ -281,10 +282,7 @@ public class MainActivity extends AppCompatActivity {
     public void attachLocationFragment(LocationFragment locationFragment) { this.locationFragment = locationFragment; }
     public void setCurrentLocation(String currentLocation) { this.currentLocation = currentLocation; }
     public void setInUse(Boolean bool) { inUseTracking = bool; }
-    // SE OGSÅ PÅ DENNE HER!!!!
-    public void setLastLocationFragmentTextView(String lastLocation) { lastLocationFragmentTextView = lastLocation; }
-    // SE PÅ DENNE HER!!! MÅSKE KAN CURRENTLOCATION BRUGES
-    public String getLastLocationFragmentTextView() { return lastLocationFragmentTextView; }
+    public String getCurrentLocation() { return currentLocation; }
     public Boolean getInUseTracking() { return inUseTracking; }
 
     /**
@@ -329,5 +327,6 @@ public class MainActivity extends AppCompatActivity {
     public void writeToFile(String data) {
         fileSystem.writeToFile(data, fileName);
     }
-
+    public void clearScanResult() { wifiReceiver.clearScanResult(); }
+    public void makeFile(String fileName) { fileSystem.makeFile(fileName); }
 }
