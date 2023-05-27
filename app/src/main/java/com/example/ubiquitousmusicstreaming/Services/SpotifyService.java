@@ -158,7 +158,7 @@ public class SpotifyService implements IService {
                         });
     }
 
-    private void updateMainActivityPlaying() { mainActivity.updatePlaying(playing); }
+    private void updateMainActivityPlaying() { mainActivity.updatePlayingNow(playing); }
     private void updateMainActivitySpeaker() { mainActivity.updateSpeaker(playingSpeaker); }
     private String getSpeakerIdFromLocation(String location) {
         Hashtable<String, String> locationDeviceName = mainActivity.getLocationDeviceName();

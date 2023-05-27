@@ -37,7 +37,7 @@ public class MusicFragment extends Fragment {
         updateTrackInformationMainActivity();
 
         Boolean playing = mainActivity.getPlaying();
-        updatePlaying(playing);
+        updatePlayingNow(playing);
         mainActivity.updateActiveDevice();
 
         playPauseButton.setOnClickListener(view -> mainActivity.changeActivationOfDevice());
@@ -89,7 +89,7 @@ public class MusicFragment extends Fragment {
         }
     }
 
-    public void updatePlaying(Boolean playing) {
+    public void updatePlayingNow(Boolean playing) {
         if (playing != null)
         {
             if (playing)

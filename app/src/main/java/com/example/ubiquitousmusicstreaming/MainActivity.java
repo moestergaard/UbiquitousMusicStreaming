@@ -150,6 +150,32 @@ public class MainActivity extends AppCompatActivity {
         return speakerName;
     }
 
+    private void updatePlayingLocation(String location, String deviceName) {
+        playing = true;
+        previousLocation = currentLocation;
+        currentLocation = location;
+        locationFragment.setTextView(currentLocation);
+        playingSpeaker = deviceName;
+        service.changeLocation(currentLocation);
+
+    }
+
+    private Settings addLocationToSettings(String room, Settings settings) {
+        if (settings != null) {
+            String[] locations = settings.getLocations();
+            String[] newLocations;
+            if (locations != null) {
+                newLocations = Arrays.copyOf(locations, locations.length + 1);
+            } else {
+                newLocations = new String[1];
+            }
+
+            newLocations[newLocations.length - 1] = room;
+            settings.setLocations(newLocations);
+        }
+        return settings;
+    }
+
     public void initializeSettings() {
         Settings settings = fileSystem.loadSettings();
 
@@ -174,7 +200,8 @@ public class MainActivity extends AppCompatActivity {
         if(inUseDataCollection) {
             List<ScanResult> scanResult = wifiReceiver.getScanResult();
             configurationClass.update(scanResult, inUseDataCollection, roomCurrentlyScanning);
-        } else if (inUseTracking) {
+            return;
+        } if (inUseTracking) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "Det er nødvendigt at give adgang til placering for at bruge denne service, da det giver adgang til nødvendige Wi-Fi informationer.", Toast.LENGTH_LONG).show();
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
@@ -190,43 +217,22 @@ public class MainActivity extends AppCompatActivity {
                     currentLocation = "";
                     locationFragment.setTextView(currentLocation);
                     playing = false;
-                } else {
-                    boolean needForChangingLocation = locationClass.needToChangeLocation(location, currentLocation);
+                    return;
+                }
 
-                    if (needForChangingLocation) {
-                        String deviceName = determineDevice(location);
+                boolean needForChangingLocation = locationClass.needToChangeLocation(location, currentLocation);
 
-                        if (deviceName != null) {
-                            playing = true;
-                            previousLocation = currentLocation;
-                            currentLocation = location;
-                            locationFragment.setTextView(currentLocation);
-                            playingSpeaker = deviceName;
-                            service.changeLocation(currentLocation);
+                if (needForChangingLocation) {
+                    String deviceName = determineDevice(location);
 
-                            if (!previousLocation.equals("")) { locationFragment.updateButtonChangeDevice(true); }
-                        }
+                    if (deviceName != null) {
+                        updatePlayingLocation(location, deviceName);
+                        if (!previousLocation.equals("")) { locationFragment.updateButtonChangeDevice(true); }
                     }
                 }
             }
             startScan();
         }
-    }
-
-    private Settings addLocationToSettings(String room, Settings settings) {
-        if (settings != null) {
-            String[] locations = settings.getLocations();
-            String[] newLocations;
-            if (locations != null) {
-                newLocations = Arrays.copyOf(locations, locations.length + 1);
-            } else {
-                newLocations = new String[1];
-            }
-
-            newLocations[newLocations.length - 1] = room;
-            settings.setLocations(newLocations);
-        }
-        return settings;
     }
 
     public void startScan() { wifiManager.startScan(); }
@@ -306,9 +312,9 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Spotify Service
      */
-    public void updatePlaying(Boolean playing) {
+    public void updatePlayingNow(Boolean playing) {
         this.playing = playing;
-        musicFragment.updatePlaying(this.playing);
+        musicFragment.updatePlayingNow(this.playing);
     }
 
     public void updateSpeaker(String playingSpeaker) {
