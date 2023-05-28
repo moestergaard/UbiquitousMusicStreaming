@@ -2,18 +2,32 @@ package com.example.ubiquitousmusicstreaming.DataManagement;
 
 import android.content.Context;
 import com.example.ubiquitousmusicstreaming.Models.LongStrings;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import java.io.BufferedReader;
 import android.net.wifi.ScanResult;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import libsvm.*;
 import java.io.File;
 import java.io.FileReader;
+import java.util.ListIterator;
 
 import org.json.simple.parser.ParseException;
 
@@ -27,6 +41,12 @@ public class DataManagementSVM implements IDataManagement {
     private double[][] trainingSamples;
     private double[] trainingLabels;
     private Context context;
+
+    // List<double[]> supportVectors;
+    List<double[]> coefficients;
+    List<Double> intercepts;
+    List<Double> classes;
+    private double gamma = 0.000013703956890699743;
 
     public DataManagementSVM(Context context) {
 
@@ -42,8 +62,11 @@ public class DataManagementSVM implements IDataManagement {
         trainingLabels = generateLabels(labelsString);
         // model = trainModel(trainingSamples, trainingLabels);
 
+        loadModelFromFile("svm_model2.json");
+
+        /*
         try {
-            model = loadModel("svm_model1.json");
+            // model = loadModel("svm_model1.json");
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (ParseException e) {
@@ -51,6 +74,8 @@ public class DataManagementSVM implements IDataManagement {
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
+
+         */
 
         // getModel();
         // model = loadModel("svm_model.libsvm");
@@ -61,7 +86,7 @@ public class DataManagementSVM implements IDataManagement {
 
     public double[] getPrediction(List<ScanResult> scanResult) {
         double[] newDataPoint = getNewDataPoint(scanResult);
-        double prediction = predict(newDataPoint);
+        double prediction = predictClass(newDataPoint);
 
         return new double[]{prediction};
     }
@@ -73,7 +98,8 @@ public class DataManagementSVM implements IDataManagement {
         int i = 0;
         int correct = 0;
         for (double[] newDataPoint : arrayTestPoints) {
-            int result = predict(newDataPoint);
+            // int result = predict(newDataPoint);
+            int result = (int) predictClass(newDataPoint);
             if (result == (int) arrayTestLabels[i]) {correct += 1;}
             System.out.println("Result: " + result + " Correct: " + (int) arrayTestLabels[i]);
             System.out.println(newDataPoint[0]);
@@ -85,6 +111,257 @@ public class DataManagementSVM implements IDataManagement {
         System.out.println("Correct: " + correct);
         System.out.println("Total: " + arrayTestLabels.length);
     }
+
+    public double predictClass(double[] newDataPoint) {
+        double maxScore = Double.NEGATIVE_INFINITY;
+        double predictedClass = Double.NaN;
+
+        for (int i = 0; i < classes.size(); i++) {
+            double intercept = intercepts.get(i);
+            double[] coef = coefficients.get(i);
+
+            double score = intercept;
+
+            for (int j = 0; j < coef.length; j++) {
+                score += coef[j] * newDataPoint[j];
+            }
+
+            if (score > maxScore) {
+                maxScore = score;
+                predictedClass = classes.get(i);
+            }
+        }
+
+        return predictedClass;
+    }
+
+
+
+
+    private void loadModelFromFile(String filePath) {
+        File file = new File(context.getFilesDir(), filePath);
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+            StringBuilder jsonDataBuilder = new StringBuilder();
+            String line = reader.readLine();
+            while (line != null) {
+                jsonDataBuilder.append(line);
+                line = reader.readLine();
+            }
+
+            String jsonData = jsonDataBuilder.toString();
+
+            JSONTokener tokener = new JSONTokener(jsonData);
+            JSONObject data = new JSONObject(tokener);
+
+            JSONArray interceptsArray = data.getJSONArray("intercepts");
+            intercepts = new ArrayList<>();
+            for (int i = 0; i < interceptsArray.length(); i++) {
+                intercepts.add(interceptsArray.getDouble(i));
+            }
+
+            JSONArray classArray = data.getJSONArray("classIndices");
+            classes = new ArrayList<>();
+            for (int i = 0; i < classArray.length(); i++) {
+                classes.add(classArray.getDouble(i));
+            }
+
+            /*
+            // Set the support vectors and coefficients of the model
+            JSONArray supportVectorsJson = data.getJSONArray("support_vectors");
+            supportVectors = new ArrayList<>();
+            for (int i = 0; i < supportVectorsJson.length(); i++) {
+                JSONArray supportVectorJson = supportVectorsJson.getJSONArray(i);
+                double[] supportVector = new double[supportVectorJson.length()];
+                for (int j = 0; j < supportVectorJson.length(); j++) {
+                    supportVector[j] = supportVectorJson.getDouble(j);
+                }
+                supportVectors.add(supportVector);
+            }
+
+             */
+
+            JSONArray coefficientsJson = data.getJSONArray("coefficients");
+            coefficients = new ArrayList<>();
+            for (int i = 0; i < coefficientsJson.length(); i++) {
+                JSONArray coefficientJson = coefficientsJson.getJSONArray(i);
+                double[] coefficient = new double[coefficientJson.length()];
+                for (int j = 0; j < coefficientJson.length(); j++) {
+                    coefficient[j] = coefficientJson.getDouble(j);
+                }
+                coefficients.add(coefficient);
+            }
+        } catch (FileNotFoundException ex) {
+            throw new RuntimeException(ex);
+        } catch (JSONException ex) {
+            throw new RuntimeException(ex);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+
+    /*
+    private void loadModelFromFile2(String filePath) {
+        File file = new File(context.getFilesDir(), filePath);
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+            String jsonData = "";
+            String line = reader.readLine();
+            while (line != null) {
+                jsonData += line;
+                line = reader.readLine();
+            }
+
+
+            JSONTokener tokener = new JSONTokener(jsonData);
+            JSONObject data = new JSONObject(tokener);
+
+
+            JSONArray rhoArray = data.getJSONArray("rho");
+            intercepts = new double[rhoArray.length()];
+            for (int i = 0; i < rhoArray.length(); i++) {
+                intercepts[i] = rhoArray.getDouble(i);
+            }
+
+            // Set the support vectors and coefficients of the model
+            JSONArray supportVectorsJson = data.getJSONArray("support_vectors");
+            supportVectors = new double[supportVectorsJson.length()][];
+            for (int i = 0; i < supportVectorsJson.length(); i++) {
+                JSONArray supportVectorJson = supportVectorsJson.getJSONArray(i);
+                double[] supportVector = new double[supportVectorJson.length()];
+                for (int j = 0; j < supportVectorJson.length(); j++) {
+                    supportVector[j] = supportVectorJson.getDouble(j);
+                }
+                supportVectors[i] = supportVector;
+            }
+
+            JSONArray coefficientsJson = data.getJSONArray("coefficients");
+            coefficients = new double[coefficientsJson.length()][];
+            for (int i = 0; i < coefficientsJson.length(); i++) {
+                JSONArray coefficientJson = coefficientsJson.getJSONArray(i);
+                double[] coefficient = new double[coefficientJson.length()];
+                for (int j = 0; j < coefficientJson.length(); j++) {
+                    coefficient[j] = coefficientJson.getDouble(j);
+                }
+                coefficients[i] = coefficient;
+            }
+        } catch (FileNotFoundException ex) {
+            throw new RuntimeException(ex);
+        } catch (JSONException ex) {
+            throw new RuntimeException(ex);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+     */
+    /*
+        try (FileReader fileReader = new FileReader(filePath)) {
+            JsonParser jsonParser = new JsonParser();
+            JsonObject jsonObject = jsonParser.parse(fileReader).getAsJsonObject();
+
+            JsonObject supportVectorsObject = jsonObject.getAsJsonObject("support_vectors");
+            supportVectors = new Gson().fromJson(supportVectorsObject, double[][].class);
+
+            JsonObject coefficientsObject = jsonObject.getAsJsonObject("coefficients");
+            coefficients = new Gson().fromJson(coefficientsObject, double[][].class);
+
+            intercepts = new Gson().fromJson(jsonObject.getAsJsonArray("rho"), double[].class);
+
+            // Assign the loaded values to the variables
+            // supportVectors, coefficients, intercepts
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+     */
+    /*
+    public double predictClass(double[] newDataPoint) {
+        double maxScore = Double.NEGATIVE_INFINITY;
+        double predictedClass = Double.NaN;
+
+        for (int i = 0; i < classes.size(); i++) {
+            double intercept = intercepts.get(i);
+            double[] coefficients = this.coefficients.get(i);
+
+            double score = intercept;
+
+            for (int j = 0; j < supportVectors.size(); j++) {
+                double[] supportVector = supportVectors.get(j);
+                double distance = calculateRbfKernelDistance(supportVector, newDataPoint);
+                score += coefficients[j] * distance;
+            }
+
+            if (score > maxScore) {
+                maxScore = score;
+                predictedClass = classes.get(i);
+            }
+        }
+
+        return predictedClass;
+    }
+
+     */
+
+    /*
+    private double calculateRbfKernelDistance(double[] vector1, double[] vector2) {
+        double distanceSquared = calculateEuclideanDistance(vector1, vector2);
+        double distance = Math.exp(-gamma * distanceSquared);
+        return distance;
+    }
+
+    private double calculateEuclideanDistance(double[] vector1, double[] vector2) {
+        if (vector1.length != vector2.length) {
+            throw new IllegalArgumentException("Vector dimensions do not match");
+        }
+
+        double distanceSquared = 0.0;
+
+        for (int i = 0; i < vector1.length; i++) {
+            double diff = vector1[i] - vector2[i];
+            distanceSquared += diff * diff;
+        }
+
+        return Math.sqrt(distanceSquared);
+    }
+
+     */
+
+    /*
+    private int predictClass2(double[] sample) {
+        double maxDistance = Double.NEGATIVE_INFINITY;
+        int predictedClass = -1;
+
+        for (int classIndex = 0; classIndex < intercepts.length; classIndex++) {
+            double distance = 0.0;
+
+            for (int i = 0; i < supportVectors.length; i++) {
+                double dotProduct = 0.0;
+                for (int j = 0; j < supportVectors[i].length; j++) {
+                    dotProduct += supportVectors[i][j] * sample[j];
+                }
+                distance += dotProduct * coefficients[classIndex][i];
+            }
+
+            distance += intercepts[classIndex];
+
+            if (distance > maxDistance) {
+                maxDistance = distance;
+                predictedClass = classIndex;
+            }
+        }
+
+        return predictedClass;
+    }
+
+     */
+
 
 
     private svm_model loadModel(String filename) throws IOException, org.json.simple.parser.ParseException, JSONException {
