@@ -51,21 +51,24 @@ public class DataManagementSVM implements IDataManagement {
         testSamples = longStrings.getTestSamples();
         testLabels = longStrings.getTestLabels();
 
-        loadModel("svm_model4.json");
+        model = loadModel("svm_model4.json");
 
         testMethod();
     }
 
     public double[] getPrediction(List<ScanResult> scanResult) {
         double[] newDataPoint = getNewDataPoint(scanResult);
+
+        System.out.println(newDataPoint.toString());
+
         double prediction = predict(newDataPoint);
+
+        System.out.println("Prediction: " + prediction);
 
         return new double[]{prediction};
     }
 
-
-
-    public static double predict(svm_model model, double[] datapoint) {
+    public double predict(svm_model model, double[] datapoint) {
         svm_node[] nodes = new svm_node[datapoint.length];
 
         for (int i = 0; i < datapoint.length; i++) {
@@ -82,7 +85,8 @@ public class DataManagementSVM implements IDataManagement {
         svm_model model = null;
         try {
             File file = new File(context.getFilesDir(), filePath);
-            ObjectInputStream inputStream = new ObjectInputStream(Files.newInputStream(file.toPath()));
+            ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file));
+            // ObjectInputStream inputStream = new ObjectInputStream(Files.newInputStream(file.toPath()));
             model = (svm_model) inputStream.readObject();
             inputStream.close();
         } catch (IOException | ClassNotFoundException e) {

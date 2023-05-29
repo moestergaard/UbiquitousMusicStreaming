@@ -74,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
 
         setupVariables();
         setupView();
-
     }
 
     private void setupView() {
