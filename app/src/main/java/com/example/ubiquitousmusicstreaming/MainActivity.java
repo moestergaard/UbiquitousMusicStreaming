@@ -328,12 +328,13 @@ public class MainActivity extends AppCompatActivity {
     public void updatePlayingNow(Boolean playing) {
         this.playing = playing;
         musicFragment.updatePlayingNow(this.playing);
-        locationFragment.setTextView(currentLocation);
+        // locationFragment.setTextView(currentLocation);
     }
 
     public void updateSpeaker(String playingSpeaker) {
         this.playingSpeaker = playingSpeaker;
         musicFragment.updatePlayingSpeaker(this.playingSpeaker);
+        locationFragment.setTextView(currentLocation);
     }
 
     public void updateTrackInformation(String trackName, String artistName) {

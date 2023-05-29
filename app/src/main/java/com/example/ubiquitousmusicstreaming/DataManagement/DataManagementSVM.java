@@ -38,22 +38,19 @@ import org.json.simple.parser.ParseException;
 public class DataManagementSVM implements IDataManagement {
     private svm_model model;
     private final String[] distinctBSSID;
-    private final String testSamples;
-    private final String testLabels;
     private final Context context;
+    private LongStrings longStrings;
 
 
     public DataManagementSVM(Context context) {
 
         this.context = context;
-        LongStrings longStrings = new LongStrings();
+        longStrings = new LongStrings();
         distinctBSSID = longStrings.getDistinctBSSID();
-        testSamples = longStrings.getTestSamples();
-        testLabels = longStrings.getTestLabels();
 
-        model = loadModel("svm_model4.json");
+        model = loadModel("svm_model8.json");
 
-        testMethod();
+        // testMethod();
     }
 
     public double[] getPrediction(List<ScanResult> scanResult) {
@@ -154,6 +151,9 @@ public class DataManagementSVM implements IDataManagement {
     }
 
     private void testMethod() {
+        String testSamples = longStrings.getTestSamples();
+        String testLabels = longStrings.getTestLabels();
+
         double[] arrayTestLabels = generateLabels(testLabels);
         List<double[]> arrayTestPoints = parseArrays(testSamples);
 
