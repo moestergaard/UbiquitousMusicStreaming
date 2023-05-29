@@ -153,10 +153,9 @@ public class MainActivity extends AppCompatActivity {
         playing = true;
         previousLocation = currentLocation;
         currentLocation = location;
-        locationFragment.setTextView(currentLocation);
+        locationFragment.setTextView(location);
         playingSpeaker = deviceName;
         service.changeLocation(currentLocation);
-
     }
 
     private Settings addLocationToSettings(String room, Settings settings) {
@@ -212,7 +211,6 @@ public class MainActivity extends AppCompatActivity {
                 if (location.equals("outside")) {
                     service.stopService();
                     currentLocation = "";
-                    locationFragment.setTextView(currentLocation);
                     playing = false;
                     startScan();
                     return;
@@ -297,12 +295,11 @@ public class MainActivity extends AppCompatActivity {
         if (deviceName != null) {
             playing = true;
             currentLocation = previousLocation;
-            previousLocation = "";
             locationClass.setPreviousLocation(previousLocation);
-            locationFragment.setTextView(currentLocation);
             locationFragment.updateButtonChangeDevice(true);
             playingSpeaker = deviceName;
             service.changeLocation(previousLocation);
+            previousLocation = "";
         }
     }
     public String getCurrentLocation() { return currentLocation; }
@@ -331,6 +328,7 @@ public class MainActivity extends AppCompatActivity {
     public void updatePlayingNow(Boolean playing) {
         this.playing = playing;
         musicFragment.updatePlayingNow(this.playing);
+        locationFragment.setTextView(currentLocation);
     }
 
     public void updateSpeaker(String playingSpeaker) {
