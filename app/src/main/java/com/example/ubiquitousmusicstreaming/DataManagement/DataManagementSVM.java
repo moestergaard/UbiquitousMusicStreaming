@@ -59,8 +59,6 @@ public class DataManagementSVM implements IDataManagement {
     public double[] getPrediction(List<ScanResult> scanResult) {
         double[] newDataPoint = getNewDataPoint(scanResult);
 
-        System.out.println(newDataPoint.toString());
-
         double prediction = predict(newDataPoint);
 
         System.out.println("Prediction: " + prediction);

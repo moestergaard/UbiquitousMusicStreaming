@@ -216,6 +216,7 @@ public class MainActivity extends AppCompatActivity {
                     currentLocation = "";
                     locationFragment.setTextView(currentLocation);
                     playing = false;
+                    startScan();
                     return;
                 }
 
