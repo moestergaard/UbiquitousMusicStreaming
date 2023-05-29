@@ -179,9 +179,7 @@ public class MainActivity extends AppCompatActivity {
         Settings settings = fileSystem.loadSettings();
 
         if (settings == null) {
-            fileSystem.createSettingFile();
-            Settings newSettings = new Settings();
-            fileSystem.storeSettings(newSettings);
+            makeNewSettings();
         } else {
             String fileName = settings.getFileName();
             if (fileName != null) {
@@ -236,6 +234,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startScan() { wifiManager.startScan(); }
+    public void makeNewSettings() {
+        fileSystem.createSettingFile();
+        Settings newSettings = new Settings();
+        fileSystem.storeSettings(newSettings);
+    }
     public Hashtable<String, String> getLocationDeviceName() { return locationDeviceName; }
 
     /**
@@ -256,6 +259,14 @@ public class MainActivity extends AppCompatActivity {
                 settings.setLocationSpeakerName(locationDeviceName);
             }
             storeSettings(settings);
+    }
+    public void makeFile(String fileName) { fileSystem.makeFile(fileName); }
+    public void setFileNameInSettings(String fileName) {
+        Settings settings = fileSystem.loadSettings();
+        if (settings != null) {
+            settings.setFileName(fileName);
+            fileSystem.storeSettings(settings);
+        }
     }
     public void setInUseDataCollection(Boolean bool) { inUseDataCollection = bool; }
     public void setRoomCurrentlyScanning(String roomCurrentlyScanning) { this.roomCurrentlyScanning = roomCurrentlyScanning; }
@@ -340,5 +351,4 @@ public class MainActivity extends AppCompatActivity {
         fileSystem.writeToFile(data, fileName);
     }
     public void clearScanResult() { wifiReceiver.clearScanResult(); }
-    public void makeFile(String fileName) { fileSystem.makeFile(fileName); }
 }

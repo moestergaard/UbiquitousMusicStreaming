@@ -46,8 +46,8 @@ public class ConfigurationFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-        setupFromMainActivity();
         setupBindings(inflater, container);
+        setupFromMainActivity();
         setupDeviceRoomSelection(spinDevices, spinRoom);
         updateTextViewDataFile();
         updateButtonsScanningActive(false);
@@ -96,15 +96,7 @@ public class ConfigurationFragment extends Fragment {
 
             builder.setPositiveButton("Ja", (dialog, which) -> {
                 fileName = LocalDateTime.now().toString() + ".txt";
-                updateTextViewDataFile();
-
-                mainActivity.makeFile(fileName);
-                mainActivity.initializeSettings();
-
-                locations = new String[]{};
-                locationDeviceName = new Hashtable<>();
-                devicesNameID = new Hashtable<>();
-                setupDeviceRoomSelection(spinDevices, spinRoom);
+                setupNewDataFile();
             });
 
             builder.setNegativeButton("Nej", (dialog, which) -> dialog.dismiss());
@@ -146,6 +138,20 @@ public class ConfigurationFragment extends Fragment {
         spinRoom = binding.spinnerRoom;
     }
 
+    private void setupNewDataFile() {
+        updateTextViewDataFile();
+
+        mainActivity.makeFile(fileName);
+        mainActivity.makeNewSettings();
+        mainActivity.setFileNameInSettings(fileName);
+        mainActivity.initializeSettings();
+
+        locations = new String[]{};
+        locationDeviceName = new Hashtable<>();
+        devicesNameID = new Hashtable<>();
+        setupDeviceRoomSelection(spinDevices, spinRoom);
+    }
+
     private void setupFromMainActivity() {
         assert getParentFragment() != null;
         mainActivity = (MainActivity) getParentFragment().getActivity();
@@ -155,7 +161,10 @@ public class ConfigurationFragment extends Fragment {
         room = mainActivity.getRoomCurrentlyScanning();
         locationDeviceName = mainActivity.getLocationDeviceName();
         fileName = mainActivity.getFileName();
-        if(fileName.equals("")) { fileName = LocalDateTime.now().toString() + ".txt"; }
+        if(fileName.equals("")) {
+            fileName = LocalDateTime.now().toString() + ".txt";
+            setupNewDataFile();
+        }
         if (mainActivity.getInUseDataCollection()) { mainActivity.startScan(); }
     }
 
