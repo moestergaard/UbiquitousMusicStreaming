@@ -8,6 +8,7 @@ import com.google.gson.JsonParser;
 
 import java.io.BufferedReader;
 import android.net.wifi.ScanResult;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,7 +18,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.io.IOException;
 import java.util.Arrays;
@@ -42,11 +45,9 @@ public class DataManagementSVM implements IDataManagement {
     private double[] trainingLabels;
     private Context context;
 
-    // List<double[]> supportVectors;
     List<double[]> coefficients;
     List<Double> intercepts;
     List<Double> classes;
-    private double gamma = 0.000013703956890699743;
 
     public DataManagementSVM(Context context) {
 
@@ -62,31 +63,15 @@ public class DataManagementSVM implements IDataManagement {
         trainingLabels = generateLabels(labelsString);
         // model = trainModel(trainingSamples, trainingLabels);
 
-        loadModelFromFile("svm_model2.json");
-
-        /*
-        try {
-            // model = loadModel("svm_model1.json");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
-
-         */
-
-        // getModel();
-        // model = loadModel("svm_model.libsvm");
-        // System.out.println(model);
+        loadModelFromFile("svm_model3.json");
 
         testMethod();
     }
 
     public double[] getPrediction(List<ScanResult> scanResult) {
         double[] newDataPoint = getNewDataPoint(scanResult);
-        double prediction = predictClass(newDataPoint);
+        // double prediction = predictClass(newDataPoint);
+        double prediction = predict(newDataPoint);
 
         return new double[]{prediction};
     }
@@ -94,14 +79,15 @@ public class DataManagementSVM implements IDataManagement {
     private void testMethod() {
         double[] arrayTestLabels = generateLabels(testLabels);
         List<double[]> arrayTestPoints = parseArrays(testSamples);
+        model = loadModel(context, "svm_model4.json");
 
         int i = 0;
         int correct = 0;
         for (double[] newDataPoint : arrayTestPoints) {
-            // int result = predict(newDataPoint);
-            int result = (int) predictClass(newDataPoint);
-            if (result == (int) arrayTestLabels[i]) {correct += 1;}
-            System.out.println("Result: " + result + " Correct: " + (int) arrayTestLabels[i]);
+            double result = predict(model, newDataPoint);
+            // int result = (int) predictClass(newDataPoint);
+            if (result == arrayTestLabels[i]) {correct += 1;}
+            System.out.println("Result: " + result + " Correct: " + arrayTestLabels[i]);
             System.out.println(newDataPoint[0]);
             System.out.println("i: " + i);
             i++;
@@ -111,6 +97,20 @@ public class DataManagementSVM implements IDataManagement {
         System.out.println("Correct: " + correct);
         System.out.println("Total: " + arrayTestLabels.length);
     }
+
+    public static double predict(svm_model model, double[] datapoint) {
+        svm_node[] nodes = new svm_node[datapoint.length];
+
+        for (int i = 0; i < datapoint.length; i++) {
+            svm_node node = new svm_node();
+            node.index = i + 1; // Index starts from 1 in LibSVM
+            node.value = datapoint[i];
+            nodes[i] = node;
+        }
+
+        return svm.svm_predict(model, nodes);
+    }
+
 
     public double predictClass(double[] newDataPoint) {
         double maxScore = Double.NEGATIVE_INFINITY;
@@ -135,7 +135,18 @@ public class DataManagementSVM implements IDataManagement {
         return predictedClass;
     }
 
-
+    public static svm_model loadModel(Context context, String filePath) {
+        svm_model model = null;
+        try {
+            File file = new File(context.getFilesDir(), filePath);
+            ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file));
+            model = (svm_model) inputStream.readObject();
+            inputStream.close();
+        } catch (IOException | ClassNotFoundException e) {
+            Log.e("SVM Model", "Error loading SVM model: " + e.getMessage());
+        }
+        return model;
+    }
 
 
     private void loadModelFromFile(String filePath) {
@@ -364,7 +375,7 @@ public class DataManagementSVM implements IDataManagement {
 
 
 
-    private svm_model loadModel(String filename) throws IOException, org.json.simple.parser.ParseException, JSONException {
+    private svm_model loadModel5(String filename) throws IOException, org.json.simple.parser.ParseException, JSONException {
         File file = new File(context.getFilesDir(), filename);
         BufferedReader reader = null;
         try {
@@ -514,6 +525,7 @@ public class DataManagementSVM implements IDataManagement {
         int predictedClass = (int) svm.svm_predict(model, nodes);
         return predictedClass;
     }
+
 
     private double[][] generateSample(String input) {
         // Remove all whitespace characters from the input string
