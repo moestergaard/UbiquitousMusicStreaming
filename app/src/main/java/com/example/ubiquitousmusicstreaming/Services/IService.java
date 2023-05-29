@@ -13,6 +13,7 @@ public interface IService {
     void stopService();
     void changeLocation(String location);
     void updateActiveDevice();
+    void updateAvailableDevices();
     List<Device> getAvailableDevices();
     Hashtable<String, String> getDeviceNameId();
     void changeActivationOfDevice();

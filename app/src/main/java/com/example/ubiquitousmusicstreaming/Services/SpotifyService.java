@@ -325,7 +325,7 @@ public class SpotifyService implements IService {
     }
 
 
-
+    public void updateAvailableDevices() { refreshSpeakers(); }
     public List<Device> getAvailableDevices() { return devices; }
     public Hashtable<String, String> getDeviceNameId() { return speakerNameId; }
 }

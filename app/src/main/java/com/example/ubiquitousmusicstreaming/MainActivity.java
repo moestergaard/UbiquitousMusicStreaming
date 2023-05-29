@@ -226,6 +226,8 @@ public class MainActivity extends AppCompatActivity {
                     if (deviceName != null) {
                         updatePlayingLocation(location, deviceName);
                         if (!previousLocation.equals("")) { locationFragment.updateButtonChangeDevice(true); }
+                    } else {
+                        updateDevices();
                     }
                 }
             }
@@ -238,6 +240,9 @@ public class MainActivity extends AppCompatActivity {
         fileSystem.createSettingFile();
         Settings newSettings = new Settings();
         fileSystem.storeSettings(newSettings);
+    }
+    private void updateDevices() {
+        service.updateAvailableDevices();
     }
     public Hashtable<String, String> getLocationDeviceName() { return locationDeviceName; }
 
