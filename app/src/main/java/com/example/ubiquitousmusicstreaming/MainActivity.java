@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
         return speakerName;
     }
 
-    private void updatePlayingLocation(String location, String deviceName) {
+    private void updateLocation(String location, String deviceName) {
         playing = true;
         previousLocation = currentLocation;
         currentLocation = location;
@@ -222,7 +222,7 @@ public class MainActivity extends AppCompatActivity {
                     String deviceName = determineDevice(location);
 
                     if (deviceName != null) {
-                        updatePlayingLocation(location, deviceName);
+                        updateLocation(location, deviceName);
                         if (!previousLocation.equals("")) { locationFragment.updateButtonChangeDevice(true); }
                     } else {
                         updateDevices();
