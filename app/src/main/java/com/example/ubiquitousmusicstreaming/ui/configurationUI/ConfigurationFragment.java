@@ -32,7 +32,7 @@ public class ConfigurationFragment extends Fragment {
     private MainActivity mainActivity;
     private EditText editTextRoom;
     private View root;
-    private Button buttonStartScanning, buttonStopScanning, buttonNewDataFile, buttonStoreDeviceRoom;
+    private Button buttonStartDataCollection, buttonStopDataCollection, buttonNewDataFile, buttonStoreDeviceRoom;
     private TextView textViewRoom, textViewDataFile;
     private Spinner spinDevices, spinRoom;
     private String room;
@@ -53,7 +53,7 @@ public class ConfigurationFragment extends Fragment {
         updateButtonsScanningActive(false);
         updateTextViewRoom(room);
 
-        buttonStartScanning.setOnClickListener(view -> {
+        buttonStartDataCollection.setOnClickListener(view -> {
             if (fileName != null) {
                 room = editTextRoom.getText().toString();
                 if (!room.isEmpty()) {
@@ -81,11 +81,10 @@ public class ConfigurationFragment extends Fragment {
             else { textViewRoom.setText("Lav en ny datafil først"); }
         });
 
-        buttonStopScanning.setOnClickListener(view -> {
+        buttonStopDataCollection.setOnClickListener(view -> {
             mainActivity.setInUseDataCollection(false);
             mainActivity.setRoomCurrentlyScanning(null);
-            String message = "Scanning stoppet for: ";
-            textViewRoom.setText(message + room);
+            textViewRoom.setText("Dataindsamling i " + room + " er stoppet.");
             updateButtonsScanningActive(false);
         });
 
@@ -128,8 +127,8 @@ public class ConfigurationFragment extends Fragment {
         root = binding.getRoot();
 
         editTextRoom = binding.editTextRoom;
-        buttonStartScanning = binding.btnStartScanning;
-        buttonStopScanning = binding.btnStopScanning;
+        buttonStartDataCollection = binding.btnStartDataCollection;
+        buttonStopDataCollection = binding.btnStopDataCollection;
         buttonNewDataFile = binding.btnNewFile;
         buttonStoreDeviceRoom = binding.btnStoreDeviceRoom;
         textViewRoom = binding.textRoom;
@@ -177,16 +176,15 @@ public class ConfigurationFragment extends Fragment {
     }
 
     private void updateButtonsScanningActive(Boolean activated) {
-        buttonStartScanning.setEnabled(!activated);
-        buttonStopScanning.setEnabled(activated);
+        buttonStartDataCollection.setEnabled(!activated);
+        buttonStopDataCollection.setEnabled(activated);
     }
 
     @SuppressLint("SetTextI18n")
     private void updateTextViewRoom(String room) {
         if (room != null)
         {
-            String displayStartScanning = "Scanning startet af: ";
-            textViewRoom.setText(displayStartScanning + room);
+            textViewRoom.setText("Dataindsamling i " + room + " er startet.");
             updateButtonsScanningActive(true);
         }
     }

@@ -71,21 +71,21 @@
                 android:gravity="center">
 
                 <Button
-                    android:id="@+id/btnStartScanning"
+                    android:id="@+id/btnStartDataCollection"
                     style="@style/Widget.Cat.Button.Small"
                     android:layout_width="131dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/startScanning" />
+                    android:text="@string/startDataCollection" />
 
                 <Button
-                    android:id="@+id/btnStopScanning"
+                    android:id="@+id/btnStopDataCollection"
                     android:layout_width="131dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:filterTouchesWhenObscured="false"
                     style="@style/Widget.Cat.Button.Small"
-                    android:text="@string/stopScanning" />
+                    android:text="@string/stopDataCollection" />
             </LinearLayout>
 
             <TextView

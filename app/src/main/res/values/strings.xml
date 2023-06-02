@@ -10,8 +10,8 @@
     <string name="firstStepExplanation">Lav en model til sporing ved at indsamle datapunkter. Dette gøres ved at indsamle i de ønskede rum et efter et. Indsaml i et rum ved at indtaste rummets navn og trykke start scanning. Gå derefter rundt i rummet uden at forlade denne side. Hvis der ønskes en ny model lav da en ny datafil og indsaml data på ny.</string>
     <string name="secondStepExplanation">Vælg den ønskede højtaler, og hvilket rum den hører til. Tryk derefter gem. Gør dette for alle højtalere.</string>
     <string name="nameOfRoom">Skriv rummets navn</string>
-    <string name="startScanning">Start Dataindsamling</string>
-    <string name="stopScanning">Stop Dataindsamling</string>
+    <string name="startDataCollection">Start Dataindsamling</string>
+    <string name="stopDataCollection">Stop Dataindsamling</string>
     <string name="newDataFile">Lav ny datafil</string>
     <string name="choseRoom">Vælg rum</string>
     <string name="choseSpeaker">Vælg højtaler</string>

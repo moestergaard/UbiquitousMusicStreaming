@@ -136,7 +136,10 @@ public class MainActivity extends AppCompatActivity {
     private String determineDevice(String location) {
         String speakerName = locationDeviceName.get(location);
         if(speakerName == null) {
-            Toast.makeText(this, "Vælg hvilken højtaler, der hører til " + location, Toast.LENGTH_LONG).show();
+            service.stopService();
+            playing = false;
+            updatePreviousCurrentLocation(location);
+            // Toast.makeText(this, "Vælg hvilken højtaler, der hører til " + location, Toast.LENGTH_LONG).show();
             return null;
         }
         Hashtable<String, String> speakerNameId = service.getDeviceNameId();
@@ -149,11 +152,15 @@ public class MainActivity extends AppCompatActivity {
         return speakerName;
     }
 
-    private void updateLocation(String location, String deviceName) {
-        playing = true;
+    private void updatePreviousCurrentLocation(String location) {
         previousLocation = currentLocation;
         currentLocation = location;
         locationFragment.setTextView(location);
+    }
+
+    private void updateLocation(String location, String deviceName) {
+        playing = true;
+        updatePreviousCurrentLocation(location);
         playingSpeaker = deviceName;
         service.changeLocation(currentLocation);
     }
