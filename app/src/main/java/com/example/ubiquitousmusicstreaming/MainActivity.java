@@ -133,24 +133,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private String determineDevice(String location) {
-        String speakerName = locationDeviceName.get(location);
-        if(speakerName == null) {
-            service.stopService();
-            playing = false;
-            updatePreviousCurrentLocation(location);
-            return null;
-        }
-        Hashtable<String, String> speakerNameId = service.getDeviceNameId();
-        String speakerId = speakerNameId.get(speakerName);
-
-        if (speakerId == null) {
-            Toast.makeText(this, "Højtaleren " + speakerName + " er ikke tilgængelig.", Toast.LENGTH_LONG).show();
-            return null;
-        }
-        return speakerName;
-    }
-
     private void updatePreviousCurrentLocation(String location) {
         previousLocation = currentLocation;
         currentLocation = location;
@@ -225,7 +207,6 @@ public class MainActivity extends AppCompatActivity {
                 boolean needForChangingLocation = locationClass.needToChangeLocation(location, currentLocation);
 
                 if (needForChangingLocation) {
-                    //String deviceName = determineDevice(location);
 
                     String deviceName = locationDeviceName.get(location);
                     if(deviceName == null) {
@@ -245,20 +226,9 @@ public class MainActivity extends AppCompatActivity {
                         startScan();
                         return;
                     }
-                    //return speakerName;
 
                     updateLocation(location, deviceName);
                     if (!previousLocation.equals("")) { locationFragment.updateButtonChangeDevice(true); }
-
-                    /*
-                    if (deviceName != null) {
-                        updateLocation(location, deviceName);
-                        if (!previousLocation.equals("")) { locationFragment.updateButtonChangeDevice(true); }
-                    } else {
-                        updateDevices();
-                    }
-
-                     */
                 }
             }
             startScan();
@@ -322,8 +292,6 @@ public class MainActivity extends AppCompatActivity {
     public void changeToPreviousLocation() {
         if (previousLocation.equals("")) { return; }
 
-        // String deviceName = determineDevice(previousLocation);
-
         String deviceName = locationDeviceName.get(previousLocation);
         if(deviceName == null) {
             service.stopService();
@@ -346,20 +314,6 @@ public class MainActivity extends AppCompatActivity {
         playingSpeaker = deviceName;
         service.changeLocation(previousLocation);
         previousLocation = "";
-
-        /*
-
-        if (deviceName != null) {
-            playing = true;
-            currentLocation = previousLocation;
-            locationClass.setPreviousLocation(previousLocation);
-            locationFragment.updateButtonChangeDevice(true);
-            playingSpeaker = deviceName;
-            service.changeLocation(previousLocation);
-            previousLocation = "";
-        }
-
-         */
     }
     public String getCurrentLocation() { return currentLocation; }
     public String getPreviousLocation() { return previousLocation; }
