@@ -2,38 +2,15 @@ package com.example.ubiquitousmusicstreaming.DataManagement;
 
 import android.content.Context;
 import com.example.ubiquitousmusicstreaming.Models.LongStrings;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
-import java.io.BufferedReader;
 import android.net.wifi.ScanResult;
 import android.util.Log;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
-
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.ObjectInputStream;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import libsvm.*;
 import java.io.File;
-import java.io.FileReader;
-import java.util.ListIterator;
-
-import org.json.simple.parser.ParseException;
 
 public class DataManagementSVM implements IDataManagement {
     private svm_model model;
@@ -49,7 +26,6 @@ public class DataManagementSVM implements IDataManagement {
         distinctBSSID = longStrings.getDistinctBSSID();
 
         model = loadModel("svm_model8.json");
-
         // testMethod();
     }
 
@@ -81,7 +57,6 @@ public class DataManagementSVM implements IDataManagement {
         try {
             File file = new File(context.getFilesDir(), filePath);
             ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file));
-            // ObjectInputStream inputStream = new ObjectInputStream(Files.newInputStream(file.toPath()));
             model = (svm_model) inputStream.readObject();
             inputStream.close();
         } catch (IOException | ClassNotFoundException e) {

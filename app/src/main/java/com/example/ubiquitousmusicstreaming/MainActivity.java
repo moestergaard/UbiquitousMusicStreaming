@@ -139,7 +139,6 @@ public class MainActivity extends AppCompatActivity {
             service.stopService();
             playing = false;
             updatePreviousCurrentLocation(location);
-            // Toast.makeText(this, "Vælg hvilken højtaler, der hører til " + location, Toast.LENGTH_LONG).show();
             return null;
         }
         Hashtable<String, String> speakerNameId = service.getDeviceNameId();
@@ -226,14 +225,40 @@ public class MainActivity extends AppCompatActivity {
                 boolean needForChangingLocation = locationClass.needToChangeLocation(location, currentLocation);
 
                 if (needForChangingLocation) {
-                    String deviceName = determineDevice(location);
+                    //String deviceName = determineDevice(location);
 
+                    String deviceName = locationDeviceName.get(location);
+                    if(deviceName == null) {
+                        updateDevices();
+                        service.stopService();
+                        playing = false;
+                        updatePreviousCurrentLocation(location);
+                        startScan();
+                        return;
+                    }
+                    Hashtable<String, String> deviceNameId = service.getDeviceNameId();
+                    String deviceId = deviceNameId.get(deviceName);
+
+                    if (deviceId == null) {
+                        updateDevices();
+                        Toast.makeText(this, "Højtaleren " + deviceName + " er ikke tilgængelig.", Toast.LENGTH_LONG).show();
+                        startScan();
+                        return;
+                    }
+                    //return speakerName;
+
+                    updateLocation(location, deviceName);
+                    if (!previousLocation.equals("")) { locationFragment.updateButtonChangeDevice(true); }
+
+                    /*
                     if (deviceName != null) {
                         updateLocation(location, deviceName);
                         if (!previousLocation.equals("")) { locationFragment.updateButtonChangeDevice(true); }
                     } else {
                         updateDevices();
                     }
+
+                     */
                 }
             }
             startScan();
@@ -297,7 +322,32 @@ public class MainActivity extends AppCompatActivity {
     public void changeToPreviousLocation() {
         if (previousLocation.equals("")) { return; }
 
-        String deviceName = determineDevice(previousLocation);
+        // String deviceName = determineDevice(previousLocation);
+
+        String deviceName = locationDeviceName.get(previousLocation);
+        if(deviceName == null) {
+            service.stopService();
+            playing = false;
+            updatePreviousCurrentLocation(previousLocation);
+            return;
+        }
+        Hashtable<String, String> deviceNameId = service.getDeviceNameId();
+        String deviceId = deviceNameId.get(deviceName);
+
+        if (deviceId == null) {
+            Toast.makeText(this, "Højtaleren " + deviceName + " er ikke tilgængelig.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        playing = true;
+        currentLocation = previousLocation;
+        locationClass.setPreviousLocation(previousLocation);
+        locationFragment.updateButtonChangeDevice(true);
+        playingSpeaker = deviceName;
+        service.changeLocation(previousLocation);
+        previousLocation = "";
+
+        /*
 
         if (deviceName != null) {
             playing = true;
@@ -308,6 +358,8 @@ public class MainActivity extends AppCompatActivity {
             service.changeLocation(previousLocation);
             previousLocation = "";
         }
+
+         */
     }
     public String getCurrentLocation() { return currentLocation; }
     public String getPreviousLocation() { return previousLocation; }
