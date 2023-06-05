@@ -239,7 +239,7 @@ public class SpotifyService implements IService {
             @Override
             public void onFailure(Call call, IOException e) { e.printStackTrace(); cancelCall(); }
             @Override
-            public void onResponse(Call call, Response response) { response.close(); cancelCall(); }
+            public void onResponse(Call call, Response response) { updateSpeakerNameId(); response.close(); cancelCall(); }
         });
     }
 

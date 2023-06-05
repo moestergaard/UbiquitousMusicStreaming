@@ -25,7 +25,7 @@ public class DataManagementSVM implements IDataManagement {
         longStrings = new LongStrings();
         distinctBSSID = longStrings.getDistinctBSSID();
 
-        model = loadModel("svm_model8.json");
+        model = loadModel("svm_model2.json");
         // testMethod();
     }
 

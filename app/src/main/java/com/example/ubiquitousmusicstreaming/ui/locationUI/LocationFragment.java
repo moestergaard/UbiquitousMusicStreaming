@@ -38,7 +38,6 @@ public class LocationFragment extends Fragment {
         buttonInUse.setOnClickListener(view -> {
             inUse = true;
 
-            mainActivity.attachLocationFragment(LocationFragment.this);
             mainActivity.setInUse(true);
             mainActivity.startScan();
 
@@ -87,6 +86,8 @@ public class LocationFragment extends Fragment {
         assert getParentFragment() != null;
         mainActivity = (MainActivity) getParentFragment().getActivity();
         assert mainActivity != null;
+        mainActivity.attachLocationFragment(this);
+
         inUse = mainActivity.getInUseTracking();
         playingLocation = mainActivity.getCurrentLocation();
         String previousPlayingLocation = mainActivity.getPreviousLocation();
@@ -127,6 +128,8 @@ public class LocationFragment extends Fragment {
         txtViewSpeaker.setText(speakerTextView.toString());
     }
 
-    public void setTextView(String text) { txtViewLocation.setText(text); }
+    public void setTextView(String text) {
+        mainActivity.runOnUiThread(() -> txtViewLocation.setText(text));
+    }
     public void updateButtonChangeDevice(Boolean enabled) { buttonChangeDeviceBack.setEnabled(enabled); }
 }

@@ -124,10 +124,12 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == REQUEST_CODE) {
             if (!(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    Toast.makeText(this, "Det er nødvendigt at give adgang til placering for at bruge denne service, da det giver adgang til nødvendige Wi-Fi informationer.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Det er nødvendigt at give adgang til placering for at bruge denne service.", Toast.LENGTH_LONG).show();
+                    // Toast.makeText(this, "Det er nødvendigt at give adgang til placering for at bruge denne service, da det giver adgang til nødvendige Wi-Fi informationer.", Toast.LENGTH_LONG).show();
                     ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
                 } else {
-                    Toast.makeText(this, "Det er nødvendigt at give adgang til placering for at bruge denne service, da det giver adgang til nødvendige Wi-Fi informationer.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Det er nødvendigt at give adgang til placering for at bruge denne service.", Toast.LENGTH_LONG).show();
+                    // Toast.makeText(this, "Det er nødvendigt at give adgang til placering for at bruge denne service, da det giver adgang til nødvendige Wi-Fi informationer.", Toast.LENGTH_LONG).show();
                 }
             }
         }
@@ -136,13 +138,15 @@ public class MainActivity extends AppCompatActivity {
     private void updatePreviousCurrentLocation(String location) {
         previousLocation = currentLocation;
         currentLocation = location;
-        locationFragment.setTextView(location);
+        // locationFragment.setTextView(location);
     }
 
     private void updateLocation(String location, String deviceName) {
         playing = true;
         updatePreviousCurrentLocation(location);
         playingSpeaker = deviceName;
+        musicFragment.updatePlayingSpeaker(deviceName);
+        locationFragment.setTextView(currentLocation);
         service.changeLocation(currentLocation);
     }
 
@@ -187,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         } if (inUseTracking) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Det er nødvendigt at give adgang til placering for at bruge denne service, da det giver adgang til nødvendige Wi-Fi informationer.", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Det er nødvendigt at give adgang til placering for at bruge denne service.", Toast.LENGTH_LONG).show();
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
                 return;
             }
@@ -312,6 +316,8 @@ public class MainActivity extends AppCompatActivity {
         locationClass.setPreviousLocation(previousLocation);
         locationFragment.updateButtonChangeDevice(true);
         playingSpeaker = deviceName;
+        locationFragment.setTextView(previousLocation);
+        musicFragment.updatePlayingSpeaker(deviceName);
         service.changeLocation(previousLocation);
         previousLocation = "";
     }
@@ -341,10 +347,10 @@ public class MainActivity extends AppCompatActivity {
     public void updatePlayingNow(Boolean playing) {
         this.playing = playing;
         musicFragment.updatePlayingNow(this.playing);
-        // locationFragment.setTextView(currentLocation);
     }
 
     public void updateSpeaker(String playingSpeaker) {
+        playing = true;
         this.playingSpeaker = playingSpeaker;
         musicFragment.updatePlayingSpeaker(this.playingSpeaker);
         locationFragment.setTextView(currentLocation);
