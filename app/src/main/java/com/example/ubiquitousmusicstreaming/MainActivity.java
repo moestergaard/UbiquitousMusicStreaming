@@ -125,11 +125,9 @@ public class MainActivity extends AppCompatActivity {
             if (!(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.ACCESS_FINE_LOCATION)) {
                     Toast.makeText(this, "Det er nødvendigt at give adgang til placering for at bruge denne service.", Toast.LENGTH_LONG).show();
-                    // Toast.makeText(this, "Det er nødvendigt at give adgang til placering for at bruge denne service, da det giver adgang til nødvendige Wi-Fi informationer.", Toast.LENGTH_LONG).show();
                     ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
                 } else {
                     Toast.makeText(this, "Det er nødvendigt at give adgang til placering for at bruge denne service.", Toast.LENGTH_LONG).show();
-                    // Toast.makeText(this, "Det er nødvendigt at give adgang til placering for at bruge denne service, da det giver adgang til nødvendige Wi-Fi informationer.", Toast.LENGTH_LONG).show();
                 }
             }
         }
@@ -138,7 +136,6 @@ public class MainActivity extends AppCompatActivity {
     private void updatePreviousCurrentLocation(String location) {
         previousLocation = currentLocation;
         currentLocation = location;
-        // locationFragment.setTextView(location);
     }
 
     private void updateLocation(String location, String deviceName) {
