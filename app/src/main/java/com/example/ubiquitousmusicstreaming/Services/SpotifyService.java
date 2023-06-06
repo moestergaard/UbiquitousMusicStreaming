@@ -143,18 +143,12 @@ public class SpotifyService implements IService {
 
     private void updateMainActivity(String trackName, String artistName, ImageUri coverImage)
     {
-        updateCoverImage(coverImage);
-        mainActivity.updateTrackInformation(trackName, artistName);
-        updateMainActivityPlaying();
-    }
-
-    private void updateCoverImage(ImageUri coverImage) {
         spotifyAppRemote
                 .getImagesApi()
                 .getImage(coverImage, Image.Dimension.LARGE)
                 .setResultCallback(
                         bitmap -> {
-                            mainActivity.updateCoverImage(bitmap);
+                            mainActivity.updateTrackInformation(trackName, artistName, bitmap, playing);
                         });
     }
 

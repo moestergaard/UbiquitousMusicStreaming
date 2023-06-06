@@ -353,15 +353,12 @@ public class MainActivity extends AppCompatActivity {
         locationFragment.setTextView(currentLocation);
     }
 
-    public void updateTrackInformation(String trackName, String artistName) {
+    public void updateTrackInformation(String trackName, String artistName, Bitmap image, Boolean playing) {
         this.trackName = trackName;
         this.artistName = artistName;
         musicFragment.updateTrackInformation(trackName, artistName);
-    }
-
-    public void updateCoverImage(Bitmap image) {
-        coverImage = image;
         musicFragment.updateCoverImage(image);
+        updatePlayingNow(playing);
     }
 
     /**
